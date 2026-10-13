@@ -20,17 +20,16 @@ Needs [uv](https://docs.astral.sh/uv/), which installs the Python version pinned
 git clone https://github.com/plant7-arch/platformer-ai.git
 cd platformer-ai
 uv sync
-export PYTHONPATH=src            # or put it in a .env file and run uv with --env-file .env
 
 uv run python -m platformer_ai.viewer                 # watch the included trained agent (Tab: play yourself)
 uv run python -m platformer_ai.train                  # train your own: 25M steps, saves runs/latest/params.msgpack
 uv run pytest                                         # tests
 ```
 
-If you use `uv run --env-file .env`, these optional lines are useful in `.env`:
+Optional JAX settings: put these in a `.env` file (it is git-ignored) and run `uv run --env-file .env ...`,
+or `export` them in your shell:
 
 ```
-PYTHONPATH=src
 XLA_PYTHON_CLIENT_PREALLOCATE=false      # do not grab all GPU memory up front
 JAX_COMPILATION_CACHE_DIR=.jax_cache     # faster start from the second run on
 ```
