@@ -1,0 +1,11 @@
+.env
+.jax_cache/
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# training runs: keep only the trained policy
+runs/*
+!runs/latest/
+runs/latest/*
+!runs/latest/params.msgpack
