@@ -157,4 +157,4 @@ the sprites are placed from the env state (feet position, one tile = 16 px).
 
 * Code: [MIT](LICENSE).
 * Art and fonts: [Brackeys Platformer Bundle](https://brackeysgames.itch.io/brackeys-platformer-bundle), CC0.
-* The level layout and mechanics were ported from the author's earlier Godot version of this project.
+* The level layout and mechanics were ported from my earlier Godot version of this project.
