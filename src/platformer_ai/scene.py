@@ -1,7 +1,7 @@
-"""Draws one 480x270 frame of the level with numpy (no pygame): tilemaps, platforms, coins, enemy, knight.
+"""Draws one 480x270 frame of the level with numpy (no pygame): terrain, platforms, coins, enemy, knight.
 
-Assets: Brackeys platformer bundle (CC0) in <assets>/sprites.  Tile layout: world_tiles.npz, decoded from the
-original scene (columns: tile x, tile y, atlas x, atlas y).
+Assets: Brackeys platformer bundle (CC0) in <assets>/sprites.  The terrain, backdrop, decorations and goal flag are
+generated from the ASCII level (terrain.py), so changing level.py changes the picture too.
 """
 from __future__ import annotations
 
@@ -12,10 +12,10 @@ import numpy as np
 from PIL import Image
 
 from platformer_ai import level as L
+from platformer_ai import terrain
 from platformer_ai import viewlogic as V
 
 CLEAR = (77, 77, 77)                 # Godot's default clear colour, shown where no tile is drawn
-TILES_FILE = Path(__file__).with_name("world_tiles.npz")
 
 
 def load_rgba(path: Path) -> np.ndarray:
@@ -58,9 +58,10 @@ class Assets:
     platform: np.ndarray         # the 32x9 platform sprite
 
 
-def build_world(tileset: np.ndarray, layers) -> tuple[np.ndarray, tuple[int, int]]:
-    """Draw tilemap layers (each an (n, 4) array: tx, ty, ax, ay), first one at the bottom."""
-    allt = np.concatenate(layers)
+def build_world(tileset: np.ndarray, layers, sprites=()) -> tuple[np.ndarray, tuple[int, int]]:
+    """Draw tile layers (each an (n, 4) array: tx, ty, ax, ay; the first one is the bottom layer; its extent sets the
+    size), then loose sprites given as (rgba image, world x, world y of the top-left corner)."""
+    allt = layers[0]
     tx0, ty0 = int(allt[:, 0].min()), int(allt[:, 1].min())
     tx1, ty1 = int(allt[:, 0].max()), int(allt[:, 1].max())
     world = np.empty(((ty1 - ty0 + 1) * V.TILE, (tx1 - tx0 + 1) * V.TILE, 3), np.uint8)
@@ -69,17 +70,53 @@ def build_world(tileset: np.ndarray, layers) -> tuple[np.ndarray, tuple[int, int
         for tx, ty, ax, ay in layer.tolist():
             tile = tileset[ay * V.TILE:(ay + 1) * V.TILE, ax * V.TILE:(ax + 1) * V.TILE]
             blit(world, tile, (tx - tx0) * V.TILE, (ty - ty0) * V.TILE)
+    for img, wx, wy in sprites:
+        blit(world, img, int(wx) - tx0 * V.TILE, int(wy) - ty0 * V.TILE)
     return world, (tx0 * V.TILE, ty0 * V.TILE)
 
 
-def load_assets(assets_dir: str | Path = "assets") -> Assets:
+def keep_clear() -> np.ndarray:
+    """Cells of the level where decorations must not stand (coins, starts, goal, the enemy's path)."""
+    m = np.zeros((L.H, L.W), bool)
+
+    def mark(x, y):
+        r, c = int(np.floor(y)), int(np.floor(x))
+        if 0 <= r < L.H and 0 <= c < L.W:
+            m[r, c] = True
+
+    for x, y in V.coin_positions(L.PLAT_X_MIN)[:-1]:
+        mark(x, y)
+    for x, y in [(L.SPAWN_X, L.SPAWN_Y), *zip(L.START_X, L.START_Y)]:
+        mark(x, y - 0.01)
+    for c in range(int(np.floor(L.ENEMY_MIN)), int(np.floor(L.ENEMY_MAX)) + 1):
+        mark(c + 0.5, L.ENEMY_Y - 0.01)
+    return m | np.asarray(L.GOAL)
+
+
+def make_world(tileset: np.ndarray, solid: np.ndarray, goal: np.ndarray, clear: np.ndarray | None = None,
+               theme: str = "grass", decorate: bool = True):
+    """Backdrop + terrain (+ decorations) + goal flags for any level grid."""
+    h, w = solid.shape
+    origin = (V.ORIGIN_TX, V.ORIGIN_TY)
+    tx0, tx1 = V.ORIGIN_TX - 20, V.ORIGIN_TX + w + 20                 # margin: the camera sees past the level ends
+    ty0, ty1 = terrain.BACKDROP_TOP, int(np.ceil((h + V.ORIGIN_TY) * V.TILE + 30) / V.TILE) + 2
+    layers = [terrain.background_tiles(tx0, tx1, ty0, ty1), terrain.terrain_tiles(solid, origin, theme)]
+    if decorate:
+        layers.insert(1, terrain.decor_tiles(solid, clear, origin))     # behind the ground, in front of the backdrop
+    flags = []
+    for c, r, n in terrain.goal_runs(goal):
+        wx, wy = V.to_px(c, r)
+        flags.append((terrain.flag_sprite(n), wx, wy))
+    return build_world(tileset, layers, flags)
+
+
+def load_assets(assets_dir: str | Path = "assets", theme: str = "grass", decorate: bool = True) -> Assets:
     d = Path(assets_dir) / "sprites"
     need = ["knight.png", "slime_green.png", "coin.png", "platforms.png", "world_tileset.png"]
     missing = [n for n in need if not (d / n).is_file()]
     if missing:
         raise FileNotFoundError(f"missing in {d}: {', '.join(missing)}  (copy the Brackeys sprites there, see README)")
-    tiles = np.load(TILES_FILE)
-    world, origin = build_world(load_rgba(d / "world_tileset.png"), [tiles["background"], tiles["mid"]])
+    world, origin = make_world(load_rgba(d / "world_tileset.png"), L.SOLID, L.GOAL, keep_clear(), theme, decorate)
     x, y, w, h = V.PLATFORM_SPRITE
     plat = load_rgba(d / "platforms.png")[y:y + h, x:x + w]
     return Assets(world, origin, load_rgba(d / "knight.png"), load_rgba(d / "slime_green.png"),

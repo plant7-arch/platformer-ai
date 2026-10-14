@@ -69,3 +69,22 @@ def test_world_covers_the_whole_level():
     x1, y1 = V.to_px(L.W, L.H)
     ox, oy = a.world_origin
     assert ox <= x0 and oy <= y0 and ox + a.world.shape[1] >= x1 and oy + a.world.shape[0] >= y1
+
+
+@needs_assets
+def test_picture_follows_an_edited_level():
+    """A different ASCII grid gives a different world picture, sized to the grid (no stored art)."""
+    tileset = scene.load_rgba(ASSETS / "sprites" / "world_tileset.png")
+
+    def world(rows, goal_rows=()):
+        solid = np.array([[c == "#" for c in r] for r in rows])
+        goal = np.array([[c == "G" for c in r] for r in (goal_rows or rows)])
+        return scene.make_world(tileset, solid, goal, decorate=False)
+
+    flat, org = world(["........", "........", "########"])
+    wide, _ = world(["................", "................", "################"])
+    tower, _ = world(["........", "...#....", "########"])
+    assert wide.shape[1] - flat.shape[1] == 8 * V.TILE                  # 8 more columns -> 8 tiles wider
+    assert not np.array_equal(flat, tower)                              # moving a block moves the art
+    with_flag, _ = world(["........", "........", "########"], ["....G...", "....G...", "........"])
+    assert not np.array_equal(flat, with_flag)                          # a goal draws a flag

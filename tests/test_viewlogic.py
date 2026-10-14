@@ -13,17 +13,17 @@ def test_coordinates_match_the_original_scene():
     assert V.to_px(0, 0) == (160, 80)
 
 
-def test_tile_art_matches_the_level():
-    """Every solid cell of the physics level has a ground tile in the decoded art (and nothing is shifted)."""
-    from pathlib import Path
-    import platformer_ai
-    t = np.load(Path(platformer_ai.__file__).with_name("world_tiles.npz"))
-    mid = {(int(x), int(y)) for x, y, *_ in t["mid"]}
-    solid = np.argwhere(L.SOLID)
-    assert len(solid) > 50
-    for r, c in solid:
-        assert (c + V.ORIGIN_TX, r + V.ORIGIN_TY) in mid, (r, c)
-    assert len(t["background"]) > 1000
+def test_signs_and_score_label_come_from_the_level():
+    labels = V.world_labels()
+    assert [t for t, *_ in labels] == [t for t, _, _ in L.LABELS]
+    assert labels[0][1:] == V.to_px(L.LABELS[0][1], L.LABELS[0][2])
+    cx, bottom = V.score_label_anchor()                 # centred above the (first) goal flag
+    col, row, n = V.goal_runs()[0]
+    assert cx == (col + 0.5 + V.ORIGIN_TX) * V.TILE and bottom < (row + V.ORIGIN_TY) * V.TILE
+
+
+def test_camera_bottom_limit_follows_the_level_height():
+    assert V.CAM_LIMIT_BOTTOM == (L.H + V.ORIGIN_TY) * V.TILE + 30      # 270 for the original 10-row level
 
 
 @pytest.mark.parametrize("left,right,jump,expect", [

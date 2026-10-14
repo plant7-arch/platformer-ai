@@ -52,7 +52,7 @@ src/platformer_ai/
   viewer.py     pygame window: watch the agent or play yourself (reads the env, never trains)
   viewlogic.py  viewer logic without pygame/jax: coordinates, animation, camera, controls
   scene.py      numpy renderer for one 480x270 frame (tilemaps + sprites)
-  world_tiles.npz  tile layout of the art, decoded once from the original Godot scene
+  terrain.py    draws terrain, backdrop, decorations and the goal flag from the ASCII level (so level edits show up)
 assets/         sprites/ and fonts/ from the Brackeys platformer bundle (CC0)
 runs/latest/    the trained policy (params.msgpack)
 tests/          env behaviour tests, viewer-logic tests, a PPO smoke test
@@ -106,7 +106,7 @@ uv run python -m platformer_ai.viewer --params runs/latest/params.msgpack
 ```
 
 A 480x270 picture scaled up in whole-number steps (the window is resizable), camera following the knight,
-tilemaps, knight / slime / coin / platform animations, coin counter. Run it from the repository root so it
+knight / slime / coin / platform animations, coin counter. Run it from the repository root so it
 finds `assets/` (or pass `--assets DIR`).
 
 | key | action |
@@ -118,11 +118,16 @@ finds `assets/` (or pass `--assets DIR`).
 | `Esc` / `Q` | quit |
 
 Options: `--human` (start with the keyboard), `--sample`, `--random-phases`, `--scale N` (initial window size),
-`--assets DIR`, `--seed`. Without a params file it starts in keyboard mode.
+`--theme grass|sand|ice`, `--no-decor`, `--assets DIR`, `--seed`. Without a params file it starts in keyboard mode.
 
 The viewer runs one env on the **CPU** (`JAX_PLATFORMS=cpu` is set unless you set it yourself), so it never
 touches the GPU, even while a training run is going. The art is only pictures: the physics are `env.py`, and
 the sprites are placed from the env state (feet position, one tile = 16 px).
+
+**The picture follows the level.** The terrain is generated from the ASCII in `level.py` (`terrain.py`): a solid
+cell with air above it gets a grass top tile, any other solid cell a dirt tile (a position hash varies them, the same
+every run), small bushes and mushrooms are sprinkled on free ground, the sky/water backdrop is generated for any
+width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABELS` in `level.py`) are optional.
 
 ## The game (ported from the original Godot level)
 
@@ -147,7 +152,9 @@ the sprites are placed from the env state (feet position, one tile = 16 px).
 
 ## Where to add features later
 
-* **More level / different layout**: edit `LEVEL` in `level.py` (all sizes are derived from it).
+* **More level / different layout**: edit `LEVEL` in `level.py` (all sizes are derived from it, and the viewer
+  redraws terrain, backdrop and flag from it). Keep exactly one `P` and one `E`, and the `M` tiles in one row.
+  A trained policy only fits the level it was trained on, so retrain after changing the layout.
 * **More enemies / platforms**: make `enemy_x`, `plat_x` arrays, `vmap` their update inside `step`, and add
   their channels to `observe`.
 * **Random levels or start positions**: `reset(key)` already takes a key; thread a key through the

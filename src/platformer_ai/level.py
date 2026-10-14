@@ -13,6 +13,7 @@ P / E stand on the bottom edge of their tile.  The moving platform starts at the
 sweeps PLATFORM_TRAVEL tiles to the right, then back.  One extra coin rides on the moving platform.
 
 Not in the original Godot level: the goal flag G (the original had no way to win).
+The viewer draws terrain, backdrop and goal flag from this ASCII (terrain.py), so editing the level is enough.
 """
 import numpy as np
 
@@ -28,6 +29,9 @@ LEVEL = """\
 #######....################........###################################
 ...........####....###....#...........................................
 """
+
+# Signs drawn in the world by the viewer (no effect on the game): (text, x, y) = top-left corner in tiles.
+LABELS = [("Falling hurts...", 28.9, 7.9), ("Great Job!", 62.3, 0.3)]
 
 # --- moving platform / enemy / riding coin parameters (tiles, tiles per second) ---
 PLATFORM_TRAVEL = 6.0

@@ -25,6 +25,7 @@ from flax import serialization
 from platformer_ai import env as E
 from platformer_ai import level as L
 from platformer_ai import scene
+from platformer_ai import terrain
 from platformer_ai import viewlogic as V
 from platformer_ai.ppo import ActorCritic
 
@@ -61,7 +62,7 @@ class Snap:
 class Viewer:
     def __init__(self, args):
         self.args = args
-        self.assets = scene.load_assets(args.assets)
+        self.assets = scene.load_assets(args.assets, args.theme, not args.no_decor)
         self.net, self.params = load_agent(args.params, args.hidden)
         self.human = self.params is None or args.human
         net = self.net
@@ -177,14 +178,16 @@ class Viewer:
             return ox + (wx - cx) * s, oy + (wy - cy) * s
 
         f = self.fonts(s)
-        for msg, left, top, width in V.WORLD_LABELS:             # the signs of the original level
+        for msg, left, top in V.world_labels():                   # signs of the level (level.LABELS)
             sx, sy = to_screen(left, top)
             self.text(surf, s, msg, sx, sy, shadow=False)
-        left, top, width = V.SCORE_LABEL_BOX                      # "You collected N coins." near the goal
-        for i, line in enumerate(V.wrap_words(V.score_text(b.coins), width, lambda t: f.size(t)[0] / s)):
-            lw = f.size(line)[0]
-            sx, sy = to_screen(left + width / 2, top + i * 9)
-            self.text(surf, s, line, sx - lw / 2, sy, shadow=False)
+        anchor = V.score_label_anchor()                           # "You collected N coins." above the goal flag
+        if anchor is not None:
+            lines = V.wrap_words(V.score_text(b.coins), V.SCORE_LABEL_WIDTH, lambda t: f.size(t)[0] / s)
+            for i, line in enumerate(lines):
+                lw = f.size(line)[0]
+                sx, sy = to_screen(anchor[0], anchor[1] - (len(lines) - i) * 9)
+                self.text(surf, s, line, sx - lw / 2, sy, shadow=False)
 
         # HUD (screen space)
         self.text(surf, s, f"Coins {b.coins}/{L.N_COINS}", ox + 4 * s, oy + 4 * s, YELLOW)
@@ -252,6 +255,8 @@ def main() -> None:
     ap.add_argument("--human", action="store_true", help="start with keyboard control")
     ap.add_argument("--sample", action="store_true", help="agent samples actions instead of argmax")
     ap.add_argument("--random-phases", action="store_true", help="random platform/enemy phases and jittered spawn")
+    ap.add_argument("--theme", default="grass", choices=sorted(terrain.THEMES), help="ground material")
+    ap.add_argument("--no-decor", action="store_true", help="no bushes / mushrooms on the ground")
     ap.add_argument("--hidden", type=int, default=128)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()

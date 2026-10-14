@@ -7,13 +7,14 @@ from __future__ import annotations
 import math
 
 from platformer_ai import level as L
+from platformer_ai import terrain
 
 # ---- screen / world -----------------------------------------------------------------------
 SCREEN_W, SCREEN_H = 480, 270        # the Godot viewport (1920x1080 at zoom 4)
 TILE = 16                            # pixels per tile in the art
 ORIGIN_TX, ORIGIN_TY = 10, 5         # our grid cell (0, 0) is tile (10, 5) of the original tilemaps
 CAM_OFFSET_Y = -4                    # Godot Camera2D offset
-CAM_LIMIT_BOTTOM = 270               # Godot Camera2D limit_bottom
+CAM_LIMIT_BOTTOM = (L.H + ORIGIN_TY) * TILE + 30   # Godot limit_bottom (270 for the 10-row level): a little below the map
 CAM_SMOOTH = 5.0                     # Godot position_smoothing_speed (default)
 SPRITE_OFFSET = {"player": (1, -12), "enemy": (0, -12)}      # sprite centre relative to the feet
 PLATFORM_SPRITE = (16, 0, 32, 9)     # region in platforms.png (x, y, w, h)
@@ -139,13 +140,26 @@ def coin_positions(plat_x: float) -> list[tuple[float, float]]:
     return out
 
 
-# Text that sits in the world in the original scene: (text, left, top, width) in world pixels.
-WORLD_LABELS = [
-    ("Space to jump", 59, 182, 110),
-    ("Falling hurts...", 623, 207, 96),
-    ("Great Job!", 1157, 85, 64),
-]
-SCORE_LABEL_BOX = (1137, 99, 102)      # left, top, width: centred, wrapped; text is "You collected N coins."
+def world_labels() -> list[tuple[str, float, float]]:
+    """Signs of the level (level.LABELS) as (text, left, top) in world pixels."""
+    return [(t, *to_px(x, y)) for t, x, y in L.LABELS]
+
+
+SCORE_LABEL_WIDTH = 102                # the "You collected N coins." sign is centred above the goal flag, wrapped to this
+
+
+def score_label_anchor():
+    """(centre x, bottom y) in world pixels of the coin-count sign: just above the first goal flag; None without a goal."""
+    runs = goal_runs()
+    if not runs:
+        return None
+    c, r, n = runs[0]
+    x, y = to_px(c + 0.5, r)
+    return x, y - 4
+
+
+def goal_runs():
+    return terrain.goal_runs(L.GOAL)
 
 
 def score_text(n: int) -> str:
