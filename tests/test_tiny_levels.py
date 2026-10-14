@@ -2,6 +2,7 @@
 
 The level is baked into the environment when `env.py` is imported, so each level runs in its own Python process,
 selected with PLATFORMER_LEVEL (see level.py).  Needs jax; runs on the CPU so it never touches the GPU.
+Includes levels without enemies or platforms and with several of each.
 About 15-30 s per level (compilation).  Run only these with:  uv run pytest tests/test_tiny_levels.py -v
 """
 import os
@@ -22,12 +23,20 @@ def rows(*r):
 
 
 LEVELS = {
-    "one row 1x12": rows("PE.MM......."),
-    "two rows 2x8": rows("PE......", "MM......"),
-    "no ground at all, with a goal 3x14": rows("P.E.MM.......G", "..............", ".............."),
-    "tall 30x14": rows("P.E.MM........", *[".............."] * 28, "##############"),
-    "floor 4x14": rows("..............", "P.E.MM........", "##############", "##############"),
-    "wide 5x120": rows("P.E.MM" + "." * 114, "." * 120, "." * 120, "." * 120, "#" * 120),
+    "one row 1x12 (a platform; an enemy would have no ground)": rows("P....MM.....", "", "platform 1 6 to 10"),
+    "two rows 2x8": rows("P.......", "MM......"),
+    "no ground at all, with a goal 3x14": rows("P...MM.......G", "..............", ".............."),
+    "tall 30x14": rows("P...MM........", *[".............."] * 27, "......E.......", "##############"),
+    "floor 4x14": rows("..............", "P...MM.....E..", "##############", "##############", "",
+                       "platform 2 5 to 7", "enemy 2 12 from 9 to 12.5"),
+    "no enemy, no platform 2x12": rows("P.....o..G..", "############"),
+    "enemy only 2x12": rows("P....E......", "############"),
+    "platform only 3x14": rows("P...........G.", "..MM..........", "##############"),
+    "three enemies, two platforms 7x40": rows(
+        "." * 40, "..MM" + "." * 36, "." * 40, "." * 10 + "MMM" + "." * 27, "." * 40,
+        "P..E.....E....E" + "." * 24 + "G", "#" * 40, "",
+        "enemy 6 4 from 2 to 4", "enemy 6 10 from 7 to 11.5", "enemy 6 15 from 13 to 16"),
+    "wide 5x120": rows("P...MM" + "." * 114, "." * 120, "." * 120, "." * 10 + "E" + "." * 109, "#" * 120),
 }
 
 CHILD = """
@@ -54,6 +63,7 @@ for random_starts, random_phases in ((False, False), (True, True)):
         assert obs.shape == (N, E.OBS_DIM) and bool(jnp.isfinite(obs).all()), "bad observation"
         assert bool(jnp.isfinite(reward).all()) and bool(jnp.isfinite(info["final_obs"]).all()), "bad reward / final_obs"
         assert state.coins_alive.shape == (N, L.N_COINS)
+        assert state.enemy_x.shape == (N, L.N_ENEMIES) and state.plat_x.shape == (N, L.N_PLATS)
         x, y = np.asarray(state.x), np.asarray(state.y)
         assert np.isfinite(x).all() and np.isfinite(y).all(), "non-finite position"
         assert (x > -1.0).all() and (x < L.W + 1.0).all(), ("x out of the map", x)
@@ -75,7 +85,8 @@ def test_environment_runs_on_the_level(name):
     try:
         f.write(LEVELS[name])
         f.close()
-        env = {**os.environ, "PLATFORMER_LEVEL": f.name, "PYTHONPATH": str(SRC), "JAX_PLATFORMS": "cpu"}
+        path = os.pathsep.join([str(SRC)] + ([os.environ["PYTHONPATH"]] if os.environ.get("PYTHONPATH") else []))
+        env = {**os.environ, "PLATFORMER_LEVEL": f.name, "PYTHONPATH": path, "JAX_PLATFORMS": "cpu"}
         r = subprocess.run([sys.executable, "-c", CHILD], env=env, capture_output=True, text=True, timeout=600)
     finally:
         os.unlink(f.name)

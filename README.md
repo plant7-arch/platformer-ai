@@ -138,9 +138,12 @@ width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABE
   Units are tiles; one env step = 1/30 s.
 * **Actions (6)**: horizontal `[none, left, right][a % 3]`, jump when `a >= 3`.
 * **One-way platforms**: a static one (spawn drops onto it; it is out of reach from the ground) and a
-  moving one that ferries the player across the 8-tile pit while carrying whoever stands on it.
-* **Enemy**: patrols between two walls, turns around when its sensor touches a wall, touch = death.
-* **Coins**: 9 (8 on the map, 1 riding the moving platform), circles with the original 5 px radius.
+  moving one that ferries the player across the 8-tile pit while carrying whoever stands on it. A level may
+  have any number of moving platforms (also none).
+* **Enemies**: each patrols between its own two x limits (given in the level; a wall inside the path is reported as an error), touch = death.
+  A level may have any number of them (also none).
+* **Coins**: 9 (8 on the map, 1 riding the moving platform), circles with the original 5 px radius. Every moving
+  platform carries one more coin.
 * **Goal**: a flag at the far right. The original level had no way to win; this is the one addition.
 * **Speeds**: our player is slower than the Godot one (6 vs 11.25 tiles/s), so the platform and the
   enemy were scaled by the same factor (3.2 and 2.0 tiles/s); relative timing is preserved.
@@ -149,7 +152,9 @@ width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABE
 * Episode is cut at 900 steps and treated as truncation (PPO bootstraps from the last state's value).
 * **Observation (778 floats)**: 9 x 17 tile window around the player with 5 channels (solid, one-way /
   moving platform, coin, goal, enemy) plus 13 scalars: velocity, on-floor, sub-tile position, progress,
-  time used, and relative position + direction of the enemy and of the moving platform.
+  time used, and relative position + direction of the *nearest* enemy and of the *nearest* moving platform
+  (the window shows all of them; with none in the level these scalars read "far away, standing still").
+  The size is the same for every level, so a policy file fits any enemy / platform count (but see below).
 
 ## Editing the level
 
@@ -159,8 +164,8 @@ The level is the ASCII picture `LEVEL` in `level.py`:
 | --- | --- | --- | --- |
 | `#` | solid tile | `-` | one-way platform (stand on it, pass through from below) |
 | `o` | coin | `G` | goal (touch = win) |
-| `P` | player spawn (exactly one) | `E` | enemy (exactly one) |
-| `S` | extra start point (optional, used by random-start training) | `M` | moving platform: one block of tiles in one row |
+| `P` | player spawn (exactly one) | `E` | enemy (any number, each `E` is one enemy) |
+| `S` | extra start point (optional, used by random-start training) | `M` | moving platform: a run of `M` tiles in a row is one platform (any number) |
 | `.` | empty | | |
 
 The level is **checked every time it loads** (`levelcheck.py`), so a mistake fails early and says where
@@ -172,14 +177,47 @@ the level has 2 problems (rows and columns count from 1):
   [spawn-count] needs exactly one 'P' (player spawn), found 2: row 1, col 4; row 4, col 18
 ```
 
+**Where things move** is written under the map, after a blank line, one line per mover (x in tiles, the centre of
+the thing; row and column count from 1, like the messages; `#` starts a comment). This is the end of the built-in level:
+
+```
+...........####....###....#...........................................
+
+platform 8 28 to 34
+enemy 7 49 from 44.5625 to 52.4375
+```
+
+* `platform ROW COL to STOP_X`: the platform with an `M` tile at ROW, COL starts where its `M` tiles are, moves to
+  `STOP_X` (left or right of the start) and back.
+* `enemy ROW COL from MIN_X to MAX_X`: the enemy at ROW, COL starts at its `E` and walks between those two x.
+* No line: a platform moves 6 tiles to the right of its start, an enemy walks 3 tiles either way of its start
+  (`DEFAULT_PLATFORM_TRAVEL`, `DEFAULT_ENEMY_REACH` in `level.py`). Walls never shorten an enemy's path: a wall inside
+  it is an error that names the cells, so you move the wall or the limits.
+
 * **Errors** stop the program, all of them at once: rows of different length, unknown symbols (typos), not exactly
-  one `P` or one `E`, no `M` / `M` tiles in two rows / a gap in the `M` block, and a moving platform whose sweep
-  (6 tiles to the right) leaves the map or runs into solid tiles.
+  one `P`, bad path lines (unknown form, no such platform / enemy there, two lines for one, `from` > `to`), and
+  paths that are not valid. For a **platform path** (everything the platform covers, edges included): it leaves the map,
+  it does not move at all, it sweeps through a solid tile, a static `-` tile, a coin, the goal, the spawn or a start
+  point `S`, it shares a stretch of its row with another platform, or with an enemy. For an **enemy path** (its body
+  included): it leaves the map, it is shorter than 0.2 tiles, the enemy does not start inside it, it runs through a
+  solid tile, a `-` tile, a coin or the goal, a hole in the ground below it (enemies do not fall), it shares a
+  stretch of its row with another enemy, or it can reach the player at the real spawn (the player would be hit at the
+  start; random starts push enemies away, the real spawn does not). Start points `S` inside an enemy path are fine.
 * **Warnings** are logged and the level still loads: no goal `G`, a start point with no ground within 4 tiles below,
-  an enemy with no ground under it or no room to patrol, and coins / goals / start points that are completely
+  an enemy path that comes within 3 tiles of the spawn, and coins / goals / start points that are completely
   walled in by solid tiles.
 
-To check a level while you edit it, without starting anything else (a text file with only the ASCII rows also works):
+Several enemies and platforms: `E` and `M` can appear as often as you like. Neighbouring `M` tiles in a row are one
+platform of that width, so `MM.MM` is two 2-wide platforms (a stray gap splits a platform!). Enemies and platforms are
+numbered row by row, left to right, and every platform brings its own coin. With no `E` or no `M` at all the level
+still loads and trains; the observation keeps its size.
+
+![a level with three enemies and two moving platforms](docs/preview_multi.png)
+
+Try it: `PLATFORMER_LEVEL=docs/example_many.txt uv run python -m platformer_ai.viewer` (the level in the picture,
+with its path lines).
+
+To check a level while you edit it, without starting anything else (a text file with the map rows and optional path lines also works):
 
 ```bash
 uv run python -m platformer_ai.levelcheck                 # the level in level.py
@@ -193,21 +231,26 @@ it works for every command (`viewer`, `train`, `play`, `levelcheck`) and is vali
 PLATFORMER_LEVEL=my_level.txt uv run python -m platformer_ai.viewer
 ```
 
-Small levels work: the moving platform needs a map at least as wide as its block plus its 6-tile sweep, and nothing
-else sets a minimum size (a 1-row level renders and runs; the viewer just shows a lot of sky).
-`tests/test_tiny_levels.py` runs the real environment on six small or odd levels (about a minute, one process per
-level because the level is baked in when `env.py` is imported).
+Small levels work: a platform needs room for its whole path, and nothing else sets a minimum size (a 1-row level renders and runs; the viewer just shows a lot of sky).
+`tests/test_tiny_levels.py` runs the real environment on small or odd levels, with and without enemies / platforms, and `tests/test_multi.py`
+checks what several enemies and platforms do (killing, carrying, rider coins, nearest-thing scalars, random starts) (a few minutes in total, one process per level because the level is baked in when `env.py` is imported).
+
+A level that is not valid stops the program with a short message (which file, every problem with row / column or line,
+and the command to check it) instead of a traceback; warnings are logged with the file name too.
 
 The check cannot tell whether a level is *beatable*: it finds things that are walled in completely, but not ones that
 are just too high or too far for the jump (about 2.7 tiles). Train an agent on it to find out, and retrain after any
-change: a policy only fits the level it was trained on.
+change: a policy only fits the level it was trained on. The included `params.msgpack` was trained on the built-in
+level (one enemy, one platform); it still loads for any level (the observation size is fixed) but it was never shown
+a second enemy.
 
 ## Where to add features later
 
 * **More level / different layout**: edit `LEVEL` in `level.py` (see "Editing the level"; all sizes are derived from
   it, and the viewer redraws terrain, backdrop and flag from it).
-* **More enemies / platforms**: make `enemy_x`, `plat_x` arrays, `vmap` their update inside `step`, and add
-  their channels to `observe`.
+* **Different enemy kinds** (flying, jumping) or **platform paths**: `enemy_x` / `plat_x` are already arrays with
+  one entry per enemy / platform; give them more fields or another update rule inside `step`. Paths come from `level.py`
+  (`PLAT_START_X` / `PLAT_STOP_X`, `ENEMY_MIN` / `ENEMY_MAX`).
 * **Random levels or start positions**: `reset(key)` already takes a key; thread a key through the
   state if `step` needs randomness after reset.
 

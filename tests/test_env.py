@@ -46,8 +46,8 @@ def test_level_matches_godot_layout():
     assert (L.H, L.W) == (10, 70)
     assert int(L.SOLID.sum()) == 177                       # collision tiles of the Godot level
     assert int(L.ONEWAY.sum()) == 2 and L.N_COINS == 9
-    assert (L.PLAT_X_MIN, L.PLAT_X_MAX, L.PLAT_TOP, L.PLAT_HALF) == (28.0, 34.0, 7.0, 1.0)
-    assert (L.ENEMY_X, L.ENEMY_Y) == (48.5, 7.0)
+    assert (L.PLAT_X_MIN[0], L.PLAT_X_MAX[0], L.PLAT_TOP[0], L.PLAT_HALF[0]) == (28.0, 34.0, 7.0, 1.0)
+    assert (L.ENEMY_X[0], L.ENEMY_Y[0]) == (48.5, 7.0)
     assert L.GOAL.sum() == 2
 
 
@@ -151,11 +151,11 @@ def test_can_walk_off_one_way_platform():
 # ---------------------------------------------------------------- moving platform
 def test_moving_platform_sweeps_and_turns():
     s, _ = run(E.initial_state(), [NOOP] * 20)
-    assert float(s.plat_x) == pytest.approx(28.0 + 20 * L.PLATFORM_SPEED * E.DT, abs=1e-3)
+    assert float(s.plat_x[0]) == pytest.approx(28.0 + 20 * L.PLATFORM_SPEED * E.DT, abs=1e-3)
     s, _ = run(E.initial_state(), [NOOP] * 57)
-    assert float(s.plat_dir) == -1.0 and float(s.plat_x) > L.PLAT_X_MAX
+    assert float(s.plat_dir[0]) == -1.0 and float(s.plat_x[0]) > L.PLAT_X_MAX[0]
     s, _ = run(E.initial_state(), [NOOP] * 114)
-    assert float(s.plat_dir) == 1.0 and float(s.plat_x) < L.PLAT_X_MIN + 0.3
+    assert float(s.plat_dir[0]) == 1.0 and float(s.plat_x[0]) < L.PLAT_X_MIN[0] + 0.3
 
 
 def test_platform_carries_player():
@@ -177,7 +177,7 @@ def test_enemy_patrols_between_walls():
     xs, dirs = [], []
     for _ in range(400):
         s, *_ = STEP(s, NOOP)
-        xs.append(float(s.enemy_x)); dirs.append(float(s.enemy_dir))
+        xs.append(float(s.enemy_x[0])); dirs.append(float(s.enemy_dir[0]))
     assert 44.4 < min(xs) and max(xs) < 52.6
     assert sum(1 for a, b in zip(dirs, dirs[1:]) if a != b) >= 3        # turned around several times
     assert xs[9] == pytest.approx(48.5 + 10 * L.ENEMY_SPEED * E.DT, abs=1e-3)
@@ -233,13 +233,13 @@ def test_batched_step_with_vmap():
 
 # ---------------------------------------------------------------- training helpers
 def _box_overlap_enemy(s):
-    return bool((float(s.x) + E.HW > float(s.enemy_x) - L.ENEMY_HALF_W) &
-                (float(s.x) - E.HW < float(s.enemy_x) + L.ENEMY_HALF_W) &
-                (float(s.y) > L.ENEMY_Y - L.ENEMY_H) & (float(s.y) - E.HEIGHT < L.ENEMY_Y))
+    return bool((float(s.x) + E.HW > float(s.enemy_x[0]) - L.ENEMY_HALF_W) &
+                (float(s.x) - E.HW < float(s.enemy_x[0]) + L.ENEMY_HALF_W) &
+                (float(s.y) > L.ENEMY_Y[0] - L.ENEMY_H) & (float(s.y) - E.HEIGHT < L.ENEMY_Y[0]))
 
 
 def test_start_points_and_patrol_limits_come_from_the_level():
-    assert L.N_STARTS == 8 and (L.ENEMY_MIN, L.ENEMY_MAX) == (44.5625, 52.4375)
+    assert L.N_STARTS == 8 and (L.ENEMY_MIN[0], L.ENEMY_MAX[0]) == (44.5625, 52.4375)
 
 
 def test_random_starts_are_valid_and_varied():
@@ -247,21 +247,21 @@ def test_random_starts_are_valid_and_varied():
     states = [reset(jax.random.PRNGKey(i)) for i in range(300)]
     for s in states:
         assert E.HW <= float(s.x) <= L.W - E.HW
-        supported = bool(E._tile_support(s.x, s.y)) or bool(E._on_mplat(s.x, s.y, s.plat_x))
+        supported = bool(E._tile_support(s.x, s.y)) or bool(E._on_mplat(s.x, s.y, s.plat_x).any())
         assert supported or bool(s.from_spawn), (float(s.x), float(s.y))    # stands on something
         assert not np.any(L.SOLID & np.asarray(E._overlap(s.x, s.y)))       # not inside a wall
-        assert L.PLAT_X_MIN <= float(s.plat_x) <= L.PLAT_X_MAX
-        assert L.ENEMY_MIN <= float(s.enemy_x) <= L.ENEMY_MAX
+        assert L.PLAT_X_MIN[0] <= float(s.plat_x[0]) <= L.PLAT_X_MAX[0]
+        assert L.ENEMY_MIN[0] <= float(s.enemy_x[0]) <= L.ENEMY_MAX[0]
         assert not _box_overlap_enemy(s)                                    # never spawns on the enemy
         assert float(s.furthest) == pytest.approx(float(s.x))
     frac_spawn = np.mean([bool(s.from_spawn) for s in states])
     assert 0.35 < frac_spawn < 0.65                                         # ~SPAWN_PROB (0.5)
     assert len({round(float(s.x), 1) for s in states}) >= 8                 # many different starts
-    assert any(28.0 <= float(s.x) <= 34.0 and float(s.y) == L.PLAT_TOP for s in states)   # on the ferry
+    assert any(28.0 <= float(s.x) <= 34.0 and float(s.y) == L.PLAT_TOP[0] for s in states)   # on the ferry
     for s in states:
         if bool(s.from_spawn):                                              # real spawn = exact default state
-            assert (float(s.x), float(s.y), float(s.plat_x), float(s.enemy_x)) == \
-                   (L.SPAWN_X, L.SPAWN_Y, L.PLAT_X_MIN, L.ENEMY_X)
+            assert (float(s.x), float(s.y), float(s.plat_x[0]), float(s.enemy_x[0])) == \
+                   (L.SPAWN_X, L.SPAWN_Y, L.PLAT_X_MIN[0], L.ENEMY_X[0])
 
 
 def test_random_phases_at_the_spawn():
@@ -271,13 +271,13 @@ def test_random_phases_at_the_spawn():
     for s in states:
         assert abs(float(s.x) - L.SPAWN_X) <= E.SPAWN_JITTER_X + 1e-6
         assert L.SPAWN_Y - E.SPAWN_JITTER_Y - 1e-6 <= float(s.y) <= L.SPAWN_Y + 1e-6
-        assert L.PLAT_X_MIN <= float(s.plat_x) <= L.PLAT_X_MAX
-        assert L.ENEMY_MIN <= float(s.enemy_x) <= L.ENEMY_MAX
-        assert float(s.plat_dir) in (-1.0, 1.0) and float(s.enemy_dir) in (-1.0, 1.0)
+        assert L.PLAT_X_MIN[0] <= float(s.plat_x[0]) <= L.PLAT_X_MAX[0]
+        assert L.ENEMY_MIN[0] <= float(s.enemy_x[0]) <= L.ENEMY_MAX[0]
+        assert float(s.plat_dir[0]) in (-1.0, 1.0) and float(s.enemy_dir[0]) in (-1.0, 1.0)
         assert float(s.furthest) == pytest.approx(float(s.x))
-    assert len({round(float(s.plat_x), 2) for s in states}) > 50           # phases really differ
-    assert len({round(float(s.enemy_x), 2) for s in states}) > 50
-    assert {float(s.plat_dir) for s in states} == {-1.0, 1.0}
+    assert len({round(float(s.plat_x[0]), 2) for s in states}) > 50           # phases really differ
+    assert len({round(float(s.enemy_x[0]), 2) for s in states}) > 50
+    assert {float(s.plat_dir[0]) for s in states} == {-1.0, 1.0}
     assert len({round(float(s.x), 2) for s in states}) > 50                 # and so does the spawn x
     # the jittered spawn still drops onto the platform and picks up the first coin
     for s0 in states[:10]:
@@ -296,7 +296,7 @@ def test_auto_reset_randomizes_phases_when_enabled():
                 break
         assert bool(d) and bool(s.from_spawn)
         np.testing.assert_allclose(np.asarray(obs), np.asarray(E.observe(s)))
-        plats.add(round(float(s.plat_x), 2)); enemies.add(round(float(s.enemy_x), 2))
+        plats.add(round(float(s.plat_x[0]), 2)); enemies.add(round(float(s.enemy_x[0]), 2))
     assert len(plats) > 20 and len(enemies) > 20
 
 
@@ -347,10 +347,10 @@ def _solid(r, c):
 def _bot(s):
     """Scripted player: run right; jump at walls; wait for the ferry; hop over the enemy."""
     x, y = float(s.x), float(s.y)
-    px, pdir, ex = float(s.plat_x), float(s.plat_dir), float(s.enemy_x)
+    px, pdir, ex = float(s.plat_x[0]), float(s.plat_dir[0]), float(s.enemy_x[0])
     sup = bool(E._tile_support(s.x, s.y))
     if 26.0 <= x < 35.0:                                         # the 8-tile pit
-        if bool(E._on_mplat(s.x, s.y, s.plat_x)) and not sup:    # riding: wait for the far end
+        if bool(E._on_mplat(s.x, s.y, s.plat_x).any()) and not sup:    # riding: wait for the far end
             return RIGHT if px >= 33.6 else NOOP
         if sup and x < 30.0:                                     # at the edge: wait for the platform
             if px <= 28.3 and pdir > 0:
@@ -372,3 +372,19 @@ def test_level_is_completable():
             assert bool(info["goal"]), "bot died or timed out"
             return
     pytest.fail("bot never finished")
+
+
+def test_built_in_level_behaves_exactly_as_with_one_enemy_and_one_platform():
+    """Numbers recorded from the version of the environment that had exactly one enemy and one platform."""
+    assert (L.N_ENEMIES, L.N_PLATS) == (1, 1) and E.OBS_DIM == 778
+    scal = np.asarray(E.RESET_OBS[-13:])
+    assert scal.tolist() == [0.0, 0.0, 0.0, 0.0, -0.5, 0.25, 0.0, 2.0, 0.75, 1.0, 1.3125, 0.75, 1.0]
+    assert float(np.asarray(E.RESET_OBS[:-13]).sum()) == 13.0
+    s = E.reset()
+    for _ in range(30):
+        s, obs, *_ = STEP(s, 5)                                      # run right + jump
+    assert (float(s.x), float(s.y), float(s.vy)) == pytest.approx((23.5, 6.1111, 7.3333), abs=1e-3)
+    assert (float(s.plat_x[0]), float(s.enemy_x[0])) == pytest.approx((31.2, 50.5), abs=1e-3)
+    assert np.asarray(obs[-13:]).tolist() == pytest.approx(
+        [1.0, 0.52381, 0.0, 0.0, -0.38889, 0.33571, 0.03333, 2.0, 0.22222, 1.0, 0.9625, 0.22222, 1.0], abs=1e-3)
+    assert float(np.asarray(obs[:-13]).sum()) == 27.0

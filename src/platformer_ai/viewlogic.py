@@ -136,14 +136,18 @@ def platform_runs() -> list[tuple[float, float]]:
     return out
 
 
-def coin_positions(plat_x: float) -> list[tuple[float, float]]:
-    """Centre of every coin in env tiles (the last one rides on the moving platform)."""
-    out = []
-    for i in range(L.N_COINS):
-        if L.COIN_RIDES[i]:
-            out.append((plat_x + L.RIDER_COIN_OFFSET[0], L.PLAT_TOP + L.RIDER_COIN_OFFSET[1]))
-        else:
-            out.append((float(L.COIN_X[i]), float(L.COIN_Y[i])))
+def platform_chunks(width: float) -> list[tuple[float, float]]:
+    """A platform `width` tiles wide is drawn with sprites 2 tiles wide, like the static ones:
+    (centre offset from the platform centre, width) per sprite; an odd last tile gets a 1-wide chunk."""
+    n = int(round(width))
+    return [(i + min(2, n - i) / 2.0 - n / 2.0, float(min(2, n - i))) for i in range(0, n, 2)]
+
+
+def coin_positions(plat_x) -> list[tuple[float, float]]:
+    """Centre of every coin in env tiles: the static ones, then one per moving platform (plat_x: one x per platform)."""
+    out = [(float(L.COIN_X[i]), float(L.COIN_Y[i])) for i in range(L.N_STATIC_COINS)]
+    for j in range(L.N_PLATS):
+        out.append((float(plat_x[j]) + L.RIDER_COIN_OFFSET[0], float(L.PLAT_TOP[j]) + L.RIDER_COIN_OFFSET[1]))
     return out
 
 

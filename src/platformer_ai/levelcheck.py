@@ -3,17 +3,28 @@
     errors    the level cannot be built (raised as LevelError, all of them at once, with row / column)
     warnings  the level loads but something looks wrong (logged on the "platformer_ai.level" logger)
 
-Run it on the level in level.py, or on a text file that holds only the ASCII rows:
+Run it on the level in level.py, or on a text file (map rows, optionally followed by a blank line and path lines):
 
     uv run python -m platformer_ai.levelcheck [my_level.txt]
 
 Rows and columns in the messages count from 1, like the line numbers in an editor.
+A level has exactly one 'P' and any number of enemies ('E') and moving platforms (runs of 'M'), also none.
+
+Paths.  After the map and a blank line, optional lines say where things move (x = tile units, centre of the thing):
+
+    platform ROW COL to STOP_X               platform with an M tile at ROW, COL: start = where the M tiles are
+    enemy ROW COL from MIN_X to MAX_X        enemy at ROW, COL: patrols between MIN_X and MAX_X (walls do not matter)
+
+Without a line a platform moves 6 tiles to the right of its start and an enemy walks 3 tiles either way of its start.
+Every path is checked on its own: inside the map, nothing in the way (tiles, one-way tiles, coins, goal, spawn),
+no other platform / enemy on the same stretch, ground under every enemy step, an enemy not within reach of the spawn.
 What it can NOT tell you is whether a level is *beatable*: it finds goals and coins that are completely walled in,
 but not ones that are merely too high or too far for the jump (apex 2.7 tiles).  Train an agent or use a bot for that.
 """
 from __future__ import annotations
 
 import logging
+import re
 import sys
 from collections import deque
 from dataclasses import dataclass, field
@@ -26,10 +37,39 @@ SYMBOLS = ".#-oGPESM"
 HINTS = {"p": "P", "e": "E", "m": "M", "s": "S", "g": "G", "0": "o", "O": "o", "=": "-", "_": "-", " ": "."}
 MAX_DROP = 4            # a start may be this many tiles above its floor (the built-in spawn drops 2)
 MAX_LISTED = 5          # cells named in one message
+MIN_PATROL = 0.2        # an enemy needs at least this much room to walk
+NEAR_SPAWN = 3.0        # warning: an enemy path this close to the spawn (tiles)
+PLAYER_HW, PLAYER_H = 0.3, 0.8      # player box, same as env.HW / env.HEIGHT
+
+_NUM = r"[-+]?(?:\d+(?:\.\d*)?|\.\d+)"
+_PLAT = re.compile(rf"^platform\s+(\d+)\s+(\d+)\s+to\s+({_NUM})$", re.I)
+_ENEMY = re.compile(rf"^enemy\s+(\d+)\s+(\d+)\s+from\s+({_NUM})\s+to\s+({_NUM})$", re.I)
+FORMS = "'platform ROW COL to STOP_X'  or  'enemy ROW COL from MIN_X to MAX_X'"
+
+# what may not stand in a path, by map symbol
+IN_THE_WAY = {"#": ("solid", "solid tiles"), "-": ("static", "static one-way tiles ('-')"), "G": ("goal", "the goal 'G'"),
+              "o": ("coin", "a coin"), "P": ("spawn", "the player spawn 'P'"), "S": ("start", "a start point 'S'")}
 
 
 class LevelError(ValueError):
     """The ASCII level cannot be used.  The message lists every problem found."""
+
+
+SOURCE = None           # where the level comes from ("docs/my_level.txt"), set by level.py; shows up in messages
+
+
+def short_errors_on_exit(hint: str) -> None:
+    """An uncaught LevelError prints just its message (and `hint`) instead of a Python traceback.  Other errors are
+    untouched.  level.py calls this when the level it loads is not valid."""
+    previous = sys.excepthook
+
+    def hook(kind, value, tb):
+        if issubclass(kind, LevelError):
+            print(f"\n{value}\n\n{hint}\n", file=sys.stderr)
+        else:
+            previous(kind, value, tb)
+
+    sys.excepthook = hook
 
 
 @dataclass
@@ -52,34 +92,146 @@ class Report:
         return not self.errors
 
 
+@dataclass
+class Platform:
+    row: int
+    c0: int
+    c1: int
+    start: float            # centre x at the start (where the M tiles are)
+    stop: float             # centre x at the other end
+
+    @property
+    def half(self) -> float:
+        return (self.c1 - self.c0 + 1) / 2.0
+
+    @property
+    def lo(self) -> float:
+        return min(self.start, self.stop)
+
+    @property
+    def hi(self) -> float:
+        return max(self.start, self.stop)
+
+    @property
+    def span(self):
+        """x range the platform ever covers (its edges)."""
+        return self.lo - self.half, self.hi + self.half
+
+    def desc(self) -> str:
+        return f"the moving platform at row {self.row + 1}, cols {self.c0 + 1}..{self.c1 + 1}"
+
+
+@dataclass
+class Enemy:
+    row: int
+    col: int
+    lo: float               # patrol range of its centre x
+    hi: float
+
+    @property
+    def x(self) -> float:
+        return self.col + 0.5
+
+    @property
+    def y(self) -> float:
+        return self.row + 1.0       # feet
+
+    def span(self, half_w: float):
+        return self.lo - half_w, self.hi + half_w
+
+    def desc(self) -> str:
+        return f"the enemy at row {self.row + 1}, col {self.col + 1}"
+
+
 def _where(cells) -> str:
     shown = [f"row {r + 1}, col {c + 1}" for r, c in cells[:MAX_LISTED]]
     more = f" (+{len(cells) - MAX_LISTED} more)" if len(cells) > MAX_LISTED else ""
     return "; ".join(shown) + more
 
 
-def patrol_limits(solid: np.ndarray, ex: float, ey: float, ray_len: float, ray_h: float):
-    """x range the enemy patrols: from the wall on its left to the wall on its right, at sensor height."""
-    h, w = solid.shape
-    row = int(np.floor(ey - ray_h))
-    c = int(ex)
-    while c >= 0 and not solid[row, c]:
-        c -= 1
-    left_face = c + 1
-    c = int(ex)
-    while c < w and not solid[row, c]:
-        c += 1
-    return left_face + ray_len, c - ray_len
+def split_text(text: str):
+    """(map rows, path lines).  The map ends at the first blank line; after it come the optional path lines
+    ('# ...' lines are comments).  Path lines are returned as (line number, text), numbered from 1."""
+    lines = text.strip("\n").split("\n") if text.strip("\n") else []
+    n = 0
+    while n < len(lines) and lines[n].strip():
+        n += 1
+    spec = [(i + 1, lines[i].strip()) for i in range(n, len(lines)) if lines[i].strip() and not lines[i].strip().startswith("#")]
+    return lines[:n], spec
 
 
-def check(text: str, platform_travel: float = 6.0, enemy_ray_len: float = 0.5625, enemy_ray_h: float = 0.4375,
-          enemy_half_w: float = 0.375) -> Report:
-    """Find everything wrong with a level text.  Never raises."""
+def entities(grid: np.ndarray, spec, platform_travel: float, enemy_reach: float, err):
+    """Platforms and enemies of a map with their paths (defaults, then the path lines).  Problems go to err(code, msg, cells)."""
+    h, w = grid.shape
+    plats = []
+    for r in range(h):
+        c = 0
+        while c < w:
+            if grid[r, c] == "M":
+                c0 = c
+                while c + 1 < w and grid[r, c + 1] == "M":
+                    c += 1
+                x0 = (c0 + c + 1) / 2.0
+                plats.append(Platform(r, c0, c, x0, x0 + platform_travel))
+            c += 1
+    enemies = [Enemy(int(r), int(c), c + 0.5 - enemy_reach, c + 0.5 + enemy_reach) for r, c in np.argwhere(grid == "E")]
+    seen = set()
+    for ln, text in spec:
+        m = _PLAT.match(text)
+        if m:
+            r, c = int(m[1]) - 1, int(m[2]) - 1
+            p = next((p for p in plats if p.row == r and p.c0 <= c <= p.c1), None)
+            if p is None:
+                err("path-target", f"line {ln}: there is no moving platform ('M') at row {r + 1}, col {c + 1}: {text!r}")
+            elif id(p) in seen:
+                err("path-duplicate", f"line {ln}: {p.desc()} already has a path line: {text!r}")
+            else:
+                seen.add(id(p))
+                p.stop = float(m[3])
+            continue
+        m = _ENEMY.match(text)
+        if m:
+            r, c = int(m[1]) - 1, int(m[2]) - 1
+            e = next((e for e in enemies if e.row == r and e.col == c), None)
+            if e is None:
+                err("path-target", f"line {ln}: there is no enemy ('E') at row {r + 1}, col {c + 1}: {text!r}")
+            elif id(e) in seen:
+                err("path-duplicate", f"line {ln}: {e.desc()} already has a path line: {text!r}")
+            elif float(m[3]) > float(m[4]):
+                err("path-order", f"line {ln}: 'from' must not be larger than 'to': {text!r}")
+            else:
+                seen.add(id(e))
+                e.lo, e.hi = float(m[3]), float(m[4])
+            continue
+        hint = " (this looks like a map row: a blank line ends the map)" if re.fullmatch(f"[{re.escape(SYMBOLS)}]+", text) else ""
+        err("path-syntax", f"line {ln}: not a path line: {text!r}{hint}.  Allowed: {FORMS}")
+    return plats, enemies
+
+
+def layout(text: str, platform_travel: float, enemy_reach: float):
+    """(map rows, platforms, enemies) of a level that already passed validate()."""
+    rows, spec = split_text(text)
+    grid = np.array([list(r) for r in rows])
+    plats, enemies = entities(grid, spec, platform_travel, enemy_reach, lambda *a: None)
+    return rows, plats, enemies
+
+
+def _overlap(a, b) -> bool:
+    return a[0] < b[1] and b[0] < a[1]
+
+
+def _cells(row: int, x_lo: float, x_hi: float, w: int):
+    return [(row, c) for c in range(max(0, int(np.floor(x_lo))), min(w, int(np.ceil(x_hi))))]
+
+
+def check(text: str, platform_travel: float = 6.0, enemy_reach: float = 3.0, enemy_half_w: float = 0.375,
+          enemy_h: float = 0.875) -> Report:
+    """Find everything wrong with a level text.  Never raises.  platform_travel / enemy_reach: paths without a path line."""
     rep = Report()
     err = lambda code, msg, cells=(): rep.errors.append(Problem(code, msg, list(cells)))
     warn = lambda code, msg, cells=(): rep.warnings.append(Problem(code, msg, list(cells)))
 
-    rows = text.strip("\n").split("\n") if text.strip("\n") else []
+    rows, spec = split_text(text)
     if not rows:
         err("empty-level", "the level has no rows")
         return rep
@@ -108,39 +260,82 @@ def check(text: str, platform_travel: float = 6.0, enemy_ray_len: float = 0.5625
     solid, oneway = grid == "#", grid == "-"
     support = solid | oneway | (grid == "M")
 
-    # --- exactly one player and one enemy -------------------------------------------------------------------------
-    cells = {}
-    for ch, name in (("P", "player spawn"), ("E", "enemy")):
-        found = [tuple(map(int, x)) for x in np.argwhere(grid == ch)]
-        cells[ch] = found
-        if len(found) != 1:
-            now = "none" if not found else f"{len(found)}: {_where(found)}"
-            err(f"{name.split()[-1]}-count", f"needs exactly one '{ch}' ({name}), found {now}", found)
+    # --- exactly one player; any number of enemies and platforms ------------------------------------------------------
+    spawn = [tuple(map(int, x)) for x in np.argwhere(grid == "P")]
+    if len(spawn) != 1:
+        now = "none" if not spawn else f"{len(spawn)}: {_where(spawn)}"
+        err("spawn-count", f"needs exactly one 'P' (player spawn), found {now}", spawn)
 
-    # --- the moving platform: one row, no gaps, room to sweep ---------------------------------------------------------
-    m_cells = [tuple(map(int, x)) for x in np.argwhere(grid == "M")]
-    m_ok = False
-    if not m_cells:
-        err("platform-missing", "needs a moving platform: put 'M' tiles next to each other in one row (the original has 2)")
-    elif len({r for r, _ in m_cells}) != 1:
-        err("platform-rows", "all 'M' tiles must be in a single row; found " + _where(m_cells), m_cells)
-    else:
-        m_row = m_cells[0][0]
-        cols = sorted(c for _, c in m_cells)
-        if cols != list(range(cols[0], cols[-1] + 1)):
-            err("platform-gap", f"the 'M' tiles in row {m_row + 1} must be one block with no gap "
-                f"(columns {cols[0] + 1}..{cols[-1] + 1})", m_cells)
-        else:
-            m_ok = True
-            last = int(np.ceil(cols[-1] + 1 + platform_travel)) - 1        # right-most column the platform covers
-            if last >= w:
-                err("platform-sweep-map", f"the moving platform sweeps {platform_travel:g} tiles to the right, up to "
-                    f"column {last + 1}, but the map is only {w} wide", m_cells)
-            else:
-                blocked = [(m_row, c) for c in range(cols[0], last + 1) if solid[m_row, c]]
-                if blocked:
-                    err("platform-sweep-solid", "the moving platform would sweep through solid tiles at " +
-                        _where(blocked), blocked)
+    plats, enemies = entities(grid, spec, platform_travel, enemy_reach, err)
+
+    # --- every platform path on its own: inside the map, nothing in the way ----------------------------------------------
+    for p in plats:
+        x0, x1 = p.span
+        here = [(p.row, c) for c in range(p.c0, p.c1 + 1)]
+        if p.stop == p.start:
+            err("platform-no-travel", f"{p.desc()} starts and stops at x={p.start:g}: it would not move", here)
+        if x0 < 0 or x1 > w:
+            err("platform-sweep-map", f"{p.desc()} moves between x={p.lo:g} and x={p.hi:g}, so with its width it covers "
+                f"x {x0:g}..{x1:g}, but the map spans 0..{w}", here)
+            continue
+        found = {}
+        for r, c in _cells(p.row, x0, x1, w):
+            kind = IN_THE_WAY.get(str(grid[r, c]))
+            if kind:
+                found.setdefault(kind, []).append((r, c))
+        for (code, what), cells in found.items():
+            err(f"platform-sweep-{code}", f"{p.desc()} would sweep through {what} at " + _where(cells), cells)
+    for i, a in enumerate(plats):                               # nothing else on the same stretch
+        for b in plats[i + 1:]:
+            if a.row == b.row and _overlap(a.span, b.span):
+                err("platform-overlap", f"{a.desc()} and {b.desc()} share part of their path (they would pass through "
+                    "each other)", [(a.row, a.c0), (b.row, b.c0)])
+        for e in enemies:
+            if a.row == e.row and _overlap(a.span, e.span(enemy_half_w)):
+                err("platform-sweep-enemy", f"{a.desc()} shares its row and part of its path with {e.desc()}",
+                    [(a.row, a.c0), (e.row, e.col)])
+
+    # --- every enemy path on its own ------------------------------------------------------------------------------------
+    for e in enemies:
+        x0, x1 = e.span(enemy_half_w)
+        if e.hi - e.lo < MIN_PATROL:
+            err("enemy-no-travel", f"{e.desc()} has a path from x={e.lo:g} to x={e.hi:g}: no room to walk")
+        if not e.lo <= e.x <= e.hi:
+            err("enemy-start-outside", f"{e.desc()} starts at x={e.x:g}, outside its path x={e.lo:g}..{e.hi:g}",
+                [(e.row, e.col)])
+        if x0 < 0 or x1 > w:
+            err("enemy-path-outside", f"{e.desc()} walks between x={e.lo:g} and x={e.hi:g}, so with its body it covers "
+                f"x {x0:g}..{x1:g}, but the map spans 0..{w}", [(e.row, e.col)])
+            continue
+        cells = _cells(e.row, x0, x1, w)
+        found = {}
+        for r, c in cells:
+            kind = IN_THE_WAY.get(str(grid[r, c]))
+            if kind and kind[0] not in ("spawn", "start"):      # 'S' only matters for random starts, which push enemies away
+                found.setdefault(kind, []).append((r, c))
+        for (code, what), bad in found.items():
+            err(f"enemy-path-{code}", f"{e.desc()} would walk through {what} at " + _where(bad), bad)
+        holes = [(e.row + 1, c) for _, c in cells if not (e.row + 1 < h and support[e.row + 1, c] and grid[e.row + 1, c] != "M")]
+        if holes:
+            err("enemy-path-ground", f"{e.desc()} would walk over missing ground (enemies do not fall, it would float) at "
+                + _where(holes), holes)
+    for i, a in enumerate(enemies):
+        for b in enemies[i + 1:]:
+            if a.row == b.row and _overlap(a.span(enemy_half_w), b.span(enemy_half_w)):
+                err("enemy-overlap", f"{a.desc()} and {b.desc()} share part of their path", [(a.row, a.col), (b.row, b.col)])
+
+    # --- an enemy that can reach the player at the real spawn (nothing pushes it away there) -------------------------
+    if len(spawn) == 1:
+        pr, pc = spawn[0]
+        px, py = pc + 0.5, pr + 1.0
+        for e in enemies:
+            x0, x1 = e.span(enemy_half_w)
+            if x0 < px + PLAYER_HW and px - PLAYER_HW < x1 and e.y - enemy_h < py and py - PLAYER_H < e.y:
+                err("enemy-hits-spawn", f"{e.desc()} can reach the player spawn at row {pr + 1}, col {pc + 1} (its path "
+                    f"x {x0:g}..{x1:g} covers the spawn): the player could be hit at the start", [(e.row, e.col), (pr, pc)])
+            elif max(x0 - px, px - x1, 0.0) < NEAR_SPAWN and abs(e.row - pr) <= 3:
+                warn("enemy-near-spawn", f"{e.desc()} patrols within {NEAR_SPAWN:g} tiles of the player spawn at row "
+                     f"{pr + 1}, col {pc + 1}", [(e.row, e.col), (pr, pc)])
 
     # --- warnings (the level still loads) -------------------------------------------------------------------------
     if not (grid == "G").any():
@@ -160,26 +355,9 @@ def check(text: str, platform_travel: float = 6.0, enemy_ray_len: float = 0.5625
         warn("no-ground-below", f"no ground within {MAX_DROP} tiles below a start point (it falls out of the map): " +
              _where(no_floor), no_floor)
 
-    if len(cells["E"]) == 1:
-        er, ec = cells["E"][0]
-        if not (er + 1 < h and (solid[er + 1, ec] or oneway[er + 1, ec])):
-            warn("enemy-floating", f"the enemy at row {er + 1}, col {ec + 1} has no ground directly below it "
-                 "(enemies do not fall, it would float)", [(er, ec)])
-        lo, hi = patrol_limits(solid, ec + 0.5, er + 1.0, enemy_ray_len, enemy_ray_h)
-        if hi - lo < 2 * enemy_half_w:
-            warn("enemy-boxed-in", f"walls leave the enemy at row {er + 1}, col {ec + 1} (almost) no room to patrol",
-                 [(er, ec)])
-        elif er + 1 < h:
-            c_from, c_to = int(np.floor(lo)), int(np.floor(hi))
-            holes = [(er + 1, c) for c in range(c_from, min(c_to, w - 1) + 1)
-                     if not (solid[er + 1, c] or oneway[er + 1, c])]
-            if holes:
-                warn("enemy-patrol-ground", "the enemy patrols over missing ground (it keeps walking in mid-air) at " +
-                     _where(holes), holes)
-
     # completely walled-in goals / coins / starts (flood fill through non-solid cells from the spawn)
-    if len(cells["P"]) == 1:
-        reach = _reachable(solid, cells["P"][0])
+    if len(spawn) == 1:
+        reach = _reachable(solid, spawn[0])
         for ch, what in (("o", "coin"), ("G", "goal"), ("S", "start point")):
             lost = [tuple(map(int, x)) for x in np.argwhere(grid == ch) if not reach[x[0], x[1]]]
             if lost:
@@ -210,18 +388,22 @@ def validate(text: str, *limits) -> Report:
     rep = check(text, *limits)
     if rep.errors:
         n = len(rep.errors)
-        raise LevelError(f"the level has {n} problem{'s' if n > 1 else ''} (rows and columns count from 1):\n" +
-                         "\n".join(f"  {e}" for e in rep.errors))
+        where = f" in {SOURCE}" if SOURCE else ""
+        raise LevelError(f"the level{where} has {n} problem{'s' if n > 1 else ''} (rows and columns count from 1, "
+                         "'line' = line of the level text):\n" + "\n".join(f"  {e}" for e in rep.errors))
     for w in rep.warnings:
-        log.warning("level warning %s", w)
+        log.warning("level warning%s %s", f" ({SOURCE})" if SOURCE else "", w)
     return rep
 
 
 def main(argv=None) -> int:
     argv = sys.argv[1:] if argv is None else argv
-    from platformer_ai import level as L          # importing it already validates the built-in level
-    text = open(argv[0]).read() if argv else L.LEVEL
-    rep = check(text, L.PLATFORM_TRAVEL, L.ENEMY_RAY_LEN, L.ENEMY_RAY_H, L.ENEMY_HALF_W)
+    if argv:
+        text = open(argv[0]).read()                # a file is checked on its own: no need for a valid level.py
+    else:
+        from platformer_ai import level as L      # the level in level.py (importing it already validates it)
+        text = L.LEVEL
+    rep = check(text)                              # the limits are check()'s defaults, the same as in level.py
     print(text.strip("\n"))
     print()
     for e in rep.errors:

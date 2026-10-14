@@ -46,8 +46,8 @@ def test_frame_shows_what_it_should():
 
     def frame(**kw):
         args = dict(player_xy=(L.SPAWN_X, L.SPAWN_Y), player_frame=V.ANIMS["player"]["idle"]["frames"][0],
-                    player_flip=False, enemy_x=L.ENEMY_X, enemy_flip=False, enemy_frame=V.ANIMS["enemy"]["walk"]["frames"][0],
-                    coin_frame=V.ANIMS["coin"]["spin"]["frames"][0], coins_alive=[True] * L.N_COINS, plat_x=L.PLAT_X_MIN)
+                    player_flip=False, enemy_x=list(L.ENEMY_X), enemy_flip=[False], enemy_frame=V.ANIMS["enemy"]["walk"]["frames"][0],
+                    coin_frame=V.ANIMS["coin"]["spin"]["frames"][0], coins_alive=[True] * L.N_COINS, plat_x=list(L.PLAT_X_MIN))
         args.update(kw)
         return scene.compose(a, cam.top_left(), **args)
 
@@ -57,9 +57,9 @@ def test_frame_shows_what_it_should():
     assert not np.array_equal(base, frame(player_flip=True))                           # knight flips
     assert not np.array_equal(base, frame(player_xy=(L.SPAWN_X + 3, L.SPAWN_Y)))       # knight moves
     # the slime is far off-screen at spawn; put it next to the knight and the picture changes
-    assert np.array_equal(base, frame(enemy_x=L.ENEMY_X + 1))
-    assert not np.array_equal(base, frame(enemy_x=L.SPAWN_X + 2))
-    assert not np.array_equal(base, frame(plat_x=L.SPAWN_X - 2))                       # moving platform drawn at plat_x
+    assert np.array_equal(base, frame(enemy_x=list(L.ENEMY_X + 1)))
+    assert not np.array_equal(base, frame(enemy_x=[L.SPAWN_X + 2]))
+    assert not np.array_equal(base, frame(plat_x=[L.SPAWN_X - 2]))                     # moving platform drawn at plat_x
 
 
 @needs_assets

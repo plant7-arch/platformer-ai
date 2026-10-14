@@ -50,7 +50,9 @@ class Snap:
     def __init__(self, s: E.EnvState):
         g = jax.device_get(s)
         self.x, self.y, self.vx, self.vy = float(g.x), float(g.y), float(g.vx), float(g.vy)
-        self.plat_x, self.enemy_x, self.enemy_dir = float(g.plat_x), float(g.enemy_x), float(g.enemy_dir)
+        self.plat_x = np.asarray(g.plat_x, dtype=float)             # one entry per moving platform
+        self.enemy_x = np.asarray(g.enemy_x, dtype=float)           # one entry per enemy
+        self.enemy_dir = np.asarray(g.enemy_dir, dtype=float)
         self.coins_alive = np.asarray(g.coins_alive, dtype=bool)
         self.ret = float(g.ep_return)
 
@@ -148,8 +150,8 @@ class Viewer:
             a = b = self.prev
         x = V.lerp_pos(a.x, b.x, alpha)
         y = V.lerp_pos(a.y, b.y, alpha)
-        plat_x = V.lerp_pos(a.plat_x, b.plat_x, alpha)
-        enemy_x = V.lerp_pos(a.enemy_x, b.enemy_x, alpha)
+        plat_x = [V.lerp_pos(p, q, alpha) for p, q in zip(a.plat_x, b.plat_x)]
+        enemy_x = [V.lerp_pos(p, q, alpha) for p, q in zip(a.enemy_x, b.enemy_x)]
         self.face_left = V.facing_left(b.vx, self.face_left)
         px, py = V.to_px(x, y)
         self.cam.update(px, py, dt)
@@ -158,7 +160,7 @@ class Viewer:
             self.assets, self.cam.top_left(),
             player_xy=(x, y), player_flip=self.face_left,
             player_frame=self.player_anim.frame(V.player_anim(b.vx, b.vy), now),
-            enemy_x=enemy_x, enemy_flip=b.enemy_dir < 0,
+            enemy_x=enemy_x, enemy_flip=list(b.enemy_dir < 0),
             enemy_frame=self.enemy_anim.frame("walk", now),
             coin_frame=self.coin_anim.frame("spin", now),
             coins_alive=b.coins_alive, plat_x=plat_x)

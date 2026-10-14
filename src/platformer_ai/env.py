@@ -10,11 +10,13 @@ Training helpers (all off by default, switched on in ppo.Config):
     progress_coef=0.1     small bonus per tile of NEW furthest-right progress (not farmable)
 
 Actions (6): horizontal = [none, left, right][a % 3],  jump = a >= 3.
-Rules: solid tiles, one-way platforms (static tiles + one moving platform that carries the player),
-a patrolling enemy (touch = death), coins (one rides on the moving platform), a goal, pits.
+Rules: solid tiles, one-way platforms (static tiles + any number of moving platforms that carry the player),
+any number of patrolling enemies (touch = death), coins (one rides on every moving platform), a goal, pits.
+The level may have 0, 1 or many enemies and moving platforms; all state arrays have a fixed length (N_ENEMIES, N_PLATS).
 Reward: +1 per coin, +5 goal (terminates), -1 death (pit or enemy, terminates).
 Episode is truncated after MAX_STEPS (info["truncated"]); `done` = terminated | truncated.
-Observation: egocentric 9 x 17 tile window with 5 channels + 13 scalars (see observe()).
+Observation: egocentric 9 x 17 tile window with 5 channels + 13 scalars (see observe()).  The window shows every
+enemy and platform; the scalars describe the NEAREST enemy and the NEAREST platform (fixed size for any level).
 """
 from __future__ import annotations
 
@@ -50,14 +52,18 @@ N_SCALARS = 13
 OBS_DIM = N_CHANNELS * PATCH[0] * PATCH[1] + N_SCALARS
 PLAT_THICK = 0.5         # only used to draw the moving platform into the observation
 
-H, W, N_COINS = L.H, L.W, L.N_COINS
+H, W, N_COINS, N_ENEMIES, N_PLATS = L.H, L.W, L.N_COINS, L.N_ENEMIES, L.N_PLATS
 _SOLID = jnp.asarray(L.SOLID)
 _ONEWAY = jnp.asarray(L.ONEWAY)
 _GOAL = jnp.asarray(L.GOAL)
 _ROWS = jnp.arange(H)[:, None]
 _COLS = jnp.arange(W)[None, :]
-_COIN_X, _COIN_Y, _COIN_RIDES = jnp.asarray(L.COIN_X), jnp.asarray(L.COIN_Y), jnp.asarray(L.COIN_RIDES)
-_ENEMY_RAY_ROW = int(np.floor(L.ENEMY_Y - L.ENEMY_RAY_H))
+_STATIC_COIN_X, _STATIC_COIN_Y = jnp.asarray(L.COIN_X[:L.N_STATIC_COINS]), jnp.asarray(L.COIN_Y[:L.N_STATIC_COINS])
+_ENEMY_X0, _ENEMY_Y = jnp.asarray(L.ENEMY_X), jnp.asarray(L.ENEMY_Y)                 # (N_ENEMIES,)
+_ENEMY_MIN, _ENEMY_MAX = jnp.asarray(L.ENEMY_MIN), jnp.asarray(L.ENEMY_MAX)
+_PLAT_TOP, _PLAT_HALF = jnp.asarray(L.PLAT_TOP), jnp.asarray(L.PLAT_HALF)           # (N_PLATS,)
+_PLAT_X_MIN, _PLAT_X_MAX = jnp.asarray(L.PLAT_X_MIN), jnp.asarray(L.PLAT_X_MAX)      # reverse at these
+_PLAT_START_X, _PLAT_DIR0 = jnp.asarray(L.PLAT_START_X), jnp.asarray(L.PLAT_DIR0)
 _START_X, _START_Y = jnp.asarray(L.START_X), jnp.asarray(L.START_Y)
 
 
@@ -80,11 +86,11 @@ class EnvState:
     y: jax.Array            # y of the player's FEET (bottom edge)
     vx: jax.Array
     vy: jax.Array
-    coins_alive: jax.Array  # (N_COINS,) bool; the last coin rides on the moving platform
-    plat_x: jax.Array       # moving platform centre x
-    plat_dir: jax.Array     # +1 / -1
-    enemy_x: jax.Array      # enemy centre x (its y is constant)
-    enemy_dir: jax.Array    # +1 / -1
+    coins_alive: jax.Array  # (N_COINS,) bool; the last N_PLATS coins ride on the moving platforms
+    plat_x: jax.Array       # (N_PLATS,) moving platform centre x
+    plat_dir: jax.Array     # (N_PLATS,) +1 / -1
+    enemy_x: jax.Array      # (N_ENEMIES,) enemy centre x (their y is constant)
+    enemy_dir: jax.Array    # (N_ENEMIES,) +1 / -1
     t: jax.Array            # steps since reset
     furthest: jax.Array     # furthest x reached this episode (progress bonus)
     from_spawn: jax.Array   # bool: episode started at the real spawn (logging)
@@ -98,7 +104,7 @@ def initial_state(rng=None) -> EnvState:
     return EnvState(
         x=f32(L.SPAWN_X), y=f32(L.SPAWN_Y), vx=f32(0), vy=f32(0),
         coins_alive=jnp.ones(N_COINS, dtype=bool),
-        plat_x=f32(L.PLAT_X_MIN), plat_dir=f32(1), enemy_x=f32(L.ENEMY_X), enemy_dir=f32(1),
+        plat_x=_PLAT_START_X, plat_dir=_PLAT_DIR0, enemy_x=_ENEMY_X0, enemy_dir=jnp.ones(N_ENEMIES, f32),
         t=jnp.int32(0), furthest=f32(L.SPAWN_X), from_spawn=jnp.bool_(True),
         rng=jax.random.PRNGKey(0) if rng is None else rng,
         ep_return=f32(0), ep_coins=f32(0))
@@ -112,10 +118,10 @@ def _sample_start(key, use_s_points: bool, random_phases: bool, spawn_prob: floa
       instead of the spawn (always with random phases) to practise the hard parts directly."""
     f32 = jnp.float32
     k = jax.random.split(key, 10)
-    plat_x = jax.random.uniform(k[2], minval=L.PLAT_X_MIN, maxval=L.PLAT_X_MAX)
-    plat_dir = jnp.where(jax.random.uniform(k[3]) < 0.5, 1.0, -1.0)
-    ex = jax.random.uniform(k[4], minval=L.ENEMY_MIN + 0.1, maxval=L.ENEMY_MAX - 0.1)
-    e_dir = jnp.where(jax.random.uniform(k[5]) < 0.5, 1.0, -1.0)
+    plat_x = jax.random.uniform(k[2], (N_PLATS,), minval=_PLAT_X_MIN, maxval=_PLAT_X_MAX)
+    plat_dir = jnp.where(jax.random.uniform(k[3], (N_PLATS,)) < 0.5, 1.0, -1.0)
+    ex = jax.random.uniform(k[4], (N_ENEMIES,), minval=_ENEMY_MIN + 0.1, maxval=_ENEMY_MAX - 0.1)
+    e_dir = jnp.where(jax.random.uniform(k[5], (N_ENEMIES,)) < 0.5, 1.0, -1.0)
     jx = jax.random.uniform(k[7], minval=-SPAWN_JITTER_X, maxval=SPAWN_JITTER_X)
     jy = jax.random.uniform(k[8], minval=-SPAWN_JITTER_Y, maxval=0.0)
     spawn_x = L.SPAWN_X + (jx if random_phases else 0.0)
@@ -123,19 +129,26 @@ def _sample_start(key, use_s_points: bool, random_phases: bool, spawn_prob: floa
 
     if use_s_points:
         use_spawn = jax.random.uniform(k[0]) < spawn_prob
-        idx = jax.random.randint(k[1], (), 0, L.N_STARTS + 1)           # last option = riding the ferry
-        on_ferry = idx == L.N_STARTS
+        # options: the S points, plus (if the level has moving platforms) riding one of them, picked at random
+        idx = jax.random.randint(k[1], (), 0, L.N_STARTS + (1 if N_PLATS else 0))
         i = jnp.minimum(idx, L.N_STARTS - 1)
-        sx = jnp.where(use_spawn, spawn_x, jnp.where(on_ferry, plat_x, _START_X[i]))
-        sy = jnp.where(use_spawn, spawn_y, jnp.where(on_ferry, L.PLAT_TOP, _START_Y[i]))
+        sx = jnp.where(use_spawn, spawn_x, _START_X[i])
+        sy = jnp.where(use_spawn, spawn_y, _START_Y[i])
+        if N_PLATS:
+            on_ferry = idx == L.N_STARTS
+            p = jax.random.randint(k[9], (), 0, N_PLATS)
+            sx = jnp.where(use_spawn, spawn_x, jnp.where(on_ferry, plat_x[p], _START_X[i]))
+            sy = jnp.where(use_spawn, spawn_y, jnp.where(on_ferry, _PLAT_TOP[p], _START_Y[i]))
         phases = jnp.logical_or(~use_spawn, random_phases)
     else:
         use_spawn = jnp.bool_(True)
         sx, sy = jnp.asarray(spawn_x, f32), jnp.asarray(spawn_y, f32)
         phases = jnp.bool_(random_phases)
 
-    ex = jnp.where(jnp.abs(ex - sx) < 1.5,                              # never start on top of the enemy
-                   jnp.where(sx + 3.0 <= L.ENEMY_MAX, sx + 3.0, sx - 3.0), ex)
+    # never start on top of an enemy: push it 3 tiles away (to whichever side still fits its patrol range)
+    away = jnp.where(sx + 3.0 <= _ENEMY_MAX, sx + 3.0, sx - 3.0)
+    away = jnp.clip(away, _ENEMY_MIN + 0.1, _ENEMY_MAX - 0.1)
+    ex = jnp.where(jnp.abs(ex - sx) < 1.5, away, ex)
     base = initial_state(rng=k[6])
     return base.replace(
         x=jnp.asarray(sx, f32), y=jnp.asarray(sy, f32), furthest=jnp.asarray(sx, f32),
@@ -186,9 +199,9 @@ def _tile_support(x, y):
 
 
 def _on_mplat(x, y, plat_x):
-    """Standing on the moving platform?"""
-    return ((jnp.abs(y - L.PLAT_TOP) <= 0.02) &
-            (x + HW > plat_x - L.PLAT_HALF) & (x - HW < plat_x + L.PLAT_HALF))
+    """(N_PLATS,) bool: standing on each moving platform?"""
+    return ((jnp.abs(y - _PLAT_TOP) <= 0.02) &
+            (x + HW > plat_x - _PLAT_HALF) & (x - HW < plat_x + _PLAT_HALF))
 
 
 def _overlap(x, y):
@@ -198,9 +211,26 @@ def _overlap(x, y):
 
 
 def _coin_pos(plat_x):
-    cx = jnp.where(_COIN_RIDES, plat_x + L.RIDER_COIN_OFFSET[0], _COIN_X)
-    cy = jnp.where(_COIN_RIDES, L.PLAT_TOP + L.RIDER_COIN_OFFSET[1], _COIN_Y)
+    """(N_COINS,) x and y of every coin: the static ones, then one per moving platform riding on it."""
+    cx = jnp.concatenate([_STATIC_COIN_X, plat_x + L.RIDER_COIN_OFFSET[0]])
+    cy = jnp.concatenate([_STATIC_COIN_Y, _PLAT_TOP + L.RIDER_COIN_OFFSET[1]])
     return cx, cy
+
+
+def _first(mask, values):
+    """values[i] for the first True in mask, else 0 (empty-safe: no argmax on a zero-length array)."""
+    first = mask & (jnp.cumsum(mask.astype(jnp.int32)) == 1)
+    return jnp.sum(jnp.where(first, values, 0.0))
+
+
+def _nearest(px, py, xs, ys, dirs, x_scale, y_scale):
+    """The 3 observation scalars for the nearest of several things: dx, dy (scaled, clipped) and its direction.
+    With none in the level: far away to the right, standing still."""
+    if xs.shape[0] == 0:
+        return jnp.asarray([2.0, 0.0, 0.0], jnp.float32)
+    dx, dy = xs - px, ys - py
+    i = jnp.argmin(dx * dx + dy * dy)
+    return jnp.stack([jnp.clip(dx[i] / x_scale, -2.0, 2.0), jnp.clip(dy[i] / y_scale, -2.0, 2.0), dirs[i]])
 
 
 # ---- observation --------------------------------------------------------------------------
@@ -218,9 +248,11 @@ def observe(s: EnvState):
     def box(left, right, top, bottom):                   # window cells touched by a box
         return (wc + 1 > left) & (wc < right) & (wr + 1 > top) & (wr < bottom)
 
-    plat = box(s.plat_x - L.PLAT_HALF, s.plat_x + L.PLAT_HALF, L.PLAT_TOP, L.PLAT_TOP + PLAT_THICK)
-    enemy = box(s.enemy_x - L.ENEMY_HALF_W, s.enemy_x + L.ENEMY_HALF_W,
-                L.ENEMY_Y - L.ENEMY_H, L.ENEMY_Y)
+    def boxes(left, right, top, bottom):                # several boxes (leading axis) -> cells touched by any
+        return box(left[:, None, None], right[:, None, None], top[:, None, None], bottom[:, None, None]).any(axis=0)
+
+    plat = boxes(s.plat_x - _PLAT_HALF, s.plat_x + _PLAT_HALF, _PLAT_TOP, _PLAT_TOP + PLAT_THICK)
+    enemy = boxes(s.enemy_x - L.ENEMY_HALF_W, s.enemy_x + L.ENEMY_HALF_W, _ENEMY_Y - L.ENEMY_H, _ENEMY_Y)
     cx, cy = _coin_pos(s.plat_x)
     coins = ((jnp.floor(cx)[:, None, None] == wc) & (jnp.floor(cy)[:, None, None] == wr)
              & s.coins_alive[:, None, None]).any(axis=0)
@@ -228,19 +260,16 @@ def observe(s: EnvState):
     patches = jnp.concatenate([solid.ravel(), (oneway | plat).ravel(), coins.ravel(),
                                goal.ravel(), enemy.ravel()]).astype(f32)
 
-    def rel(d, scale):
-        return jnp.clip(d / scale, -2.0, 2.0)
-
-    scalars = jnp.stack([
+    scalars = jnp.concatenate([jnp.stack([
         s.vx / RUN_SPEED,
         s.vy / JUMP_SPEED,
-        (_tile_support(s.x, s.y) | _on_mplat(s.x, s.y, s.plat_x)).astype(f32),
+        (_tile_support(s.x, s.y) | _on_mplat(s.x, s.y, s.plat_x).any()).astype(f32),
         s.x - jnp.floor(s.x) - 0.5,                  # sub-tile position
         s.y - jnp.floor(s.y) - 0.5,
         s.x / W,                                     # progress through the level
-        s.t / MAX_STEPS,                             # time used
-        rel(s.enemy_x - s.x, 8.0), rel(L.ENEMY_Y - s.y, 4.0), s.enemy_dir,
-        rel(s.plat_x - s.x, 8.0), rel(L.PLAT_TOP - s.y, 4.0), s.plat_dir,
+        s.t / MAX_STEPS]),                           # time used
+        _nearest(s.x, s.y, s.enemy_x, _ENEMY_Y, s.enemy_dir, 8.0, 4.0),     # nearest enemy: dx, dy, direction
+        _nearest(s.x, s.y, s.plat_x, _PLAT_TOP, s.plat_dir, 8.0, 4.0),      # nearest moving platform
     ]).astype(f32)
     return jnp.concatenate([patches, scalars])
 
@@ -257,14 +286,14 @@ def step(state: EnvState, action, random_starts: bool = False, random_phases: bo
 
     # moving platform: move, then flip at the ends (like the original script)
     new_px = state.plat_x + state.plat_dir * L.PLATFORM_SPEED * DT
-    new_pd = jnp.where(new_px >= L.PLAT_X_MAX, -1.0,
-                       jnp.where(new_px <= L.PLAT_X_MIN, 1.0, state.plat_dir))
+    new_pd = jnp.where(new_px >= _PLAT_X_MAX, -1.0,
+                       jnp.where(new_px <= _PLAT_X_MIN, 1.0, state.plat_dir))
     plat_dx = new_px - state.plat_x
 
     tile_sup = _tile_support(state.x, state.y)
-    on_mp = _on_mplat(state.x, state.y, state.plat_x)
-    on_floor = tile_sup | on_mp
-    carry = jnp.where(on_mp & ~tile_sup, plat_dx, 0.0)      # the platform carries whoever stands on it
+    on_mp = _on_mplat(state.x, state.y, state.plat_x)       # (N_PLATS,)
+    on_floor = tile_sup | on_mp.any()
+    carry = jnp.where(tile_sup, 0.0, _first(on_mp, plat_dx))    # the platform carries whoever stands on it
 
     vx = hdir * RUN_SPEED
     vy = jnp.minimum(state.vy + GRAVITY * DT, MAX_FALL)
@@ -288,22 +317,22 @@ def step(state: EnvState, action, random_starts: bool = False, random_phases: bo
     solid_hit = _solid(row_feet, c_l) | _solid(row_feet, c_r)
     oneway_hit = (_oneway(row_feet, c_l) | _oneway(row_feet, c_r)) & (state.y <= row_feet + 0.01)
     landed_tile = (vy > 0) & (solid_hit | oneway_hit)
-    over_mp = (nx + HW > new_px - L.PLAT_HALF) & (nx - HW < new_px + L.PLAT_HALF)
-    landed_mp = (vy > 0) & over_mp & (state.y <= L.PLAT_TOP + 0.01) & (ny >= L.PLAT_TOP)
+    over_mp = (nx + HW > new_px - _PLAT_HALF) & (nx - HW < new_px + _PLAT_HALF)
+    landed_mp = (vy > 0) & over_mp & (state.y <= _PLAT_TOP + 0.01) & (ny >= _PLAT_TOP)      # (N_PLATS,)
+    mp_top = jnp.min(jnp.concatenate([jnp.where(landed_mp, _PLAT_TOP, 1e9), jnp.asarray([1e9], f32)]))  # highest hit
     bonk = (vy < 0) & (_solid(row_head, c_l) | _solid(row_head, c_r))
     ny = jnp.where(landed_tile, row_feet.astype(f32), ny)
-    ny = jnp.where(landed_mp, f32(L.PLAT_TOP), ny)
+    landed_mp = landed_mp.any()
+    ny = jnp.where(landed_mp, mp_top, ny)
     ny = jnp.where(bonk, row_head + 1.0 + HEIGHT + EPS, ny)
     vy = jnp.where(landed_tile | landed_mp | bonk, 0.0, vy)
 
-    # --- enemy: turns around when a wall sensor touches a solid tile, then walks ---
-    hit_r = _solid(_ENEMY_RAY_ROW, jnp.floor(state.enemy_x + L.ENEMY_RAY_LEN).astype(i32))
-    hit_l = _solid(_ENEMY_RAY_ROW, jnp.floor(state.enemy_x - L.ENEMY_RAY_LEN).astype(i32))
-    e_dir = jnp.where(hit_r, -1.0, state.enemy_dir)
-    e_dir = jnp.where(hit_l, 1.0, e_dir)
+    # --- enemies: walk back and forth between their own x limits (walls play no part) ---
+    e_dir = jnp.where(state.enemy_x >= _ENEMY_MAX, -1.0, state.enemy_dir)
+    e_dir = jnp.where(state.enemy_x < _ENEMY_MIN, 1.0, e_dir)
     new_ex = state.enemy_x + e_dir * L.ENEMY_SPEED * DT
     hit_enemy = ((nx + HW > new_ex - L.ENEMY_HALF_W) & (nx - HW < new_ex + L.ENEMY_HALF_W) &
-                 (ny > L.ENEMY_Y - L.ENEMY_H) & (ny - HEIGHT < L.ENEMY_Y))
+                 (ny > _ENEMY_Y - L.ENEMY_H) & (ny - HEIGHT < _ENEMY_Y)).any()
 
     # --- coins (circles), goal, death ---
     cx, cy = _coin_pos(new_px)

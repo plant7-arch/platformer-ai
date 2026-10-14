@@ -93,11 +93,22 @@ def test_platform_runs_and_coins():
     assert len(runs) == (n_oneway + 1) // 2 and n_oneway == 2   # the level has one 2-tile floating platform
     (cx, top), = runs
     assert top == float(np.argwhere(L.ONEWAY)[0][0]) and cx == np.argwhere(L.ONEWAY)[:, 1].mean() + 0.5
-    coins = V.coin_positions(30.0)
+    coins = V.coin_positions([30.0])
     assert len(coins) == L.N_COINS
-    assert coins[-1] == (30.0 + L.RIDER_COIN_OFFSET[0], L.PLAT_TOP + L.RIDER_COIN_OFFSET[1])
+    assert coins[-1] == (30.0 + L.RIDER_COIN_OFFSET[0], L.PLAT_TOP[0] + L.RIDER_COIN_OFFSET[1])
     assert coins[0] == (float(L.COIN_X[0]), float(L.COIN_Y[0]))
-    assert V.coin_positions(31.0)[-1][0] == coins[-1][0] + 1.0 and V.coin_positions(31.0)[0] == coins[0]
+    assert V.coin_positions([31.0])[-1][0] == coins[-1][0] + 1.0 and V.coin_positions([31.0])[0] == coins[0]
+
+
+def test_platform_chunks_cover_any_width():
+    assert V.platform_chunks(2) == [(0.0, 2.0)]
+    assert V.platform_chunks(1) == [(0.0, 1.0)]
+    assert V.platform_chunks(3) == [(-0.5, 2.0), (1.0, 1.0)]
+    assert V.platform_chunks(4) == [(-1.0, 2.0), (1.0, 2.0)]
+    for n in range(1, 9):                                    # the chunks tile the platform exactly
+        spans = sorted((o - w / 2, o + w / 2) for o, w in V.platform_chunks(n))
+        assert spans[0][0] == -n / 2 and spans[-1][1] == n / 2
+        assert all(a[1] == b[0] for a, b in zip(spans, spans[1:]))
 
 
 def test_text_helpers():

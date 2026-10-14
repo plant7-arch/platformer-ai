@@ -84,12 +84,13 @@ def keep_clear() -> np.ndarray:
         if 0 <= r < L.H and 0 <= c < L.W:
             m[r, c] = True
 
-    for x, y in V.coin_positions(L.PLAT_X_MIN)[:-1]:
+    for x, y in V.coin_positions(L.PLAT_X_MIN)[:L.N_STATIC_COINS]:
         mark(x, y)
     for x, y in [(L.SPAWN_X, L.SPAWN_Y), *zip(L.START_X, L.START_Y)]:
         mark(x, y - 0.01)
-    for c in range(int(np.floor(L.ENEMY_MIN)), int(np.floor(L.ENEMY_MAX)) + 1):
-        mark(c + 0.5, L.ENEMY_Y - 0.01)
+    for lo, hi, ey in zip(L.ENEMY_MIN, L.ENEMY_MAX, L.ENEMY_Y):
+        for c in range(int(np.floor(lo)), int(np.floor(hi)) + 1):
+            mark(c + 0.5, float(ey) - 0.01)
     return m | np.asarray(L.GOAL)
 
 
@@ -130,7 +131,8 @@ def _sheet(sheet: np.ndarray, rect) -> np.ndarray:
 
 def compose(a: Assets, cam_tl: tuple[int, int], *, player_xy, player_frame, player_flip,
             enemy_x, enemy_flip, enemy_frame, coin_frame, coins_alive, plat_x) -> np.ndarray:
-    """One frame, (270, 480, 3) uint8.  Positions are in env tiles; cam_tl is the view's top-left in world px."""
+    """One frame, (270, 480, 3) uint8.  Positions are in env tiles; cam_tl is the view's top-left in world px.
+    enemy_x / enemy_flip: one entry per enemy;  plat_x: one entry per moving platform (both may be empty)."""
     cx, cy = cam_tl
     frame = crop(a.world, cx - a.world_origin[0], cy - a.world_origin[1], V.SCREEN_W, V.SCREEN_H)
 
@@ -141,8 +143,10 @@ def compose(a: Assets, cam_tl: tuple[int, int], *, player_xy, player_frame, play
     for sx, sy in V.platform_runs():                       # static one-way platforms
         px, py = V.to_px(sx, sy)
         put(a.platform, px - pw / 2, py + V.PLATFORM_COLLIDER_H / 2 - ph / 2)
-    px, py = V.to_px(plat_x, L.PLAT_TOP)                   # moving platform
-    put(a.platform, px - pw / 2, py + V.PLATFORM_COLLIDER_H / 2 - ph / 2)
+    for x, top, half in zip(plat_x, L.PLAT_TOP, L.PLAT_HALF):      # moving platforms, any width
+        for off, _ in V.platform_chunks(2 * float(half)):
+            px, py = V.to_px(float(x) + off, float(top))
+            put(a.platform, px - pw / 2, py + V.PLATFORM_COLLIDER_H / 2 - ph / 2)
 
     coin_img = _sheet(a.coin, coin_frame)
     for alive, (x, y) in zip(coins_alive, V.coin_positions(plat_x)):
@@ -150,9 +154,10 @@ def compose(a: Assets, cam_tl: tuple[int, int], *, player_xy, player_frame, play
             wx, wy = V.to_px(x, y)
             put(coin_img, wx - 8, wy - 8)
 
-    ex, ey = V.to_px(enemy_x, L.ENEMY_Y)
     ox, oy = V.SPRITE_OFFSET["enemy"]
-    put(_sheet(a.slime, enemy_frame), ex + ox - 12, ey + oy - 12, enemy_flip)
+    for x, y, flip in zip(enemy_x, L.ENEMY_Y, enemy_flip):
+        ex, ey = V.to_px(float(x), float(y))
+        put(_sheet(a.slime, enemy_frame), ex + ox - 12, ey + oy - 12, flip)
 
     px, py = V.to_px(*player_xy)
     ox, oy = V.SPRITE_OFFSET["player"]
