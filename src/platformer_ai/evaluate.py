@@ -4,8 +4,8 @@ Unlike the running `SPAWN` numbers in the training log (which only average episo
 already finished, so they look better than reality while many episodes are still running),
 this runs every episode to its end, all on the GPU in one jitted scan (MAX_STEPS ticks).
 
-    evaluate = make_eval(greedy(network), n_envs=512)
-    metrics = evaluate(params, jax.random.PRNGKey(0))       # dict of scalars
+    evaluate = make_eval(greedy(network), n_envs=512, levels=levels)
+    metrics = evaluate(params, jax.random.PRNGKey(0))       # dict of scalars, plus metrics["per_level"] (arrays)
 """
 from __future__ import annotations
 
@@ -33,15 +33,23 @@ def sampled(network):
     return act
 
 
-def make_eval(act_fn, n_envs: int = 512):
-    """act_fn(params, obs[N, OBS_DIM], key) -> actions[N].  Returns a jitted evaluate(params, key)."""
-    v_step = jax.vmap(functools.partial(E.step, random_starts=False, random_phases=True))
-    v_reset = jax.vmap(functools.partial(E.reset, random_start=False, random_phases=True))
+def make_eval(act_fn, n_envs: int = 512, levels=None):
+    """act_fn(params, obs[N, OBS_DIM], key) -> actions[N].  Returns a jitted evaluate(params, key).
+    levels: env.make_levels(...) (default: the level of level.py).  The environments are split evenly over the levels
+    (n_envs is rounded up to a multiple of their number) and every one stays on its level."""
+    n_lv = E.n_levels(E.DEFAULT_LEVELS if levels is None else levels)
+    n_envs = -(-n_envs // n_lv) * n_lv
+    level_of = jnp.arange(n_envs) % n_lv                    # env i plays level i % n_levels
+    onehot = (level_of[:, None] == jnp.arange(n_lv)[None, :]).astype(jnp.float32)
+    v_step = jax.vmap(functools.partial(E.step, random_starts=False, random_phases=True, levels=levels,
+                                        keep_level=True))
+    v_reset = jax.vmap(lambda k, i: E.reset(k, random_start=False, random_phases=True, levels=levels, level=i))
+    v_observe = jax.vmap(functools.partial(E.observe, levels=levels))
 
     def evaluate(params, key):
         key, k_env = jax.random.split(key)
-        states = v_reset(jax.random.split(k_env, n_envs))
-        obs = jax.vmap(E.observe)(states)
+        states = v_reset(jax.random.split(k_env, n_envs), level_of)
+        obs = v_observe(states)
         zeros = jnp.zeros(n_envs, jnp.float32)
         init = (states, obs, key, jnp.zeros(n_envs, bool), zeros, zeros, zeros, zeros, zeros)
 
@@ -61,7 +69,9 @@ def make_eval(act_fn, n_envs: int = 512):
 
         carry, _ = jax.lax.scan(body, init, None, length=E.MAX_STEPS)
         _, _, _, finished, ret, coins, goal, max_x, length = carry
-        return dict(ret=ret.mean(), goal=goal.mean(), coins=coins.mean(), max_x=max_x.mean(),
-                    length=length.mean(), finished=finished.mean())
+        per = dict(ret=ret, goal=goal, coins=coins, max_x=max_x, length=length, finished=finished.astype(jnp.float32))
+        out = {k: v.mean() for k, v in per.items()}                              # over all levels (equal shares)
+        out["per_level"] = {k: (onehot * v[:, None]).sum(0) / onehot.sum(0) for k, v in per.items()}   # (n_levels,)
+        return out
 
     return jax.jit(evaluate)

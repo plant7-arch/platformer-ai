@@ -1,7 +1,7 @@
 """Several enemies and moving platforms (or none): behaviour of the real environment on small purpose-built levels.
 
-The level is baked into env.py when it is imported, so every scenario runs in its own Python process, with the level
-chosen by PLATFORMER_LEVEL (see level.py).  Needs jax; runs on the CPU.  About 10-30 s per scenario (compilation).
+Every scenario uses the default level of env.py (the one level.py loads), so it runs in its own Python process,
+with the level chosen by PLATFORMER_LEVEL (see level.py).  Needs jax; runs on the CPU.  About 10-30 s per scenario (compilation).
 Run only these with:  uv run pytest tests/test_multi.py -v
 """
 import os
@@ -74,6 +74,18 @@ platform 3 17 to 5
 enemy 5 6 from 3 to 12
 """
 
+RIDERS = """\
+........................
+........................
+...E..o.................
+..MMMMM.................
+............E...........
+P.........--------......
+########################
+
+enemy 3 4 from 2.5 to 5
+"""
+
 # ---- scenarios: (level, code run after the prelude; it must print OK) ----------------------------------------------
 SCENARIOS = {
     "no enemies, no platforms": (NOTHING, """
@@ -143,11 +155,11 @@ print("OK")
 """),
 
     "two platforms": (TWO_PLATFORMS, """
-assert L.N_PLATS == 2 and L.N_ENEMIES == 0 and L.N_COINS == 2
+assert L.N_PLATS == 2 and L.N_ENEMIES == 0 and L.N_COINS == 0
 assert L.PLAT_TOP.tolist() == [2.0, 3.0] and L.PLAT_HALF.tolist() == [1.0, 1.5]       # row by row: the upper one first
 assert L.PLAT_X_MIN.tolist() == [11.0, 3.5] and L.PLAT_X_MAX.tolist() == [17.0, 9.5]
 s = E.reset()
-assert s.plat_x.tolist() == [11.0, 3.5] and s.coins_alive.tolist() == [True, True]
+assert s.plat_x.tolist() == [11.0, 3.5] and s.coins_alive.shape == (0,)
 # riding the lower platform (index 1) carries the player 3.2 * 15 / 30 = 1.6 tiles; the upper one is not involved
 s1, obs, r, d, info = run(put(s, x=3.5, y=3.0), 15)
 assert float(s1.y) == 3.0 and abs(float(s1.x) - 5.1) < 1e-3, (float(s1.x), float(s1.y))
@@ -158,11 +170,11 @@ assert float(s2.y) == 2.0 and abs(float(s2.x) - 12.6) < 1e-3
 # both platforms are drawn into the one-way channel
 ow = channel(E.observe(put(s, x=8.5, y=5.0)), 1)
 assert ow[PR + 3 - 4, PC + 3 - 8] == 1 and ow[PR + 2 - 4, PC + 11 - 8] == 1, ow
-# each platform has its own rider coin: standing on the lower platform takes only the second coin
+# a platform brings no coin of its own: standing on it earns nothing
 s3, obs, r, d, info = E.step(put(s, x=3.5, y=3.0), 0)
-assert float(r) == 1.0 and s3.coins_alive.tolist() == [True, False]
-s4, obs, r, d, info = E.step(put(s, x=11.0, y=2.0), 0)
-assert float(r) == 1.0 and s4.coins_alive.tolist() == [False, True]
+assert float(r) == 0.0 and s3.coins_alive.shape == (0,)
+_, obs, r, d, info = E.step(put(s, x=11.0, y=2.0), 0)
+assert float(r) == 0.0
 # a jumper falling onto the lower platform lands on it (not on the floor below, not through it)
 s5, *_ = run(put(s, x=3.5, y=2.5), 8)
 assert float(s5.y) == 3.0 and float(s5.vy) == 0.0
@@ -216,6 +228,60 @@ assert lo >= 3.0 - 0.07 and hi <= 12.0 + 0.07 and hi - lo > 8.5, (lo, hi)
 for i in range(40):
     st = E.reset(jax.random.PRNGKey(i), random_phases=True)
     assert 5.0 <= float(st.plat_x[0]) <= 17.0 and 3.0 <= float(st.enemy_x[0]) <= 12.0
+print("OK")
+"""),
+
+    "riders: an enemy on a platform, a coin stuck to it, an enemy on a one-way run": (RIDERS, """
+assert (L.N_ENEMIES, L.N_PLATS) == (2, 1)
+assert L.ENEMY_RIDE.tolist() == [0, -1]
+assert L.ENEMY_MIN.tolist() == [-2.0, 10.375] and L.ENEMY_MAX.tolist() == [0.5, 17.625]   # a rider's limits: relative to its platform
+assert L.N_COINS == 1 and L.COIN_PLAT.tolist() == [0]               # just the coin stuck to the platform
+s = E.reset()
+assert s.enemy_x.tolist() == [3.5, 12.5] and s.plat_x.tolist() == [4.5]
+cx, cy = (np.asarray(a) for a in E._coin_pos(s.plat_x))
+assert cx.tolist() == [6.5] and cy.tolist() == [2.5]
+# the platform moves 3.2 tiles/s: after 15 steps it is 1.6 tiles on.  The coins went with it, and the rider walked 1.0
+# on its own plus those 1.6 (so it looks like walking on the platform)
+s1, *_ = run(s, 15)
+assert abs(float(s1.plat_x[0]) - 6.1) < 1e-3
+cx1, cy1 = (np.asarray(a) for a in E._coin_pos(s1.plat_x))
+assert np.allclose(cx1, cx + 1.6, atol=1e-3) and cy1.tolist() == cy.tolist()
+assert abs(float(s1.enemy_x[0]) - (3.5 + 1.0 + 1.6)) < 1e-3
+assert abs(float(s1.enemy_x[0] - s1.plat_x[0]) - (3.5 - 4.5 + 1.0)) < 1e-3          # relative to the platform: just its walk
+# it turns round at its limit relative to the platform (+0.5 from the platform centre), wherever the platform is
+s2, *_ = run(put(s, plat_x=[6.0], enemy_x=[6.45, 12.5]), 2)
+assert s2.enemy_dir.tolist()[0] == -1.0
+# ... and never leaves the platform, however long it rides (the platform goes to the end of its path and back)
+t, rel_lo, rel_hi, seen = s, 99.0, -99.0, set()
+for i in range(400):
+    t, obs, r, d, info = E.step(t, 0)
+    rel = float(t.enemy_x[0] - t.plat_x[0])
+    rel_lo, rel_hi = min(rel_lo, rel), max(rel_hi, rel)
+    seen.add(round(float(t.plat_x[0])))
+    assert 10.375 - 0.1 <= float(t.enemy_x[1]) <= 17.625 + 0.1                    # the one on the one-way run stays on it
+    assert not bool(d)
+assert rel_lo >= -2.0 - 0.07 and rel_hi <= 0.5 + 0.07 and rel_hi - rel_lo > 2.3, (rel_lo, rel_hi)
+assert 5 in seen and 10 in seen                                                     # the platform really went to and fro
+# standing on the platform you are carried, and a rider touching you kills
+on = put(s, x=4.5, y=3.0, enemy_x=[8.0, 12.5])
+s3, *_ = run(on, 15)
+assert abs(float(s3.x) - (4.5 + 1.6)) < 1e-3 and float(s3.y) == 3.0
+dead = E.step(put(s, x=3.5, y=3.0), 0)                                              # the rider is at x=3.5 too
+assert float(dead[2]) == -1.0 and bool(dead[3])
+# the stuck coin is collected like any other
+s4, obs, r, d, info = E.step(put(s, x=6.5, y=3.0, enemy_x=[3.5, 12.5]), 0)
+assert float(r) == 1.0 and s4.coins_alive.tolist() == [False]
+# the coin channel of the observation follows a stuck coin to its new tile
+s5, obs5, *_ = run(put(s, x=9.5, y=3.0), 40)                                        # the platform carries the player 4.3 tiles
+coin = channel(E.observe(put(s5, x=float(s5.x), y=float(s5.y))), 2)
+tile = int(np.floor(E._coin_pos(s5.plat_x)[0][0]))
+assert coin[PR + 2 - int(np.floor(float(s5.y) - 0.4)), PC + tile - int(np.floor(float(s5.x)))] == 1
+# random phases: the rider starts on its platform wherever the platform starts
+for i in range(60):
+    st = E.reset(jax.random.PRNGKey(i), random_phases=True)
+    rel = float(st.enemy_x[0] - st.plat_x[0])
+    assert -2.0 - 1e-4 <= rel <= 0.5 + 1e-4 and 4.5 <= float(st.plat_x[0]) <= 10.5, rel
+    assert 10.375 <= float(st.enemy_x[1]) <= 17.625
 print("OK")
 """),
 

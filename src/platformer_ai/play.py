@@ -1,4 +1,5 @@
-"""Watch a trained policy in the terminal.   uv run python -m platformer_ai.play --params runs/latest/params.msgpack"""
+"""Watch a trained policy in the terminal.   uv run python -m platformer_ai.play [--params RUN]
+(default: the latest run, see runs.py)"""
 from __future__ import annotations
 
 import argparse
@@ -9,27 +10,38 @@ import jax
 import jax.numpy as jnp
 from flax import serialization
 
+from platformer_ai import cli
+
+if __name__ == "__main__":
+    cli.level_from_argv()          # --level FILE: has to be set before the level is loaded by the imports below
+
 from platformer_ai import env as E
 from platformer_ai import render
+from platformer_ai import runs
 from platformer_ai.terminal import Screen
 from platformer_ai.ppo import ActorCritic
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--params", default="runs/latest/params.msgpack")
+    ap.add_argument("--params", default="latest",
+                    help="'latest' (default), a run folder or run name under runs/, or a params.msgpack file")
     ap.add_argument("--episodes", type=int, default=3)
     ap.add_argument("--sample", action="store_true", help="sample actions instead of argmax")
     ap.add_argument("--fps", type=float, default=30.0)
     ap.add_argument("--random-phases", action="store_true",
                     help="random platform / enemy phases and jittered spawn (shows if it reacts)")
     ap.add_argument("--hidden", type=int, default=128)
+    cli.add_level_argument(ap)
     args = ap.parse_args()
 
     net = ActorCritic(E.N_ACTIONS, args.hidden)
     template = net.init(jax.random.PRNGKey(0), jnp.zeros((E.OBS_DIM,), jnp.float32))
-    with open(args.params, "rb") as f:
-        params = serialization.from_bytes(template, f.read())
+    path = runs.resolve_params(args.params)
+    if not path.is_file():
+        raise SystemExit(f"no policy at {path} (train one first, or pick a run: uv run python -m platformer_ai.runs)")
+    print(f"policy: {path}")
+    params = serialization.from_bytes(template, path.read_bytes())
 
     @jax.jit
     def act(params, obs, key):

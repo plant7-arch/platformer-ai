@@ -84,11 +84,13 @@ def keep_clear() -> np.ndarray:
         if 0 <= r < L.H and 0 <= c < L.W:
             m[r, c] = True
 
-    for x, y in V.coin_positions(L.PLAT_X_MIN)[:L.N_STATIC_COINS]:
+    for x, y in V.coin_positions(L.PLAT_START_X)[:L.N_STATIC_COINS]:
         mark(x, y)
     for x, y in [(L.SPAWN_X, L.SPAWN_Y), *zip(L.START_X, L.START_Y)]:
         mark(x, y - 0.01)
-    for lo, hi, ey in zip(L.ENEMY_MIN, L.ENEMY_MAX, L.ENEMY_Y):
+    for lo, hi, ey, ride in zip(L.ENEMY_MIN, L.ENEMY_MAX, L.ENEMY_Y, L.ENEMY_RIDE):
+        if ride >= 0:                                       # riders walk on a platform, not on the ground
+            continue
         for c in range(int(np.floor(lo)), int(np.floor(hi)) + 1):
             mark(c + 0.5, float(ey) - 0.01)
     return m | np.asarray(L.GOAL)
@@ -124,6 +126,11 @@ def load_assets(assets_dir: str | Path = "assets", theme: str = "grass", decorat
                   load_rgba(d / "coin.png"), plat)
 
 
+def platform_block(sprite: np.ndarray, n: int) -> np.ndarray:
+    """The platform sprite as one seamless block n tiles wide: left cap, middle tiles, right cap (V.platform_pieces)."""
+    return np.concatenate([sprite[:, x0:x1] for x0, x1 in V.platform_pieces(n)], axis=1)
+
+
 def _sheet(sheet: np.ndarray, rect) -> np.ndarray:
     x, y, w, h = rect
     return sheet[y:y + h, x:x + w]
@@ -139,14 +146,15 @@ def compose(a: Assets, cam_tl: tuple[int, int], *, player_xy, player_frame, play
     def put(img, wx, wy, flip=False):                      # world pixel -> screen
         blit(frame, img, int(round(wx)) - cx, int(round(wy)) - cy, flip)
 
-    ph, pw = a.platform.shape[:2]
-    for sx, sy in V.platform_runs():                       # static one-way platforms
-        px, py = V.to_px(sx, sy)
-        put(a.platform, px - pw / 2, py + V.PLATFORM_COLLIDER_H / 2 - ph / 2)
+    ph = a.platform.shape[0]
+    def block(cx_tiles, top, n):                           # one continuous platform block, n tiles wide
+        img = platform_block(a.platform, n)
+        px, py = V.to_px(cx_tiles, top)
+        put(img, px - img.shape[1] / 2, py + V.PLATFORM_COLLIDER_H / 2 - ph / 2)
+    for sx, sy, n in V.platform_runs():                    # static one-way platforms
+        block(sx, sy, n)
     for x, top, half in zip(plat_x, L.PLAT_TOP, L.PLAT_HALF):      # moving platforms, any width
-        for off, _ in V.platform_chunks(2 * float(half)):
-            px, py = V.to_px(float(x) + off, float(top))
-            put(a.platform, px - pw / 2, py + V.PLATFORM_COLLIDER_H / 2 - ph / 2)
+        block(float(x), float(top), int(round(2 * float(half))))
 
     coin_img = _sheet(a.coin, coin_frame)
     for alive, (x, y) in zip(coins_alive, V.coin_positions(plat_x)):

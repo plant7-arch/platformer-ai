@@ -21,8 +21,9 @@ git clone https://github.com/plant7-arch/platformer-ai.git
 cd platformer-ai
 uv sync
 
-uv run python -m platformer_ai.viewer                 # watch the included trained agent (Tab: play yourself)
-uv run python -m platformer_ai.train                  # train your own: 25M steps, saves runs/latest/params.msgpack
+uv run python -m platformer_ai.viewer                 # watch the latest trained agent (Tab: play yourself)
+uv run python -m platformer_ai.train                  # train your own: 25M steps, into a new runs/<date>_<time>/
+uv run python -m platformer_ai.runs                   # list the runs; the latest one is what viewer / play use
 uv run pytest                                         # tests
 ```
 
@@ -43,7 +44,9 @@ much lower power state on battery and training can be several times slower.
 src/platformer_ai/
   level.py      the level as ASCII (edit it! also holds the S start points)
   levelcheck.py checks the level when it loads: errors with row/col, warnings in the log
-  env.py        reset / step / observe: pure functions on a small pytree; vmap for many envs
+  env.py        reset / step / observe: pure functions on a small pytree; vmap for many envs; the level is an input
+  cli.py        the --level FILE option of viewer / play
+  runs.py       run folders, finding the latest run, `python -m platformer_ai.runs` lists them
   ppo.py        PureJaxRL-style PPO (MLP actor-critic)
   evaluate.py   fixed GPU evaluation: 512 full episodes from the spawn with random phases
   train.py      training loop, prints metrics + periodic evaluation, saves params
@@ -55,7 +58,7 @@ src/platformer_ai/
   scene.py      numpy renderer for one 480x270 frame (tilemaps + sprites)
   terrain.py    draws terrain, backdrop, decorations and the goal flag from the ASCII level (so level edits show up)
 assets/         sprites/ and fonts/ from the Brackeys platformer bundle (CC0)
-runs/latest/    the trained policy (params.msgpack)
+runs/           one folder per training run (params.msgpack, run.json, levels.txt); runs/pretrained/ = the included policy
 tests/          env behaviour tests, viewer-logic tests, a PPO smoke test
 ```
 
@@ -100,10 +103,72 @@ if the agent only works from the spawn but not from the other starts, lower it.
 end of the training log, stays intact, and the per-episode results are printed after the game view closes.
 Ctrl-C leaves cleanly. When stdout is not a terminal (piped), it only prints the results.
 
+## Runs: keeping several trainings
+
+Every training run gets its own folder, so nothing is overwritten:
+
+```
+runs/2026-10-14_205407/                  uv run python -m platformer_ai.train
+runs/2026-10-14_211502_three_levels/     uv run python -m platformer_ai.train --levels docs/levels/ --name three_levels
+    params.msgpack    the policy (saved every 25 updates and at the end)
+    checkpoint.msgpack  network + optimiser state + random key, saved with it (what --resume needs)
+    run.json          command, levels, settings, steps done, last evaluation, finished or not
+    levels.txt        the level files it trained / was tested on
+```
+
+`--out DIR` picks the folder yourself. **The latest run** is your run whose `params.msgpack` was saved most recently
+(a run that is still training counts, so you can watch it learn); `viewer` and `play` use it unless you pass
+`--params` (a run name, a run folder or a `.msgpack` file). `runs/pretrained/` (the policy that comes with the
+repository) is only used when you have no runs of your own, or with `--params pretrained`. See them all:
+
+```bash
+uv run python -m platformer_ai.runs
+  run                              saved                   steps  levels   goal  return  status
+  pretrained                       2026-10-14 21:40              -       -      -       -  shipped with the repository
+* 2026-10-14_211502_three_levels   2026-10-14 21:16   24,903,680       3   0.96    7.22  done
+```
+
+**Resuming.** A run that stopped (Ctrl-C saves the last finished update and prints the command; a crash loses at
+most the updates since the last save, every 25) goes on where it was:
+
+```bash
+uv run python -m platformer_ai.train --resume                         # the latest run
+uv run python -m platformer_ai.train --resume 2026-10-14_205407       # a given run (name or folder)
+uv run python -m platformer_ai.train --resume --total-steps 50000000  # a finished run: train it longer
+```
+
+The settings and levels come from the run's `run.json` (only `--total-steps` and `--eval-every` can be given), the
+network, the Adam state, the learning-rate schedule and the random stream continue exactly; the environments start
+fresh episodes. With a bigger `--total-steps` the learning-rate schedule is stretched to the new end, so the rate
+picks up again from `lr x (1 - done / new total)` and decays to 0.
+
+**Training on from a policy that has no checkpoint** (`runs/pretrained/`, which only keeps `params.msgpack` in git,
+or runs made before `--resume` existed) starts a *new* run whose network begins with those weights, with any levels
+and settings you like; only the optimiser and the learning-rate schedule start fresh:
+
+```bash
+uv run python -m platformer_ai.train --init-from pretrained --levels docs/levels/ --name more_pretrained
+uv run python -m platformer_ai.train --init-from 2026-10-14_212223 --levels my_levels/
+```
+
+To ship a new policy, copy a run's `params.msgpack` into `runs/pretrained/`. The `.gitignore` keeps every run out of
+git except that file:
+
+```
+runs/*
+!runs/pretrained/
+runs/pretrained/*
+!runs/pretrained/params.msgpack
+```
+
+(Also un-ignore `runs/pretrained/checkpoint.msgpack` and `runs/pretrained/run.json`, and copy them along, if the
+shipped policy should be resumable with `--resume pretrained`; the checkpoint is about three times the policy's size.)
+
 ## The viewer (pygame)
 
 ```bash
-uv run python -m platformer_ai.viewer --params runs/latest/params.msgpack
+uv run python -m platformer_ai.viewer                                     # the latest run
+uv run python -m platformer_ai.viewer --params 2026-10-14_205407_three     # a run by name (or a folder / .msgpack)
 ```
 
 A 480x270 picture scaled up in whole-number steps (the window is resizable), camera following the knight,
@@ -141,9 +206,9 @@ width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABE
   moving one that ferries the player across the 8-tile pit while carrying whoever stands on it. A level may
   have any number of moving platforms (also none).
 * **Enemies**: each patrols between its own two x limits (given in the level; a wall inside the path is reported as an error), touch = death.
-  A level may have any number of them (also none).
-* **Coins**: 9 (8 on the map, 1 riding the moving platform), circles with the original 5 px radius. Every moving
-  platform carries one more coin.
+  A level may have any number of them (also none). One standing on a platform walks on it and is carried along by it.
+* **Coins**: 9 (8 on the map, 1 of them sitting on the moving platform), circles with the original 5 px radius. Only
+  coins drawn in the map exist; an `o` right above a moving platform sticks to it.
 * **Goal**: a flag at the far right. The original level had no way to win; this is the one addition.
 * **Speeds**: our player is slower than the Godot one (6 vs 11.25 tiles/s), so the platform and the
   enemy were scaled by the same factor (3.2 and 2.0 tiles/s); relative timing is preserved.
@@ -187,8 +252,8 @@ platform 8 28 to 34
 enemy 7 49 from 44.5625 to 52.4375
 ```
 
-* `platform ROW COL to STOP_X`: the platform with an `M` tile at ROW, COL starts where its `M` tiles are, moves to
-  `STOP_X` (left or right of the start) and back.
+* `platform ROW COL [to STOP_X]`: the platform with an `M` tile at ROW, COL starts where its `M` tiles are,
+  moves to `STOP_X` (left or right of the start) and back.  (`no-coin`, from older levels, is still accepted and does nothing.)
 * `enemy ROW COL from MIN_X to MAX_X`: the enemy at ROW, COL starts at its `E` and walks between those two x.
 * No line: a platform moves 6 tiles to the right of its start, an enemy walks 3 tiles either way of its start
   (`DEFAULT_PLATFORM_TRAVEL`, `DEFAULT_ENEMY_REACH` in `level.py`). Walls never shorten an enemy's path: a wall inside
@@ -207,9 +272,27 @@ enemy 7 49 from 44.5625 to 52.4375
   an enemy path that comes within 3 tiles of the spawn, and coins / goals / start points that are completely
   walled in by solid tiles.
 
+**Enemies on platforms, coins on platforms.**
+
+* An `E` standing right on an `M` tile **rides that moving platform**: it walks on it between the platform's ends and is
+  carried along, so its own walking speed adds to the platform's speed. Without a path line it walks the whole
+  platform; with one, `MIN_X` / `MAX_X` are x *on the platform at its start*, and the enemy's body must stay on the
+  platform (`enemy-rides-outside` otherwise).
+* An `E` standing on a run of `-` tiles patrols only that run (same rule, with the run as the platform).
+* An `o` right above an `M` tile is **stuck to that platform** and moves with it. A platform has a coin only if
+  you draw one.
+* Checks on top of the path checks: a rider may not walk through a coin stuck to its platform, a stuck coin may not travel through solid tiles, two riders on
+  one platform may not share a stretch, another platform in a rider's row may not sweep through it, and solid tiles
+  right above a platform's path give a warning (nobody can stand or ride there).
+
+```
+.....E...o..........         enemy 3 4 from 2.5 to 5       <- on the platform at its start
+..MMMMM.............
+```
+
 Several enemies and platforms: `E` and `M` can appear as often as you like. Neighbouring `M` tiles in a row are one
 platform of that width, so `MM.MM` is two 2-wide platforms (a stray gap splits a platform!). Enemies and platforms are
-numbered row by row, left to right, and every platform brings its own coin. With no `E` or no `M` at all the level
+numbered row by row, left to right,. With no `E` or no `M` at all the level
 still loads and trains; the observation keeps its size.
 
 ![a level with three enemies and two moving platforms](docs/preview_multi.png)
@@ -233,16 +316,54 @@ PLATFORMER_LEVEL=my_level.txt uv run python -m platformer_ai.viewer
 
 Small levels work: a platform needs room for its whole path, and nothing else sets a minimum size (a 1-row level renders and runs; the viewer just shows a lot of sky).
 `tests/test_tiny_levels.py` runs the real environment on small or odd levels, with and without enemies / platforms, and `tests/test_multi.py`
-checks what several enemies and platforms do (killing, carrying, rider coins, nearest-thing scalars, random starts) (a few minutes in total, one process per level because the level is baked in when `env.py` is imported).
+checks what several enemies and platforms do (killing, carrying, rider coins, nearest-thing scalars, random starts) (a few minutes in total, one process per level because they use the default level of `env.py`). `tests/test_levels_input.py` checks several levels of different sizes in one padded set.
 
 A level that is not valid stops the program with a short message (which file, every problem with row / column or line,
 and the command to check it) instead of a traceback; warnings are logged with the file name too.
 
 The check cannot tell whether a level is *beatable*: it finds things that are walled in completely, but not ones that
 are just too high or too far for the jump (about 2.7 tiles). Train an agent on it to find out, and retrain after any
-change: a policy only fits the level it was trained on. The included `params.msgpack` was trained on the built-in
-level (one enemy, one platform); it still loads for any level (the observation size is fixed) but it was never shown
-a second enemy.
+change. The included policy (`runs/pretrained/`) was trained on the three small levels in `docs/levels/` only; it
+loads for any level (the observation size is fixed) but has never seen the others, the built-in level included. To
+get a policy that plays many levels, train on many levels (next section).
+
+## Several levels: the level is an input
+
+The environment does not have the level built in: it takes it as data. `env.make_levels([...])` packs any number of
+levels of any sizes into one set of arrays, padded to the largest map and the largest numbers of enemies, platforms,
+coins and start points (masks switch the unused slots off, so they never move into view, kill or count). Every
+environment carries the index of the level it plays (`state.level`), and each reset picks a random level, so every
+training batch mixes all of them. The observation is the same 778 numbers for every level, so one network plays them
+all and old checkpoints still load.
+
+```bash
+uv run python -m platformer_ai.levelcheck my_levels/                     # check them all first
+uv run python -m platformer_ai.train --levels my_levels/ extra.txt       # train on all of them at once
+uv run python -m platformer_ai.train --levels my_levels/ --test-levels unseen/   # + evaluate on levels it never sees
+uv run python -m platformer_ai.viewer --level unseen/hard.txt            # watch the policy on any level
+uv run python -m platformer_ai.play --level unseen/hard.txt
+```
+
+A folder stands for all `*.txt` files in it (`docs/levels/` has three small ones to start with:
+`--levels docs/levels/`). Without `--levels`, training uses the level of `level.py` (or
+`PLATFORMER_LEVEL`), exactly as before. With several levels the evaluation prints one line over all of them and one
+line per level; `--test-levels` adds an `UNSEEN` evaluation on levels that are never trained on, which is the honest
+test of whether the agent learned to *play* rather than to memorise. The level names of a run are saved in
+`runs/.../levels.txt`.
+
+In code:
+
+```python
+from platformer_ai import env as E, level as L
+levels = E.make_levels(L.load_all(["my_levels/"]))            # or [L.build(text, "name"), ...]
+state = E.reset(key, levels=levels)                           # a random level; level=i for a given one
+state, obs, reward, done, info = E.step(state, action, levels=levels)          # keep_level=True: stay on it
+obs = E.observe(state, levels)
+```
+
+Leaving `levels` out means the level of `level.py`, so a single-level run behaves exactly as before (same numbers).
+The one visible difference inside a padded set: when the player falls out of a level that is shorter than the
+tallest one, the observation window keeps showing the empty rows below it instead of stopping at the map's edge.
 
 ## Where to add features later
 
@@ -251,8 +372,9 @@ a second enemy.
 * **Different enemy kinds** (flying, jumping) or **platform paths**: `enemy_x` / `plat_x` are already arrays with
   one entry per enemy / platform; give them more fields or another update rule inside `step`. Paths come from `level.py`
   (`PLAT_START_X` / `PLAT_STOP_X`, `ENEMY_MIN` / `ENEMY_MAX`).
-* **Random levels or start positions**: `reset(key)` already takes a key; thread a key through the
-  state if `step` needs randomness after reset.
+* **Random / generated levels**: the env already takes levels as data (`make_levels`); a generator only has to
+  write level text (and pass `levelcheck`), then train with `--levels`. A curriculum would weight the random level
+  choice in `reset` instead of picking uniformly.
 
 ## Credits and license
 

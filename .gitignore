@@ -4,8 +4,8 @@
 __pycache__/
 *.pyc
 .pytest_cache/
-# training runs: keep only the trained policy
+# training runs: keeping only the trained policy
 runs/*
-!runs/latest/
-runs/latest/*
-!runs/latest/params.msgpack
+!runs/pretrained/
+runs/pretrained/*
+!runs/pretrained/params.msgpack

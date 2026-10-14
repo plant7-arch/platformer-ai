@@ -1,6 +1,6 @@
 """pygame window for the platformer: watch the trained agent, or take over with the keyboard.
 
-  uv run python -m platformer_ai.viewer --params runs/latest/params.msgpack
+  uv run python -m platformer_ai.viewer [--params RUN]          (default: the latest run, see runs.py)
 
 The window only READS the JAX env (one env, one jitted step per tick, on the CPU) - training is untouched.
 Keys:  Tab agent <-> you | arrows / A D move, Space / Up / W jump | P pause, . single step | R restart | Esc quit
@@ -22,8 +22,14 @@ import numpy as np
 import pygame
 from flax import serialization
 
+from platformer_ai import cli
+
+if __name__ == "__main__":
+    cli.level_from_argv()          # --level FILE: has to be set before the level is loaded by the imports below
+
 from platformer_ai import env as E
 from platformer_ai import level as L
+from platformer_ai import runs
 from platformer_ai import scene
 from platformer_ai import terrain
 from platformer_ai import viewlogic as V
@@ -251,7 +257,8 @@ DT_SIM = E.DT
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--params", default="runs/latest/params.msgpack")
+    ap.add_argument("--params", default="latest",
+                    help="'latest' (default), a run folder or run name under runs/, or a params.msgpack file")
     ap.add_argument("--assets", default="assets", help="folder with sprites/ and fonts/ (Brackeys bundle)")
     ap.add_argument("--scale", type=int, default=3, help="initial window = 480x270 times this (resizable)")
     ap.add_argument("--human", action="store_true", help="start with keyboard control")
@@ -260,8 +267,11 @@ def main() -> None:
     ap.add_argument("--theme", default="grass", choices=sorted(terrain.THEMES), help="ground material")
     ap.add_argument("--no-decor", action="store_true", help="no bushes / mushrooms on the ground")
     ap.add_argument("--hidden", type=int, default=128)
+    cli.add_level_argument(ap)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
+    args.params = str(runs.resolve_params(args.params))
+    print(f"policy: {args.params}")
     v = Viewer(args)
     print("compiling the env on the CPU (a few seconds) ...")
     v.step(v.state, 0)                                    # warm-up so the window does not stutter at the start

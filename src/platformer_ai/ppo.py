@@ -85,14 +85,17 @@ def _log_prob(logits, action):
     return jnp.take_along_axis(logp, action[..., None], axis=-1)[..., 0], logp
 
 
-def make_train(cfg: Config):
+def make_train(cfg: Config, levels=None):
+    """levels: env.make_levels(...) to train on (default: the level of level.py).  Every environment plays a random
+    one of them and gets a new random one at every reset, so each batch mixes all levels."""
     network = ActorCritic(E.N_ACTIONS, cfg.hidden)
     v_step = jax.vmap(functools.partial(
         E.step, random_starts=cfg.random_starts, random_phases=cfg.random_phases,
-        spawn_prob=cfg.spawn_prob, progress_coef=cfg.progress_coef))
+        spawn_prob=cfg.spawn_prob, progress_coef=cfg.progress_coef, levels=levels))
     v_reset = jax.vmap(functools.partial(
         E.reset, random_start=cfg.random_starts, random_phases=cfg.random_phases,
-        spawn_prob=cfg.spawn_prob))
+        spawn_prob=cfg.spawn_prob, levels=levels))
+    v_observe = jax.vmap(functools.partial(E.observe, levels=levels))
 
     def lr_schedule(count):
         # `count` counts gradient steps; decay linearly to 0 over all updates
@@ -109,7 +112,7 @@ def make_train(cfg: Config):
         params = network.init(k_net, jnp.zeros((E.OBS_DIM,), jnp.float32))
         train_state = TrainState.create(apply_fn=network.apply, params=params, tx=tx)
         env_states = v_reset(jax.random.split(k_env, cfg.num_envs))
-        obs = jax.vmap(E.observe)(env_states)
+        obs = v_observe(env_states)
         return train_state, env_states, obs, rng
 
     def update(runner):

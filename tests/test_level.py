@@ -223,7 +223,7 @@ def _python(code, level_text):
 def test_level_file_override():
     r = _python("from platformer_ai import level as L; print(L.H, L.W, L.N_COINS)", "P....E.....MM.......\n####################\n")
     assert r.returncode == 0, r.stderr
-    assert r.stdout.split() == ["2", "20", "1"]            # the file replaced the built-in level
+    assert r.stdout.split() == ["2", "20", "0"]            # the file replaced the built-in level
 
 
 def test_level_file_override_is_validated_too():
@@ -254,7 +254,7 @@ def test_parse_numbers_enemies_and_platforms_row_by_row():
                 paths="enemy 3 13 from 11 to 14\nenemy 3 7 from 5 to 9\n# a comment\nplatform 2 2 to 5\n"
                       "platform 2 9 to 12\nplatform 2 19 to 22.5")
     p = L.parse(text)
-    assert p["enemies"] == [(6.5, 3.0, 5.0, 9.0), (12.5, 3.0, 11.0, 14.0)]    # (x, feet y, patrol min x, max x)
+    assert p["enemies"] == [(6.5, 3.0, 5.0, 9.0, -1), (12.5, 3.0, 11.0, 14.0, -1)]    # (x, feet y, min x, max x, platform it rides or -1)
     # "MMM" and "M" are separate platforms.  (top y, start x, stop x, width)
     assert p["platforms"] == [(1.0, 2.0, 5.0, 2.0), (1.0, 9.5, 12.0, 3.0), (1.0, 18.5, 22.5, 1.0)]
 
@@ -263,7 +263,7 @@ def test_paths_without_path_lines_use_the_defaults():
     text = mini("P........................", "........E....MM...........", "#" * 25)
     p = L.parse(text)
     assert p["platforms"] == [(1.0, 14.0, 14.0 + L.DEFAULT_PLATFORM_TRAVEL, 2.0)]
-    assert p["enemies"] == [(8.5, 2.0, 8.5 - L.DEFAULT_ENEMY_REACH, 8.5 + L.DEFAULT_ENEMY_REACH)]
+    assert p["enemies"] == [(8.5, 2.0, 8.5 - L.DEFAULT_ENEMY_REACH, 8.5 + L.DEFAULT_ENEMY_REACH, -1)]
 
 
 def test_a_platform_may_start_at_its_right_end():
@@ -309,7 +309,7 @@ def test_enemy_path_ignores_walls_and_is_not_set_by_them():
     assert "enemy-path-solid" in codes(check(text).errors)
     ok = mini("P.........................", "...........E.#............", "#" * 27, paths="enemy 2 12 from 9 to 12.5")
     assert check(ok).ok
-    assert L.parse(ok)["enemies"] == [(11.5, 2.0, 9.0, 12.5)]
+    assert L.parse(ok)["enemies"] == [(11.5, 2.0, 9.0, 12.5, -1)]
 
 
 def test_an_enemy_close_to_the_real_spawn():
@@ -329,7 +329,7 @@ def test_an_enemy_close_to_the_real_spawn():
 def test_path_line_messages_say_what_is_wrong():
     rep = check(edit(paths=PATHS + "platform 8 28 until 34\n....P....."))
     msgs = [e.message for e in rep.errors]
-    assert any("line 14" in m and "platform ROW COL to STOP_X" in m for m in msgs)           # the allowed forms are listed
+    assert any("line 14" in m and "platform ROW COL [to STOP_X]" in m for m in msgs)           # the allowed forms are listed
     assert any("looks like a map row" in m for m in msgs)
     rep = check(edit(paths="platform 8 28 to 34\nenemy 7 49 from 52 to 44"))
     assert "line 13" in rep.errors[0].message
@@ -369,3 +369,87 @@ def test_the_checker_works_on_a_file_without_a_valid_level_py():
         assert K.main([bad.name]) == 1
     finally:
         os.unlink(bad.name)
+
+
+# ---- riders: enemies on platforms, coins stuck to platforms --------------------------------------------------------------
+RIDE = ("........................", "........................", "...E..o.................", "..MMMMM.................",
+        "............E...........", "P.........--------......", "########################")
+
+
+def ride(paths="enemy 3 4 from 2.5 to 5", rows=RIDE):
+    """The RIDE level with the given path lines."""
+    return mini(*rows, paths=paths)
+
+
+def test_riders_and_stuck_coins_are_valid_and_parsed():
+    text = ride()
+    assert check(text).ok, [str(e) for e in check(text).errors]
+    p = L.parse(text)
+    assert p["enemies"] == [(3.5, 3.0, -2.0, 0.5, 0), (12.5, 5.0, 10.375, 17.625, -1)]   # rider limits relative to platform
+    assert p["coins"].size == 0 and p["stuck_coins"] == [(2.0, 2.5, 0)]                   # coin 2 tiles right of the centre
+    assert p["platforms"] == [(3.0, 4.5, 10.5, 5.0)]
+
+
+def test_a_rider_without_a_path_line_walks_the_whole_platform():
+    rows = list(RIDE)
+    rows[2] = "...E...................."                       # (no coin stuck to the platform)
+    p = L.parse(ride(paths="", rows=rows))
+    assert p["enemies"][0] == (3.5, 3.0, -2.5 + 0.375, 2.5 - 0.375, 0)         # the platform is 5 wide
+
+
+def test_a_rider_may_not_leave_its_platform():
+    assert "enemy-rides-outside" in codes(check(ride("enemy 3 4 from 1 to 5")).errors)          # left end
+    assert "enemy-rides-outside" in codes(check(ride("enemy 3 4 from 2.5 to 7")).errors)         # right end
+    assert "enemy-rides-outside" not in codes(check(ride("enemy 3 4 from 2.375 to 6.625")).errors)   # exactly on it
+
+
+def test_an_enemy_on_a_one_way_run_stays_on_the_run():
+    assert check(ride("enemy 3 4 from 2.5 to 5\nenemy 5 13 from 10.375 to 17.625")).ok
+    bad = check(ride("enemy 3 4 from 2.5 to 5\nenemy 5 13 from 9 to 15"))
+    assert "enemy-rides-outside" in codes(bad.errors) and "one-way" in " ".join(e.message for e in bad.errors)
+
+
+def test_a_rider_may_not_walk_through_a_coin_stuck_to_its_platform():
+    assert "enemy-path-coin" in codes(check(ride("")).errors)                      # whole platform = through the coin too
+    assert check(ride("enemy 3 4 from 2.5 to 5.5")).ok                             # body ends at 5.875, the coin starts at 6.19
+    assert "enemy-path-coin" in codes(check(ride("enemy 3 4 from 2.5 to 6.5")).errors)
+
+
+def test_a_stuck_coin_must_not_travel_through_tiles():
+    rows = list(RIDE)
+    rows[2] = "...E..o...#..................."[:24]           # a block in the coin's way, in the row above the path
+    rep = check(ride(rows=rows))
+    assert "coin-path-solid" in codes(rep.errors) and "stuck to the moving platform at row 4" in " ".join(e.message for e in rep.errors)
+    assert "platform-headroom" in codes(rep.warnings)
+
+
+def test_a_block_above_a_platform_path_is_a_warning():
+    ground = "#" * 24
+    blocked = mini("P.......................", "......#.................", "..MM....................", ground)
+    free = mini("P.......................", "........................", "..MM....................", ground)
+    assert check(blocked).ok and "platform-headroom" in codes(check(blocked).warnings)
+    assert "platform-headroom" not in codes(check(free).warnings)
+
+
+def test_riders_on_one_platform_may_not_share_a_stretch():
+    rows = list(RIDE)
+    rows[2] = "...E.E.................."                        # two riders, no coin
+    clash = ride("enemy 3 4 from 2.5 to 5\nenemy 3 6 from 4.5 to 6.5", rows=rows)
+    apart = ride("enemy 3 4 from 2.5 to 3.5\nenemy 3 6 from 5.5 to 6.5", rows=rows)
+    assert "enemy-overlap" in codes(check(clash).errors)
+    assert check(apart).ok, [str(e) for e in check(apart).errors]
+
+
+def test_a_platform_in_the_riders_row_would_hit_it():
+    rows = list(RIDE)
+    rows[2] = "...E..o..MM..................."[:24]           # a second platform sweeping through the rider's row
+    rep = check(ride("enemy 3 4 from 2.5 to 5\nplatform 3 10 to 16", rows=rows))
+    assert "platform-sweep-enemy" in codes(rep.errors)
+
+
+def test_a_platform_has_no_coin_unless_one_is_drawn_on_it():
+    rows = ("P...........", "............", "..MM........", "############")
+    assert L.parse(mini(*rows))["stuck_coins"] == [] and L.parse(mini(*rows))["coins"].shape == (0, 2)
+    assert L.parse(mini(*rows, paths="platform 3 3 to 6 no-coin"))["platforms"][0] == (2.0, 3.0, 6.0, 2.0)   # old keyword: accepted
+    drawn = ("P...........", "...o........", "..MM........", "############")
+    assert [(round(x, 3), y, i) for x, y, i in L.parse(mini(*drawn))["stuck_coins"]] == [(0.5, 1.5, 0)]

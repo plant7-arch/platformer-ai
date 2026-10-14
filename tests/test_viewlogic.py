@@ -4,6 +4,7 @@ import pytest
 
 from platformer_ai import level as L
 from platformer_ai import viewlogic as V
+from platformer_ai import scene as S
 
 
 def test_coordinates_match_the_original_scene():
@@ -90,25 +91,34 @@ def test_camera_follows_with_offset_limit_and_smoothing():
 def test_platform_runs_and_coins():
     runs = V.platform_runs()
     n_oneway = int(L.ONEWAY.sum())
-    assert len(runs) == (n_oneway + 1) // 2 and n_oneway == 2   # the level has one 2-tile floating platform
-    (cx, top), = runs
+    assert n_oneway == 2 and len(runs) == 1                      # the level has one 2-tile floating platform: one block
+    (cx, top, n), = runs
+    assert n == 2
     assert top == float(np.argwhere(L.ONEWAY)[0][0]) and cx == np.argwhere(L.ONEWAY)[:, 1].mean() + 0.5
     coins = V.coin_positions([30.0])
     assert len(coins) == L.N_COINS
-    assert coins[-1] == (30.0 + L.RIDER_COIN_OFFSET[0], L.PLAT_TOP[0] + L.RIDER_COIN_OFFSET[1])
+    assert coins[-1] == (30.0 + float(L.COIN_X[-1]), float(L.COIN_Y[-1]))
     assert coins[0] == (float(L.COIN_X[0]), float(L.COIN_Y[0]))
     assert V.coin_positions([31.0])[-1][0] == coins[-1][0] + 1.0 and V.coin_positions([31.0])[0] == coins[0]
 
 
-def test_platform_chunks_cover_any_width():
-    assert V.platform_chunks(2) == [(0.0, 2.0)]
-    assert V.platform_chunks(1) == [(0.0, 1.0)]
-    assert V.platform_chunks(3) == [(-0.5, 2.0), (1.0, 1.0)]
-    assert V.platform_chunks(4) == [(-1.0, 2.0), (1.0, 2.0)]
-    for n in range(1, 9):                                    # the chunks tile the platform exactly
-        spans = sorted((o - w / 2, o + w / 2) for o, w in V.platform_chunks(n))
-        assert spans[0][0] == -n / 2 and spans[-1][1] == n / 2
-        assert all(a[1] == b[0] for a, b in zip(spans, spans[1:]))
+def test_platform_pieces_make_one_continuous_block():
+    assert V.platform_pieces(2) == [(0, 16), (16, 32)]                 # the sprite itself
+    assert V.platform_pieces(1) == [(0, 8), (24, 32)]
+    assert V.platform_pieces(3) == [(0, 16), (8, 24), (16, 32)]
+    for n in range(1, 9):
+        pieces = V.platform_pieces(n)
+        assert sum(x1 - x0 for x0, x1 in pieces) == 16 * n              # exactly n tiles wide: no gap, no overlap
+        assert pieces[0][0] == 0 and pieces[-1][1] == 32                # a cap only at each end
+        assert all(p == (8, 24) for p in pieces[1:-1])
+
+
+def test_a_wide_platform_is_one_block_without_caps_inside():
+    sprite = np.arange(9 * 32 * 4, dtype=np.uint8).reshape(9, 32, 4)
+    for n in (1, 2, 3, 5):
+        img = S.platform_block(sprite, n)
+        assert img.shape == (9, 16 * n, 4)
+        assert (img[:, :8] == sprite[:, :8]).all() and (img[:, -8:] == sprite[:, -8:]).all()
 
 
 def test_text_helpers():

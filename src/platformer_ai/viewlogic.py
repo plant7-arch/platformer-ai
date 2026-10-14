@@ -117,8 +117,8 @@ def keys_to_action(left: bool, right: bool, jump: bool) -> int:
 
 
 # ---- what to draw ----------------------------------------------------------------------------
-def platform_runs() -> list[tuple[float, float]]:
-    """Static one-way tiles grouped into runs -> (centre x, top y) in env tiles; one sprite per 2 tiles."""
+def platform_runs() -> list[tuple[float, float, int]]:
+    """Static one-way tiles grouped into runs -> (centre x, top y, width in tiles) in env tiles; one block per run."""
     out = []
     for r in range(L.H):
         c = 0
@@ -127,27 +127,28 @@ def platform_runs() -> list[tuple[float, float]]:
                 c0 = c
                 while c < L.W and L.ONEWAY[r, c]:
                     c += 1
-                n = c - c0
-                for i in range(0, n, 2):
-                    w = min(2, n - i)
-                    out.append((c0 + i + w / 2.0, float(r)))
+                out.append((c0 + (c - c0) / 2.0, float(r), c - c0))
             else:
                 c += 1
     return out
 
 
-def platform_chunks(width: float) -> list[tuple[float, float]]:
-    """A platform `width` tiles wide is drawn with sprites 2 tiles wide, like the static ones:
-    (centre offset from the platform centre, width) per sprite; an odd last tile gets a 1-wide chunk."""
-    n = int(round(width))
-    return [(i + min(2, n - i) / 2.0 - n / 2.0, float(min(2, n - i))) for i in range(0, n, 2)]
+def platform_pieces(width: float) -> list[tuple[int, int]]:
+    """A platform `width` tiles wide is ONE block cut from the 32 px (2 tile) sprite: the left cap, as many middle tiles
+    as needed, the right cap -> source pixel columns (x0, x1) of the sprite, left to right, 16 px per tile
+    (a 1 tile platform is half of each cap).  No gaps, no overlap, caps only at the two ends."""
+    n = max(1, int(round(width)))
+    if n == 1:
+        return [(0, 8), (24, 32)]
+    return [(0, 16)] + [(8, 24)] * (n - 2) + [(16, 32)]
 
 
 def coin_positions(plat_x) -> list[tuple[float, float]]:
-    """Centre of every coin in env tiles: the static ones, then one per moving platform (plat_x: one x per platform)."""
-    out = [(float(L.COIN_X[i]), float(L.COIN_Y[i])) for i in range(L.N_STATIC_COINS)]
-    for j in range(L.N_PLATS):
-        out.append((float(plat_x[j]) + L.RIDER_COIN_OFFSET[0], float(L.PLAT_TOP[j]) + L.RIDER_COIN_OFFSET[1]))
+    """Centre of every coin in env tiles; coins riding a moving platform follow it (plat_x: one x per platform)."""
+    out = []
+    for i in range(L.N_COINS):
+        k = int(L.COIN_PLAT[i])
+        out.append((float(L.COIN_X[i]) + (float(plat_x[k]) if k >= 0 else 0.0), float(L.COIN_Y[i])))
     return out
 
 
