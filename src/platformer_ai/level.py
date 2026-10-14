@@ -15,6 +15,8 @@ sweeps PLATFORM_TRAVEL tiles to the right, then back.  One extra coin rides on t
 Not in the original Godot level: the goal flag G (the original had no way to win).
 The viewer draws terrain, backdrop and goal flag from this ASCII (terrain.py), so editing the level is enough.
 """
+import os
+
 import numpy as np
 
 from platformer_ai import levelcheck
@@ -31,6 +33,12 @@ LEVEL = """\
 #######....################........###################################
 ...........####....###....#...........................................
 """
+
+# Try another level without editing this file: PLATFORMER_LEVEL=my_level.txt uv run python -m platformer_ai.viewer
+# (a text file holding only the ASCII rows; works for every command, including train and levelcheck).
+if os.environ.get("PLATFORMER_LEVEL"):
+    with open(os.environ["PLATFORMER_LEVEL"]) as _f:
+        LEVEL = _f.read()
 
 # Signs drawn in the world by the viewer (no effect on the game): (text, x, y) = top-left corner in tiles.
 LABELS = [("Falling hurts...", 28.9, 7.9), ("Great Job!", 62.3, 0.3)]

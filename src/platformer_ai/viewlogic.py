@@ -14,7 +14,14 @@ SCREEN_W, SCREEN_H = 480, 270        # the Godot viewport (1920x1080 at zoom 4)
 TILE = 16                            # pixels per tile in the art
 ORIGIN_TX, ORIGIN_TY = 10, 5         # our grid cell (0, 0) is tile (10, 5) of the original tilemaps
 CAM_OFFSET_Y = -4                    # Godot Camera2D offset
-CAM_LIMIT_BOTTOM = (L.H + ORIGIN_TY) * TILE + 30   # Godot limit_bottom (270 for the 10-row level): a little below the map
+
+
+def cam_limit_bottom(rows: int) -> int:
+    """Godot's limit_bottom: a little below the map (270 for the original 10-row level)."""
+    return (rows + ORIGIN_TY) * TILE + 30
+
+
+CAM_LIMIT_BOTTOM = cam_limit_bottom(L.H)
 CAM_SMOOTH = 5.0                     # Godot position_smoothing_speed (default)
 SPRITE_OFFSET = {"player": (1, -12), "enemy": (0, -12)}      # sprite centre relative to the feet
 PLATFORM_SPRITE = (16, 0, 32, 9)     # region in platforms.png (x, y, w, h)

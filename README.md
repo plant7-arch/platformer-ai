@@ -186,6 +186,18 @@ uv run python -m platformer_ai.levelcheck                 # the level in level.p
 uv run python -m platformer_ai.levelcheck my_level.txt
 ```
 
+To try a level **without editing `level.py`**, put the ASCII rows in a text file and point `PLATFORMER_LEVEL` at it;
+it works for every command (`viewer`, `train`, `play`, `levelcheck`) and is validated the same way:
+
+```bash
+PLATFORMER_LEVEL=my_level.txt uv run python -m platformer_ai.viewer
+```
+
+Small levels work: the moving platform needs a map at least as wide as its block plus its 6-tile sweep, and nothing
+else sets a minimum size (a 1-row level renders and runs; the viewer just shows a lot of sky).
+`tests/test_tiny_levels.py` runs the real environment on six small or odd levels (about a minute, one process per
+level because the level is baked in when `env.py` is imported).
+
 The check cannot tell whether a level is *beatable*: it finds things that are walled in completely, but not ones that
 are just too high or too far for the jump (about 2.7 tiles). Train an agent on it to find out, and retrain after any
 change: a policy only fits the level it was trained on.

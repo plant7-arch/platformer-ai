@@ -75,3 +75,17 @@ def test_goal_runs_and_flag():
         assert f[..., 3].max() == 255 and f[..., 3].min() == 0      # drawn, with transparent surroundings
         assert f[-1, :, 3].any() and not f[0, :, 3].any()           # stands on the bottom edge, nothing above the pole
     assert T.goal_runs(L.GOAL) == [(69, 2, 2)]
+
+
+@pytest.mark.parametrize("h,w", [(1, 1), (1, 9), (3, 1), (2, 2)])
+def test_terrain_functions_accept_tiny_and_empty_grids(h, w):
+    empty = np.zeros((h, w), bool)
+    assert T.terrain_tiles(empty, (10, 5)).shape == (0, 4)
+    assert T.decor_tiles(empty, None, (10, 5)).shape == (0, 4)
+    assert T.top_mask(empty).shape == (h, w) and not T.top_mask(empty).any()
+    assert T.goal_runs(empty) == []
+    full = np.ones((h, w), bool)
+    tiles = T.terrain_tiles(full, (10, 5))
+    assert len(tiles) == h * w
+    assert len(T.decor_tiles(full)) == 0                 # nothing can stand on the top row of a full map
+    assert T.background_tiles(0, 1, 0, 1).shape == (1, 4)

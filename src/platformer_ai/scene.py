@@ -99,7 +99,7 @@ def make_world(tileset: np.ndarray, solid: np.ndarray, goal: np.ndarray, clear: 
     h, w = solid.shape
     origin = (V.ORIGIN_TX, V.ORIGIN_TY)
     tx0, tx1 = V.ORIGIN_TX - 20, V.ORIGIN_TX + w + 20                 # margin: the camera sees past the level ends
-    ty0, ty1 = terrain.BACKDROP_TOP, int(np.ceil((h + V.ORIGIN_TY) * V.TILE + 30) / V.TILE) + 2
+    ty0, ty1 = terrain.BACKDROP_TOP, V.cam_limit_bottom(h) // V.TILE + 2
     layers = [terrain.background_tiles(tx0, tx1, ty0, ty1), terrain.terrain_tiles(solid, origin, theme)]
     if decorate:
         layers.insert(1, terrain.decor_tiles(solid, clear, origin))     # behind the ground, in front of the backdrop

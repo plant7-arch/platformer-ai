@@ -2,7 +2,10 @@
 import logging
 import os
 import random
+import subprocess
+import sys
 import tempfile
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -161,3 +164,25 @@ def test_command_line_checker():
     finally:
         os.unlink(bad.name)
         os.unlink(good.name)
+
+
+def _python(code, level_text):
+    f = tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False)
+    try:
+        f.write(level_text)
+        f.close()
+        env = {**os.environ, "PLATFORMER_LEVEL": f.name, "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src")}
+        return subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True, timeout=120)
+    finally:
+        os.unlink(f.name)
+
+
+def test_level_file_override():
+    r = _python("from platformer_ai import level as L; print(L.H, L.W, L.N_COINS)", "PE.MM.......\n")
+    assert r.returncode == 0, r.stderr
+    assert r.stdout.split() == ["1", "12", "1"]            # the file replaced the built-in level
+
+
+def test_level_file_override_is_validated_too():
+    r = _python("from platformer_ai import level", "PE.MM.......x\n")
+    assert r.returncode != 0 and "unknown-symbol" in r.stderr and "row 1, col 13" in r.stderr

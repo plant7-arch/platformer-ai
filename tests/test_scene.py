@@ -88,3 +88,47 @@ def test_picture_follows_an_edited_level():
     assert not np.array_equal(flat, tower)                              # moving a block moves the art
     with_flag, _ = world(["........", "........", "########"], ["....G...", "....G...", "........"])
     assert not np.array_equal(flat, with_flag)                          # a goal draws a flag
+
+
+# ---- tiny / empty / odd grids: the world must cover everything the camera can show ---------------------------------
+def fake_tileset():
+    """A tileset without assets: every pixel opaque, never the 'nothing here' colour, so a clear-coloured pixel in a
+    cropped view can only mean the world did not cover that part."""
+    rng = np.random.default_rng(0)
+    ts = rng.integers(0, 256, (256, 256, 4)).astype(np.uint8)
+    ts[..., 3] = 255
+    ts[..., 0] &= 0xFE                                    # red is even, the clear colour's red (77) is odd
+    return ts
+
+
+GRIDS = [(1, 1), (1, 12), (2, 8), (3, 3), (10, 70), (30, 14), (1, 200), (12, 1)]
+
+
+@pytest.mark.parametrize("h,w", GRIDS)
+def test_world_covers_every_camera_position_for_any_grid(h, w):
+    rng = np.random.default_rng(h * 1000 + w)
+    for solid in (np.zeros((h, w), bool), rng.random((h, w)) < 0.4, np.ones((h, w), bool)):
+        goal = np.zeros((h, w), bool)
+        goal[0, -1] = True
+        world, (ox, oy) = scene.make_world(fake_tileset(), solid, goal, decorate=True)
+        assert world.shape[1] == (w + 40) * V.TILE                     # 20 tiles of margin on both sides
+        # camera centres the viewer can reach: x over the whole width, y from above the map to the bottom limit
+        xs = [V.to_px(0.0, 0.0)[0], V.to_px(w / 2, 0.0)[0], V.to_px(float(w), 0.0)[0]]
+        limit = V.cam_limit_bottom(h) - V.SCREEN_H / 2                 # the camera never goes lower than this
+        top = min(V.to_px(0.0, -3.0)[1] + V.CAM_OFFSET_Y, limit)
+        bottom = min(V.to_px(0.0, h + 1.0)[1] + V.CAM_OFFSET_Y, limit)
+        for cx in xs:
+            for cy in (top, (top + bottom) / 2, bottom):
+                x0, y0 = int(round(cx - V.SCREEN_W / 2)), int(round(cy - V.SCREEN_H / 2))
+                assert ox <= x0 and x0 + V.SCREEN_W <= ox + world.shape[1], (h, w, cx)
+                assert oy <= y0 and y0 + V.SCREEN_H <= oy + world.shape[0], (h, w, cy)
+                view = scene.crop(world, x0 - ox, y0 - oy, V.SCREEN_W, V.SCREEN_H)
+                assert not (view == np.array(scene.CLEAR)).all(axis=2).any(), (h, w, cx, cy)
+
+
+def test_world_height_grows_with_the_grid():
+    ts = fake_tileset()
+    small, _ = scene.make_world(ts, np.zeros((2, 14), bool), np.zeros((2, 14), bool))
+    tall, _ = scene.make_world(ts, np.zeros((30, 14), bool), np.zeros((30, 14), bool))
+    assert tall.shape[0] - small.shape[0] == 28 * V.TILE
+    assert V.cam_limit_bottom(10) == 270 and V.cam_limit_bottom(30) == 590
