@@ -12,6 +12,6 @@ P...........E.......#....E......#.....#.......E.........G
 # three enemies with their own patrols, a platform that ferries over the pit, another one up high
 platform 4 6 to 14
 platform 6 34 to 41
-enemy 8 13 from 8 to 30
+enemy 8 13 from 8 to 18
 enemy 8 26 from 22 to 30
 enemy 8 47 from 41 to 54
