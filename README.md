@@ -42,6 +42,7 @@ much lower power state on battery and training can be several times slower.
 ```
 src/platformer_ai/
   level.py      the level as ASCII (edit it! also holds the S start points)
+  levelcheck.py checks the level when it loads: errors with row/col, warnings in the log
   env.py        reset / step / observe: pure functions on a small pytree; vmap for many envs
   ppo.py        PureJaxRL-style PPO (MLP actor-critic)
   evaluate.py   fixed GPU evaluation: 512 full episodes from the spawn with random phases
@@ -150,11 +151,49 @@ width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABE
   moving platform, coin, goal, enemy) plus 13 scalars: velocity, on-floor, sub-tile position, progress,
   time used, and relative position + direction of the enemy and of the moving platform.
 
+## Editing the level
+
+The level is the ASCII picture `LEVEL` in `level.py`:
+
+| symbol | meaning | symbol | meaning |
+| --- | --- | --- | --- |
+| `#` | solid tile | `-` | one-way platform (stand on it, pass through from below) |
+| `o` | coin | `G` | goal (touch = win) |
+| `P` | player spawn (exactly one) | `E` | enemy (exactly one) |
+| `S` | extra start point (optional, used by random-start training) | `M` | moving platform: one block of tiles in one row |
+| `.` | empty | | |
+
+The level is **checked every time it loads** (`levelcheck.py`), so a mistake fails early and says where
+(rows and columns count from 1, like the line numbers in your editor):
+
+```
+the level has 2 problems (rows and columns count from 1):
+  [unknown-symbol] not a level symbol: 'p' at row 2, col 10 (did you mean 'P'?).  Valid symbols: . # - o G P E S M
+  [spawn-count] needs exactly one 'P' (player spawn), found 2: row 1, col 4; row 4, col 18
+```
+
+* **Errors** stop the program, all of them at once: rows of different length, unknown symbols (typos), not exactly
+  one `P` or one `E`, no `M` / `M` tiles in two rows / a gap in the `M` block, and a moving platform whose sweep
+  (6 tiles to the right) leaves the map or runs into solid tiles.
+* **Warnings** are logged and the level still loads: no goal `G`, a start point with no ground within 4 tiles below,
+  an enemy with no ground under it or no room to patrol, and coins / goals / start points that are completely
+  walled in by solid tiles.
+
+To check a level while you edit it, without starting anything else (a text file with only the ASCII rows also works):
+
+```bash
+uv run python -m platformer_ai.levelcheck                 # the level in level.py
+uv run python -m platformer_ai.levelcheck my_level.txt
+```
+
+The check cannot tell whether a level is *beatable*: it finds things that are walled in completely, but not ones that
+are just too high or too far for the jump (about 2.7 tiles). Train an agent on it to find out, and retrain after any
+change: a policy only fits the level it was trained on.
+
 ## Where to add features later
 
-* **More level / different layout**: edit `LEVEL` in `level.py` (all sizes are derived from it, and the viewer
-  redraws terrain, backdrop and flag from it). Keep exactly one `P` and one `E`, and the `M` tiles in one row.
-  A trained policy only fits the level it was trained on, so retrain after changing the layout.
+* **More level / different layout**: edit `LEVEL` in `level.py` (see "Editing the level"; all sizes are derived from
+  it, and the viewer redraws terrain, backdrop and flag from it).
 * **More enemies / platforms**: make `enemy_x`, `plat_x` arrays, `vmap` their update inside `step`, and add
   their channels to `observe`.
 * **Random levels or start positions**: `reset(key)` already takes a key; thread a key through the
@@ -164,4 +203,4 @@ width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABE
 
 * Code: [MIT](LICENSE).
 * Art and fonts: [Brackeys Platformer Bundle](https://brackeysgames.itch.io/brackeys-platformer-bundle), CC0.
-* The level layout and mechanics were ported from my earlier Godot version of this project.
+* The level layout and mechanics were ported from [my earlier Godot version](https://github.com/plant7-arch/Godot-AI) of this project.

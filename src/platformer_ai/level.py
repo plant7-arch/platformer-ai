@@ -17,6 +17,8 @@ The viewer draws terrain, backdrop and goal flag from this ASCII (terrain.py), s
 """
 import numpy as np
 
+from platformer_ai import levelcheck
+
 LEVEL = """\
 ......................................................................
 ......................................................................
@@ -44,22 +46,18 @@ RIDER_COIN_OFFSET = (-0.0625, -0.5)       # relative to (platform centre x, plat
 
 
 def parse(text: str):
+    """ASCII -> arrays and positions.  Raises levelcheck.LevelError (all problems, with row/col) for an unusable level
+    and logs warnings for a suspicious one; see levelcheck.py."""
+    levelcheck.validate(text, PLATFORM_TRAVEL, ENEMY_RAY_LEN, ENEMY_RAY_H, ENEMY_HALF_W)
     rows = text.strip("\n").split("\n")
-    if len({len(r) for r in rows}) != 1:
-        raise ValueError("all level rows must have the same length")
     grid = np.array([list(r) for r in rows])
 
     def one(ch):
-        cells = np.argwhere(grid == ch)
-        if len(cells) != 1:
-            raise ValueError(f"level needs exactly one '{ch}'")
-        return cells[0]
+        return np.argwhere(grid == ch)[0]
 
     sr, sc = one("P")
     er, ec = one("E")
     m_cells = np.argwhere(grid == "M")
-    if len(m_cells) == 0 or len(set(m_cells[:, 0])) != 1:
-        raise ValueError("'M' tiles must be in a single row")
     m_row, m_c0, m_c1 = int(m_cells[0, 0]), int(m_cells[:, 1].min()), int(m_cells[:, 1].max())
     coins = np.argwhere(grid == "o")
     starts = np.argwhere(grid == "S")
@@ -99,17 +97,4 @@ START_Y = np.array([p[1] for p in _starts], dtype=np.float32)
 N_STARTS = len(_starts)
 
 
-def _patrol_limits():
-    """Walls left/right of the enemy at sensor height -> the x range it patrols."""
-    row = int(np.floor(ENEMY_Y - ENEMY_RAY_H))
-    c = int(ENEMY_X)
-    while c >= 0 and not SOLID[row, c]:
-        c -= 1
-    left_face = c + 1
-    c = int(ENEMY_X)
-    while c < W and not SOLID[row, c]:
-        c += 1
-    return left_face + ENEMY_RAY_LEN, c - ENEMY_RAY_LEN
-
-
-ENEMY_MIN, ENEMY_MAX = _patrol_limits()
+ENEMY_MIN, ENEMY_MAX = levelcheck.patrol_limits(SOLID, ENEMY_X, ENEMY_Y, ENEMY_RAY_LEN, ENEMY_RAY_H)
