@@ -1,4 +1,4 @@
-# platformer-ai
+# Platformer AI
 
 A small platformer written as pure JAX functions, plus PPO. Environment stepping, the policy, GAE and the
 optimiser updates all run inside **one jitted function on the GPU**: no game engine, no CPU round trips
