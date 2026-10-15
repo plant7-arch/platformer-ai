@@ -4,6 +4,18 @@ inside one jitted function, so nothing leaves the GPU during an update.
     init, update = make_train(Config())
     runner = init(jax.random.PRNGKey(0))
     runner, metrics = update(runner)        # one rollout (num_envs * num_steps) + PPO epochs
+
+runner = (train_state, env_states, obs, rng, curriculum).  The adaptive curriculum (Config.curriculum, several levels
+only) is a small dict of per-level numbers that lives on the GPU with the rest:
+
+    n, g     faded counts of the episodes that started at the real spawn and ended (n), and that reached the goal (g),
+             from the training rollouts themselves; every update multiplies them by curriculum_decay first, so they
+             follow the agent as it improves (decay 0.95: roughly the last 20 updates count)
+    rate     (g + 1) / (n + 2): the estimated goal rate (a level with no episodes yet counts as 0.5)
+    p        mix / L + (1 - mix) * (1 - rate) / sum(1 - rate): the chance each level is picked at a reset.  A share
+             `curriculum_mix` stays uniform (nothing is forgotten), the rest goes where the agent fails
+    logits   log p, handed to env.step for the resets of the next rollout
+Without the curriculum the level choice is uniform and every number is exactly as before.
 """
 from __future__ import annotations
 
@@ -43,6 +55,9 @@ class Config:
     random_starts: bool = True     # some episodes start at random points of the level ('S' markers)
     spawn_prob: float = 0.5        # with random_starts: share of episodes starting at the spawn
     progress_coef: float = 0.1     # bonus per tile of new furthest-right progress (0 = off)
+    curriculum: bool = False       # adaptive curriculum: pick levels the agent fails on more often (several levels)
+    curriculum_mix: float = 0.3    # ... share of resets that stay uniform over all levels
+    curriculum_decay: float = 0.95  # ... per update fading of the per-level episode counts
 
     @property
     def batch_size(self) -> int:
@@ -85,13 +100,38 @@ def _log_prob(logits, action):
     return jnp.take_along_axis(logp, action[..., None], axis=-1)[..., 0], logp
 
 
+def curriculum_init(n_levels: int) -> dict:
+    """No episodes seen yet: every level estimated at 0.5, picked uniformly."""
+    z = jnp.zeros(n_levels, jnp.float32)
+    p = jnp.full(n_levels, 1.0 / n_levels, jnp.float32)
+    return dict(n=z, g=z, rate=z + 0.5, p=p, logits=jnp.log(p))
+
+
+def curriculum_update(curr: dict, level, ended, reached, mix: float, decay: float) -> dict:
+    """Fold one rollout into the curriculum.  level / ended / reached: per transition, the level index, 1 if an
+    episode from the spawn ended there, 1 if it also reached the goal."""
+    n_lv = curr["n"].shape[0]
+    n = decay * curr["n"] + jax.ops.segment_sum(ended, level, num_segments=n_lv)
+    g = decay * curr["g"] + jax.ops.segment_sum(reached, level, num_segments=n_lv)
+    rate = (g + 1.0) / (n + 2.0)
+    fail = 1.0 - rate
+    p = mix / n_lv + (1.0 - mix) * fail / fail.sum()
+    return dict(n=n, g=g, rate=rate, p=p, logits=jnp.log(p))
+
+
 def make_train(cfg: Config, levels=None):
     """levels: env.make_levels(...) to train on (default: the level of level.py).  Every environment plays a random
     one of them and gets a new random one at every reset, so each batch mixes all levels."""
     network = ActorCritic(E.N_ACTIONS, cfg.hidden)
-    v_step = jax.vmap(functools.partial(
+    n_lv = E.n_levels(E.DEFAULT_LEVELS if levels is None else levels)
+    use_curriculum = cfg.curriculum and n_lv > 1
+    step_fn = functools.partial(
         E.step, random_starts=cfg.random_starts, random_phases=cfg.random_phases,
-        spawn_prob=cfg.spawn_prob, progress_coef=cfg.progress_coef, levels=levels))
+        spawn_prob=cfg.spawn_prob, progress_coef=cfg.progress_coef, levels=levels)
+    if use_curriculum:
+        v_step = jax.vmap(lambda s, a, lg: step_fn(s, a, level_logits=lg), in_axes=(0, 0, None))
+    else:
+        v_step = jax.vmap(lambda s, a, lg: step_fn(s, a), in_axes=(0, 0, None))
     v_reset = jax.vmap(functools.partial(
         E.reset, random_start=cfg.random_starts, random_phases=cfg.random_phases,
         spawn_prob=cfg.spawn_prob, levels=levels))
@@ -113,10 +153,10 @@ def make_train(cfg: Config, levels=None):
         train_state = TrainState.create(apply_fn=network.apply, params=params, tx=tx)
         env_states = v_reset(jax.random.split(k_env, cfg.num_envs))
         obs = v_observe(env_states)
-        return train_state, env_states, obs, rng
+        return train_state, env_states, obs, rng, curriculum_init(n_lv)
 
     def update(runner):
-        train_state, env_states, obs, rng = runner
+        train_state, env_states, obs, rng, curr = runner
 
         # ---------------- collect a rollout ----------------
         def env_step(carry, _):
@@ -125,7 +165,7 @@ def make_train(cfg: Config, levels=None):
             logits, value = network.apply(train_state.params, obs)
             action = jax.random.categorical(key, logits)
             log_prob, _ = _log_prob(logits, action)
-            env_states, next_obs, reward, done, info = v_step(env_states, action)
+            env_states, next_obs, reward, done, info = v_step(env_states, action, curr["logits"])
             # time-limit truncation is not a real terminal: bootstrap from the final state's value
             _, v_final = network.apply(train_state.params, info["final_obs"])
             reward = reward + cfg.gamma * v_final * info["truncated"].astype(jnp.float32)
@@ -133,7 +173,7 @@ def make_train(cfg: Config, levels=None):
             ep = dict(done=done, ep_return=info["ep_return"],
                       ep_length=info["ep_length"].astype(jnp.float32),
                       ep_coins=info["ep_coins"], goal=info["goal"].astype(jnp.float32),
-                      max_x=info["max_x"], from_spawn=info["from_spawn"])
+                      max_x=info["max_x"], from_spawn=info["from_spawn"], level=info["level"])
             return (env_states, next_obs, rng), (tr, ep)
 
         (env_states, obs, rng), (traj, ep) = jax.lax.scan(
@@ -209,6 +249,10 @@ def make_train(cfg: Config, levels=None):
             sp_maxx=total(ep["max_x"], sp_eps), sp_len=total(ep["ep_length"], sp_eps),
             loss=loss, pg_loss=pg_loss, v_loss=v_loss, entropy=entropy,
         )
-        return (train_state, env_states, obs, rng), metrics
+        if use_curriculum:
+            curr = curriculum_update(curr, ep["level"].ravel(), sp_eps.ravel(), (ep["goal"] * sp_eps).ravel(),
+                                     cfg.curriculum_mix, cfg.curriculum_decay)
+            metrics.update(level_p=curr["p"], level_rate=curr["rate"], level_n=curr["n"])
+        return (train_state, env_states, obs, rng, curr), metrics
 
     return init, jax.jit(update), network

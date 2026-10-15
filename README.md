@@ -476,6 +476,31 @@ Every evaluation runs at least 4 episodes per level (`--eval-per-level`, at leas
 3000 episodes, a second or two on the GPU, and makes the per-level `UNSEEN` numbers much firmer (with 9 episodes a
 level's goal rate can easily be 20 points off; the tier and overall lines are already reliable).
 
+### Adaptive curriculum: practise what it fails on
+
+By default every reset picks a training level uniformly, so a level the agent already finishes 99% of the time gets as
+much practice as one it finishes half the time. `--curriculum` changes that:
+
+```bash
+uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3/test/ --curriculum \
+    --init-from 2026-10-15_125821_t3_drill --name t3_curriculum
+```
+
+* **What it measures**: for every level, the episodes of the training rollouts that started at the real spawn and
+  ended, and whether they reached the flag. That is free (thousands per update, no extra evaluation), and the counts
+  fade by `--curriculum-decay` (0.95) per update, so about the last 20 updates count and the estimate follows the
+  agent as it improves. A level without episodes yet counts as 50%.
+* **How it picks**: `chance = mix / L + (1 - mix) * failure share`. `--curriculum-mix` (0.3) of the resets stay
+  uniform over all levels, so mastered levels are still practised and not forgotten; the rest go to the levels in
+  proportion to how often the agent fails them. Everything stays on the GPU; nothing slows down.
+* **What you see**: after every evaluation a line like
+  `CURRICULUM  practice: tier 1 14%, tier 2 21%, tier 3 65%  |  hardest 60 levels get 31% of resets (uniform: 10%)  |
+  est. goal from training episodes 0.94`, at `-v 2` and in the final block also the five most practised levels. Every
+  save writes `runs/<run>/curriculum.csv` (each level's estimated goal rate, faded episode count and chance of being
+  picked), and `--resume` continues the curriculum where it was.
+* The evaluation is not affected: `EVAL` lines still play every level equally, so runs with and without the
+  curriculum compare directly. Without `--curriculum` training is exactly as before.
+
 ### Scoring a policy without training
 
 ```bash
@@ -501,8 +526,9 @@ episodes it does not, which is one more reason to use many episodes per level.
 * **Different enemy kinds** (flying, jumping) or **platform paths**: `enemy_x` / `plat_x` are already arrays with
   one entry per enemy / platform; give them more fields or another update rule inside `step`. Paths come from `level.py`
   (`PLAT_START_X` / `PLAT_STOP_X`, `ENEMY_MIN` / `ENEMY_MAX`).
-* **A curriculum**: generated levels carry their tier (`levelgen.tier_of`); weight the random level choice in
-  `reset` by it instead of picking uniformly. **More segment kinds**: a new `seg_*` method in `levelgen.Builder` and an
+* **Another curriculum**: `ppo.curriculum_update` turns per-level results into the chance of each level being picked
+  (`env.reset(level_logits=...)`); a different rule (by tier, by learning progress, by value error) only changes that
+  function. **More segment kinds**: a new `seg_*` method in `levelgen.Builder` and an
   entry in `WEIGHTS`; `levelplan` checks the result.
 
 ## Credits and license

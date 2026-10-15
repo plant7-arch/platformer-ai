@@ -101,6 +101,36 @@ def level_summary(names: list[str], args) -> str:
     return f"{n} levels from {' '.join(args or [])}" + (f" ({detail})" if detail else "")
 
 
+def curriculum_lines(m: dict, names: list[str], detail: bool = False) -> list[str]:
+    """Where the adaptive curriculum sends the resets now (from the last update's metrics)."""
+    p, rate, n = (np.asarray(m[k]) for k in ("level_p", "level_rate", "level_n"))
+    k = max(1, len(p) // 10)
+    hard = np.argsort(rate)[:k]
+    parts = []
+    tiers = np.array([levelgen.tier_of(x) or 0 for x in names])
+    if tiers.any():
+        parts.append("practice: " + ", ".join(f"{'tier ' + str(t) if t else 'other'} {p[tiers == t].sum():.0%}"
+                                              for t in sorted(set(tiers.tolist()))))
+    parts.append(f"hardest {k} levels get {p[hard].sum():.0%} of resets (uniform: {k / len(p):.0%})")
+    parts.append(f"est. goal from training episodes {float((rate * n).sum() / max(n.sum(), 1e-9)):.2f}")
+    out = ["    CURRICULUM  " + "  |  ".join(parts)]
+    if detail:
+        out.append("        most practised: " + ",  ".join(
+            f"{Path(names[i]).name} {p[i]:.1%} (est. goal {rate[i]:.2f})" for i in np.argsort(-p)[:5]))
+    return out
+
+
+def write_curriculum_csv(path, names: list[str], curr: dict) -> None:
+    """The curriculum's view of every level: estimated goal rate, faded episode count, chance of being picked."""
+    rows = ["level,tier,est_goal,episodes,pick_chance"]
+    for i, nm in enumerate(names):
+        rows.append(f"{nm},{levelgen.tier_of(nm) or ''},{float(curr['rate'][i]):.4f},{float(curr['n'][i]):.1f},"
+                    f"{float(curr['p'][i]):.6f}")
+    tmp = Path(str(path) + ".tmp")
+    tmp.write_text("\n".join(rows) + "\n")
+    tmp.replace(path)
+
+
 def eval_envs(n_levels: int, per_level: int) -> int:
     """Episodes per evaluation: at least 512, at least per_level for every level, a multiple of the level count."""
     n = max(512, per_level * n_levels)
@@ -124,6 +154,13 @@ def main() -> None:
                     help="platform and enemy always start at the same phase (the old, memorisable setup)")
     ap.add_argument("--spawn-prob", type=float, default=Config.spawn_prob,
                     help="with random starts: share of episodes that start at the spawn")
+    ap.add_argument("--curriculum", action="store_true",
+                    help="adaptive curriculum: pick the levels the agent fails on more often (several levels only)")
+    ap.add_argument("--curriculum-mix", type=float, default=Config.curriculum_mix, metavar="X",
+                    help="with --curriculum: share of resets that stay uniform over all levels (default %(default)s)")
+    ap.add_argument("--curriculum-decay", type=float, default=Config.curriculum_decay, metavar="X",
+                    help="with --curriculum: per-update fading of the per-level counts (default %(default)s: about the "
+                         "last 20 updates count)")
     ap.add_argument("--eval-every", type=int, default=20,
                     help="run the fixed evaluation every N updates (0 = never)")
     ap.add_argument("--eval-per-level", type=int, default=4,
@@ -171,7 +208,11 @@ def main() -> None:
         cfg = replace(Config(), total_timesteps=args.total_steps or Config.total_timesteps, num_envs=args.num_envs,
                       num_steps=args.num_steps, lr=args.lr, seed=args.seed, gamma=args.gamma,
                       progress_coef=args.progress_coef, random_starts=not args.no_random_starts,
-                      random_phases=not args.no_random_phases, spawn_prob=args.spawn_prob)
+                      random_phases=not args.no_random_phases, spawn_prob=args.spawn_prob,
+                      curriculum=args.curriculum, curriculum_mix=args.curriculum_mix,
+                      curriculum_decay=args.curriculum_decay)
+        if not 0.0 <= cfg.curriculum_mix <= 1.0 or not 0.0 <= cfg.curriculum_decay < 1.0:
+            raise SystemExit("--curriculum-mix must be 0..1 and --curriculum-decay 0..1 (below 1)")
         level_args, test_args = args.levels, args.test_levels
     if level_args:
         names, levels = load_levels(level_args, "--levels")
@@ -199,6 +240,12 @@ def main() -> None:
     print(f"training on {level_summary(names, level_args)}"
           + (f";  testing on {level_summary(tests[0], test_args)} unseen" if tests else ""))
     print(f"{cfg.n_updates} updates x {cfg.batch_size} steps = {cfg.n_updates * cfg.batch_size:,} steps")
+    use_curriculum = cfg.curriculum and len(names) > 1
+    if use_curriculum:
+        print(f"adaptive curriculum: on ({cfg.curriculum_mix:.0%} of resets uniform, the rest by failure rate; "
+              f"counts fade by {cfg.curriculum_decay:g} per update)")
+    elif cfg.curriculum:
+        print("adaptive curriculum: off (it needs several levels)")
 
     init, update, network = make_train(cfg, levels)
     runner = init(jax.random.PRNGKey(cfg.seed))
@@ -220,11 +267,16 @@ def main() -> None:
         print(f"network starts from {start_params}")
     first = 1
     if resumed:
-        template = dict(train_state=runner[0], rng=runner[3])
-        saved = serialization.from_bytes(template, resumed["bytes"])
-        # the network, optimiser (Adam moments, step count -> learning-rate schedule) and random stream go on where
-        # they stopped; the environments simply start fresh episodes
-        runner = (saved["train_state"], runner[1], runner[2], saved["rng"])
+        raw = serialization.msgpack_restore(resumed["bytes"])
+        # the network, optimiser (Adam moments, step count -> learning-rate schedule), random stream and curriculum go
+        # on where they stopped; the environments simply start fresh episodes
+        curr = runner[4]
+        if use_curriculum and "curriculum" in raw:
+            saved_curr = serialization.from_state_dict(curr, raw["curriculum"])
+            if all(saved_curr[k].shape == curr[k].shape for k in curr):
+                curr = saved_curr
+        runner = (serialization.from_state_dict(runner[0], raw["train_state"]), runner[1], runner[2],
+                  serialization.from_state_dict(runner[3], raw["rng"]), curr)
         first = resumed["update"] + 1
     n_eval = eval_envs(len(names), args.eval_per_level)
     evals = [("greedy ", names, n_eval, make_eval(greedy(network), n_eval, levels)),
@@ -236,7 +288,11 @@ def main() -> None:
 
     def save(i: int, finished: bool = False):
         (out / runs.PARAMS).write_bytes(serialization.to_bytes(runner[0].params))
-        state = serialization.to_bytes(dict(train_state=runner[0], rng=runner[3]))
+        parts = dict(train_state=runner[0], rng=runner[3])
+        if use_curriculum:
+            parts["curriculum"] = runner[4]
+            write_curriculum_csv(out / "curriculum.csv", names, jax.device_get(runner[4]))
+        state = serialization.to_bytes(parts)
         tmp = out / (runs.STATE + ".tmp")
         tmp.write_bytes(state)
         tmp.replace(out / runs.STATE)            # (an interrupted save never leaves a broken checkpoint)
@@ -279,6 +335,8 @@ def main() -> None:
                                                        for k in ("ret", "coins", "goal", "max_x", "length")}
                 if args.verbosity == 1 and not last:
                     print(eval_compact(i, results))
+                if use_curriculum and args.verbosity >= 1:
+                    print("\n".join(curriculum_lines(m, names, detail=args.verbosity >= 2 or last)))
             if i % 25 == 0:
                 save(i)
     except KeyboardInterrupt:                          # Ctrl-C: keep everything up to the last finished update

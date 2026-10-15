@@ -263,9 +263,10 @@ def _sample_start(key, lv: Level, level, use_s_points: bool, random_phases: bool
 
 
 def reset(key=None, random_start: bool = False, random_phases: bool = False,
-          spawn_prob: float = SPAWN_PROB, levels=None, level=None) -> EnvState:
+          spawn_prob: float = SPAWN_PROB, levels=None, level=None, level_logits=None) -> EnvState:
     """The exact default spawn, unless a randomisation option is on (see _sample_start).
-    level: which level (an index into `levels`); None = a random one (with a single level: that one)."""
+    level: which level (an index into `levels`); None = a random one (with a single level: that one).
+    level_logits: (n_levels,) log-weights for that random choice (the adaptive curriculum); None = uniform."""
     if key is None:
         key = jax.random.PRNGKey(0)
     levels = _levels(levels)
@@ -274,7 +275,10 @@ def reset(key=None, random_start: bool = False, random_phases: bool = False,
             level = 0
         else:
             key, k_level = jax.random.split(key)
-            level = jax.random.randint(k_level, (), 0, n_levels(levels))
+            if level_logits is None:
+                level = jax.random.randint(k_level, (), 0, n_levels(levels))
+            else:
+                level = jax.random.categorical(k_level, level_logits).astype(jnp.int32)
     if random_start or random_phases:
         return _sample_start(key, _pick(levels, level), level, random_start, random_phases, spawn_prob)
     return initial_state(rng=key, levels=levels, level=level)
@@ -410,9 +414,11 @@ def observe(s: EnvState, levels=None):
 
 # ---- dynamics -----------------------------------------------------------------------------
 def step(state: EnvState, action, random_starts: bool = False, random_phases: bool = False,
-         spawn_prob: float = SPAWN_PROB, progress_coef: float = 0.0, levels=None, keep_level: bool = False):
+         spawn_prob: float = SPAWN_PROB, progress_coef: float = 0.0, levels=None, keep_level: bool = False,
+         level_logits=None):
     """One tick.  The options are static training settings (bind them with functools.partial).
-    keep_level: the auto-reset stays on the same level (evaluation); otherwise it picks a random one of `levels`."""
+    keep_level: the auto-reset stays on the same level (evaluation); otherwise it picks a random one of `levels`
+    (weighted by level_logits if given: the adaptive curriculum, see ppo.py)."""
     f32, i32 = jnp.float32, jnp.int32
     levels = _levels(levels)
     lv = _pick(levels, state.level)
@@ -505,7 +511,8 @@ def step(state: EnvState, action, random_starts: bool = False, random_phases: bo
                 max_x=nxt.furthest, from_spawn=state.from_spawn, level=state.level)
 
     fresh = reset(reset_key, random_start=random_starts, random_phases=random_phases, spawn_prob=spawn_prob,
-                  levels=levels, level=state.level if keep_level else None)     # auto-reset, still no CPU involved
+                  levels=levels, level=state.level if keep_level else None,      # auto-reset, still no CPU involved
+                  level_logits=level_logits)
     out = jax.tree_util.tree_map(lambda a, b: jnp.where(done, a, b), fresh, nxt)
     if random_starts or random_phases or n_levels(levels) > 1:
         fresh_obs = observe(fresh, levels)
