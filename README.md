@@ -45,6 +45,7 @@ src/platformer_ai/
   level.py      the level as ASCII (edit it! also holds the S start points)
   levelcheck.py checks the level when it loads: errors with row/col, warnings in the log
   levelgen.py   random levels in 3 difficulty tiers (valid and beatable), writes gen/train/ and gen/test/
+  levelsettings.py  the generator's settings: built-in tiers, settings file + options, checks
   levelplan.py  beam search over the real env: can a level be finished? (used by levelgen)
   env.py        reset / step / observe: pure functions on a small pytree; vmap for many envs; the level is an input
   cli.py        the --level FILE option of viewer / play
@@ -387,7 +388,7 @@ coins, riders on platforms and ledges), with a start point `S` in front of every
 
 ```bash
 uv run python -m platformer_ai.levelgen                    # gen/train/ (300 levels) and gen/test/ (60), seed 0, ~4 min on CPU
-uv run python -m platformer_ai.levelgen --show 2 --tier 3  # just print a few, write nothing
+uv run python -m platformer_ai.levelgen --show 2 --tiers 3 # just print a few, write nothing
 uv run python -m platformer_ai.train --levels gen/train/ --test-levels gen/test/ --name generated
 uv run python -m platformer_ai.viewer --level gen/test/t3_0002.txt
 ```
@@ -411,6 +412,53 @@ uv run python -m platformer_ai.viewer --level gen/test/t3_0002.txt
   `reset` by them later. `levelgen.tier_of(name)` reads the tier of a file.
 * `--seed` gives another set; the test set uses its own seed (`seed + 1000003`), so it never shares a level with the
   training set. The same seed gives the same levels. `gen/` is not in git: regenerate it with the command above.
+
+### Shaping the levels: settings file or options
+
+Everything the generator does can be changed, either in a settings file (TOML) or with options, or both: every
+setting has a name, the file uses it as a key, and the command line has an option for the common ones plus
+`--set NAME=VALUE` for every one (also per tier and for the held-out set). The command line wins over the file.
+
+```bash
+uv run python -m platformer_ai.levelgen --config docs/levelgen/tier3_drill.toml            # a ready-made set
+uv run python -m platformer_ai.levelgen --tiers 3 --riders 2 --min ferry=1 --out gen_hard  # the same kind of thing
+uv run python -m platformer_ai.levelgen --config my.toml --gap 3 --print-settings          # show, write nothing
+uv run python -m platformer_ai.levelgen --help                                             # every option
+```
+
+| setting | option | what it does |
+| --- | --- | --- |
+| `out`, `seed`, `train`, `test`, `test_seed`, `verify` | `--out` `--seed` `--train` `--test` `--test-seed` `--no-verify` | what to write |
+| `tiers` | `--tiers 3`, `--tiers 1=1,2=1,3=3` | which tiers, in which shares |
+| `width`, `height` | `--width 60-80`, `--height 10-12` | level size (per tier by default) |
+| `gap`, `stone_gap`, `max_step` | `--gap 2-3`, `--stone-gap 2-3`, `--max-step 2` | how wide the pits, how high the steps (the physics cap them: gap 4, step 2) |
+| `max_enemies` | `--max-enemies 4` | enemies per level at most |
+| `only`, `without` | `--only gap,enemy`, `--without stones` | which segment kinds are used |
+| `weight.KIND` | `--weight enemy=2,gap=0.5` | how often a kind is picked, times its built-in weight (0 = never) |
+| `limit.KIND`, `min.KIND` | `--limit ferry=2`, `--min ferry=1` | at most / at least N of a kind per level |
+| `coins` | `--coins 2` | coin amount (0 = none) |
+| `riders` | `--riders 2` | enemies on ledges and riding platforms (1 = the tier-3 amount, 0 = none) |
+| `pairs`, `narrow_stones` | `--pairs 0.6`, `--narrow-stones 0.5` | chance of two enemies on one stretch / of 1-tile stepping stones |
+
+Segment kinds: `flat`, `step`, `gap`, `enemy`, `ledge`, `ferry`, `stones`, `upper` (a moving platform above the
+ground). In a file, a setting at the top applies to every tier, `[tier.3]` to one tier, `[test_set]` to the held-out
+set only (and `[test_set.tier.3]`); the more specific one wins. On the command line: `--set tier.3.riders=2`,
+`--set test_set.tiers=1,2,3`. `docs/levelgen/example.toml` lists every setting with its built-in value.
+
+Without any settings the generator makes exactly the levels it always made. Every set saves its settings as
+`OUT/settings.toml` (with the resolved tiers as comments), so `--config gen/settings.toml` makes the same set again.
+Settings that cannot work are refused with the reason (`gap 5-5 is outside 1-4 (a jump covers about 4 tiles ...)`,
+`no segment kind 'enemie' (did you mean 'enemy'?)`), and the beatability search still checks every level.
+
+**Tier-3 drill** (`docs/levelgen/tier3_drill.toml`): 600 training levels, 60% tier 3, with riders twice as often and
+more narrow stepping stones, ferries and upper platforms (what the first generated run failed on most), and the
+standard held-out set, so its `UNSEEN` numbers compare directly with a run on `gen/`:
+
+```bash
+uv run python -m platformer_ai.levelgen --config docs/levelgen/tier3_drill.toml
+uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3/test/ \
+    --init-from <your generated run> --total-steps 100000000 --name t3_drill
+```
 
 **Evaluation with many levels.** Up to 12 levels the `EVAL` lines name every level, as before. With more, they print
 one line per tier, how many levels are at goal rate 0 / below 0.5 / 0.5-0.9 / 0.9 and up, and the 5 worst levels:

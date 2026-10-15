@@ -4,7 +4,7 @@ import random
 import numpy as np
 import pytest
 
-from platformer_ai import levelcheck, levelgen, levelplan, train
+from platformer_ai import levelcheck, levelgen, levelplan, levelsettings, train
 
 
 def grid_of(text):
@@ -21,8 +21,9 @@ def test_generated_levels_are_clean_and_shaped_by_tier(tier):
         assert not rep.errors and not rep.warnings, (text, rep.errors, rep.warnings)
         g = grid_of(text)
         h, w = g.shape
-        assert levelgen.HEIGHT[0] <= h <= levelgen.HEIGHT[1]
-        assert levelgen.WIDTH[tier][0] <= w <= levelgen.WIDTH[tier][1]
+        d = levelsettings.TIER_DEFAULTS[tier]
+        assert d["height"][0] <= h <= d["height"][1]
+        assert d["width"][0] <= w <= d["width"][1]
         assert (g == "P").sum() == 1 and (g[:, -1] == "G").sum() == 2          # spawn, flag at the right edge
         assert np.argwhere(g == "P")[0][1] <= 2
         assert levelgen.tier_of(text) == tier

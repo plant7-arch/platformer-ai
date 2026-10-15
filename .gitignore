@@ -12,3 +12,4 @@ runs/pretrained/*
 
 # generated levels (python -m platformer_ai.levelgen)
 gen/
+gen_*/

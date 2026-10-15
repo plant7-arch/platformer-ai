@@ -1,0 +1,28 @@
+# Tier-3 drill: more tier-3 levels, and more of what the first generated run failed on (riders on ferries and upper
+# platforms, narrow stepping stones).  The held-out set is the standard one (same seed, built-in settings), so its
+# UNSEEN numbers compare directly with a run on the default gen/.
+#
+#   uv run python -m platformer_ai.levelgen --config docs/levelgen/tier3_drill.toml
+#   uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3/test/ \
+#       --init-from <your generated run> --total-steps 100000000 --name t3_drill
+
+out = "gen_t3"
+seed = 1                    # other training levels than gen/ (seed 0)
+train = 600
+test = 60
+test_seed = 1000003         # = the default held-out set of gen/
+tiers = { 1 = 1, 2 = 1, 3 = 3 }   # 120 / 120 / 360: mostly tier 3, some easier ones so nothing is forgotten
+
+[tier.3]
+riders = 2                  # enemies on ferries / upper platforms / ledges twice as often (chances are capped at 1)
+narrow_stones = 0.6         # 1-tile stepping stones twice as often
+weight = { ferry = 1.5, upper = 1.5, stones = 1.5 }
+
+# the held-out set: back to the built-in settings
+[test_set]
+tiers = { 1 = 1, 2 = 1, 3 = 1 }
+
+[test_set.tier.3]
+riders = 1
+narrow_stones = 0.3
+weight = { ferry = 1, upper = 1, stones = 1 }
