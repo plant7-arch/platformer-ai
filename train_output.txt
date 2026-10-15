@@ -1,0 +1,1469 @@
+run folder: runs/2026-10-15_113450_generated
+devices: [CudaDevice(id=0)]
+training on 300 levels from gen/train/ (tier 1: 100, tier 2: 100, tier 3: 100);  testing on 60 levels from gen/test/ (tier 1: 20, tier 2: 20, tier 3: 20) unseen
+762 updates x 131072 steps = 99,876,864 steps
+upd    1/762  steps     131,072  SPAWN eps     7 return -0.71 coins  0.3 goal 0.00 max_x   6.4 len   113 | ALL return -0.82 goal 0.00 | ent 1.79 v_loss 0.021   103,605 sps (includes compile)
+upd    2/762  steps     262,144  SPAWN eps    62 return -0.76 coins  0.2 goal 0.00 max_x   6.8 len   182 | ALL return -0.80 goal 0.00 | ent 1.77 v_loss 0.010   584,839 sps
+upd    3/762  steps     393,216  SPAWN eps   304 return -0.73 coins  0.3 goal 0.00 max_x   7.6 len   258 | ALL return -0.77 goal 0.00 | ent 1.74 v_loss 0.023   588,481 sps
+upd    4/762  steps     524,288  SPAWN eps   622 return -0.58 coins  0.4 goal 0.00 max_x   8.7 len   262 | ALL return -0.68 goal 0.00 | ent 1.69 v_loss 0.034   587,360 sps
+upd    5/762  steps     655,360  SPAWN eps  1021 return -0.31 coins  0.7 goal 0.00 max_x  10.5 len   267 | ALL return -0.51 goal 0.00 | ent 1.62 v_loss 0.052   588,624 sps
+upd    6/762  steps     786,432  SPAWN eps  1529 return -0.07 coins  0.9 goal 0.00 max_x  12.3 len   254 | ALL return -0.30 goal 0.01 | ent 1.54 v_loss 0.080   586,452 sps
+upd    7/762  steps     917,504  SPAWN eps  2021 return  0.24 coins  1.1 goal 0.02 max_x  14.1 len   243 | ALL return  0.01 goal 0.03 | ent 1.46 v_loss 0.137   585,914 sps
+upd    8/762  steps   1,048,576  SPAWN eps  2553 return  0.43 coins  1.3 goal 0.03 max_x  15.5 len   231 | ALL return  0.24 goal 0.05 | ent 1.37 v_loss 0.154   586,468 sps
+upd    9/762  steps   1,179,648  SPAWN eps  3098 return  0.58 coins  1.3 goal 0.04 max_x  16.6 len   218 | ALL return  0.46 goal 0.08 | ent 1.31 v_loss 0.195   587,518 sps
+upd   10/762  steps   1,310,720  SPAWN eps  3607 return  0.69 coins  1.4 goal 0.05 max_x  17.6 len   209 | ALL return  0.59 goal 0.09 | ent 1.26 v_loss 0.176   586,460 sps
+upd   11/762  steps   1,441,792  SPAWN eps  4132 return  0.79 coins  1.4 goal 0.06 max_x  18.4 len   202 | ALL return  0.79 goal 0.11 | ent 1.21 v_loss 0.198   586,593 sps
+upd   12/762  steps   1,572,864  SPAWN eps  4621 return  0.88 coins  1.5 goal 0.07 max_x  19.2 len   195 | ALL return  0.93 goal 0.12 | ent 1.17 v_loss 0.193   587,103 sps
+upd   13/762  steps   1,703,936  SPAWN eps  4904 return  1.01 coins  1.6 goal 0.08 max_x  20.2 len   185 | ALL return  1.09 goal 0.14 | ent 1.18 v_loss 0.185   587,143 sps
+upd   14/762  steps   1,835,008  SPAWN eps  5111 return  1.14 coins  1.6 goal 0.09 max_x  21.3 len   175 | ALL return  1.28 goal 0.16 | ent 1.15 v_loss 0.195   587,725 sps
+upd   15/762  steps   1,966,080  SPAWN eps  5201 return  1.23 coins  1.7 goal 0.09 max_x  22.1 len   164 | ALL return  1.44 goal 0.18 | ent 1.13 v_loss 0.194   587,197 sps
+upd   16/762  steps   2,097,152  SPAWN eps  5183 return  1.37 coins  1.7 goal 0.11 max_x  23.1 len   157 | ALL return  1.61 goal 0.20 | ent 1.12 v_loss 0.189   587,956 sps
+upd   17/762  steps   2,228,224  SPAWN eps  5162 return  1.43 coins  1.7 goal 0.12 max_x  23.6 len   152 | ALL return  1.72 goal 0.21 | ent 1.10 v_loss 0.196   588,241 sps
+upd   18/762  steps   2,359,296  SPAWN eps  5078 return  1.53 coins  1.7 goal 0.13 max_x  24.3 len   149 | ALL return  1.84 goal 0.23 | ent 1.08 v_loss 0.200   587,743 sps
+upd   19/762  steps   2,490,368  SPAWN eps  4967 return  1.61 coins  1.8 goal 0.14 max_x  24.9 len   149 | ALL return  1.92 goal 0.24 | ent 1.07 v_loss 0.207   587,844 sps
+upd   20/762  steps   2,621,440  SPAWN eps  4893 return  1.74 coins  1.8 goal 0.15 max_x  25.5 len   151 | ALL return  2.06 goal 0.25 | ent 1.04 v_loss 0.210   586,199 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  2.55  coins  2.2  goal 0.22  max_x  29.5  len  149
+        tier 1    100 levels   return  4.16  coins  2.8  goal 0.40  max_x  31.4
+        tier 2    100 levels   return  2.65  coins  2.4  goal 0.21  max_x  32.3
+        tier 3    100 levels   return  0.84  coins  1.5  goal 0.06  max_x  24.9
+        levels by goal rate:  0: 172   <0.5: 58   0.5-0.9: 43   >=0.9: 27
+        worst: t1_0105.txt 0.00 (x 8),  t3_0191.txt 0.00 (x 8),  t3_0224.txt 0.00 (x 9),  t2_0055.txt 0.00 (x 9),  t2_0073.txt 0.00 (x 9)
+    EVAL sampled  1200 fresh episodes, random phases:  return  2.77  coins  2.5  goal 0.22  max_x  30.5  len  178
+        tier 1    100 levels   return  4.18  coins  2.9  goal 0.38  max_x  31.6
+        tier 2    100 levels   return  2.97  coins  2.6  goal 0.23  max_x  33.5
+        tier 3    100 levels   return  1.15  coins  1.9  goal 0.04  max_x  26.4
+        levels by goal rate:  0: 156   <0.5: 71   0.5-0.9: 63   >=0.9: 10
+        worst: t2_0163.txt 0.00 (x 7),  t3_0059.txt 0.00 (x 8),  t2_0055.txt 0.00 (x 8),  t2_0058.txt 0.00 (x 9),  t3_0068.txt 0.00 (x 9)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  2.39  coins  2.2  goal 0.20  max_x  29.9  len  157
+        tier 1     20 levels   return  3.76  coins  2.5  goal 0.37  max_x  31.6
+        tier 2     20 levels   return  2.66  coins  2.5  goal 0.19  max_x  34.9
+        tier 3     20 levels   return  0.74  coins  1.5  goal 0.03  max_x  23.2
+        levels by goal rate:  0: 29   <0.5: 23   0.5-0.9: 7   >=0.9: 1
+        worst: t3_0044.txt 0.00 (x 8),  t1_0024.txt 0.00 (x 9),  t1_0015.txt 0.00 (x 9),  t3_0053.txt 0.00 (x 9),  t3_0005.txt 0.00 (x 10)
+upd   21/762  steps   2,752,512  SPAWN eps  4811 return  1.84 coins  1.9 goal 0.16 max_x  26.0 len   153 | ALL return  2.17 goal 0.26 | ent 1.04 v_loss 0.217   584,606 sps
+upd   22/762  steps   2,883,584  SPAWN eps  4654 return  1.96 coins  2.0 goal 0.17 max_x  26.7 len   157 | ALL return  2.29 goal 0.28 | ent 1.03 v_loss 0.224   587,105 sps
+upd   23/762  steps   3,014,656  SPAWN eps  4545 return  2.16 coins  2.1 goal 0.18 max_x  27.6 len   162 | ALL return  2.46 goal 0.29 | ent 1.01 v_loss 0.227   585,414 sps
+upd   24/762  steps   3,145,728  SPAWN eps  4362 return  2.34 coins  2.2 goal 0.19 max_x  28.4 len   167 | ALL return  2.62 goal 0.31 | ent 1.00 v_loss 0.230   585,946 sps
+upd   25/762  steps   3,276,800  SPAWN eps  4241 return  2.61 coins  2.3 goal 0.22 max_x  29.6 len   174 | ALL return  2.84 goal 0.33 | ent 0.99 v_loss 0.226   585,193 sps
+upd   26/762  steps   3,407,872  SPAWN eps  4115 return  2.84 coins  2.4 goal 0.23 max_x  30.5 len   180 | ALL return  3.02 goal 0.34 | ent 0.97 v_loss 0.234   585,344 sps
+upd   27/762  steps   3,538,944  SPAWN eps  3978 return  3.05 coins  2.5 goal 0.25 max_x  31.7 len   188 | ALL return  3.21 goal 0.36 | ent 0.92 v_loss 0.235   583,504 sps
+upd   28/762  steps   3,670,016  SPAWN eps  3899 return  3.25 coins  2.7 goal 0.26 max_x  32.6 len   194 | ALL return  3.41 goal 0.38 | ent 0.88 v_loss 0.243   584,463 sps
+upd   29/762  steps   3,801,088  SPAWN eps  3806 return  3.50 coins  2.8 goal 0.28 max_x  33.6 len   201 | ALL return  3.61 goal 0.40 | ent 0.86 v_loss 0.247   584,507 sps
+upd   30/762  steps   3,932,160  SPAWN eps  3719 return  3.71 coins  2.9 goal 0.30 max_x  34.5 len   206 | ALL return  3.79 goal 0.41 | ent 0.88 v_loss 0.251   584,474 sps
+upd   31/762  steps   4,063,232  SPAWN eps  3625 return  3.97 coins  3.0 goal 0.32 max_x  35.6 len   212 | ALL return  3.99 goal 0.43 | ent 0.89 v_loss 0.248   584,727 sps
+upd   32/762  steps   4,194,304  SPAWN eps  3564 return  4.24 coins  3.2 goal 0.35 max_x  36.6 len   218 | ALL return  4.22 goal 0.45 | ent 0.90 v_loss 0.236   586,055 sps
+upd   33/762  steps   4,325,376  SPAWN eps  3459 return  4.46 coins  3.3 goal 0.36 max_x  37.6 len   224 | ALL return  4.39 goal 0.47 | ent 0.91 v_loss 0.224   585,352 sps
+upd   34/762  steps   4,456,448  SPAWN eps  3417 return  4.69 coins  3.4 goal 0.38 max_x  38.6 len   230 | ALL return  4.58 goal 0.49 | ent 0.89 v_loss 0.220   585,379 sps
+upd   35/762  steps   4,587,520  SPAWN eps  3375 return  4.87 coins  3.5 goal 0.40 max_x  39.4 len   235 | ALL return  4.73 goal 0.50 | ent 0.89 v_loss 0.233   585,355 sps
+upd   36/762  steps   4,718,592  SPAWN eps  3335 return  5.02 coins  3.6 goal 0.41 max_x  40.2 len   239 | ALL return  4.86 goal 0.51 | ent 0.87 v_loss 0.250   586,102 sps
+upd   37/762  steps   4,849,664  SPAWN eps  3308 return  5.21 coins  3.7 goal 0.43 max_x  40.8 len   243 | ALL return  4.97 goal 0.52 | ent 0.87 v_loss 0.241   585,585 sps
+upd   38/762  steps   4,980,736  SPAWN eps  3227 return  5.44 coins  3.8 goal 0.45 max_x  41.6 len   248 | ALL return  5.14 goal 0.54 | ent 0.88 v_loss 0.211   585,926 sps
+upd   39/762  steps   5,111,808  SPAWN eps  3183 return  5.67 coins  3.9 goal 0.47 max_x  42.5 len   254 | ALL return  5.33 goal 0.55 | ent 0.88 v_loss 0.206   585,548 sps
+upd   40/762  steps   5,242,880  SPAWN eps  3139 return  5.84 coins  3.9 goal 0.48 max_x  43.2 len   260 | ALL return  5.47 goal 0.57 | ent 0.86 v_loss 0.230   585,147 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  6.77  coins  4.3  goal 0.56  max_x  46.4  len  282
+        tier 1    100 levels   return  8.38  coins  4.9  goal 0.74  max_x  42.6
+        tier 2    100 levels   return  7.21  coins  4.5  goal 0.62  max_x  49.5
+        tier 3    100 levels   return  4.72  coins  3.7  goal 0.33  max_x  47.0
+        levels by goal rate:  0: 58   <0.5: 43   0.5-0.9: 107   >=0.9: 92
+        worst: t2_0265.txt 0.00 (x 4),  t3_0020.txt 0.00 (x 5),  t2_0061.txt 0.00 (x 10),  t3_0068.txt 0.00 (x 11),  t3_0107.txt 0.00 (x 12)
+    EVAL sampled  1200 fresh episodes, random phases:  return  6.57  coins  4.3  goal 0.55  max_x  46.2  len  279
+        tier 1    100 levels   return  8.19  coins  4.8  goal 0.73  max_x  42.2
+        tier 2    100 levels   return  6.62  coins  4.3  goal 0.56  max_x  48.9
+        tier 3    100 levels   return  4.92  coins  3.8  goal 0.36  max_x  47.4
+        levels by goal rate:  0: 44   <0.5: 55   0.5-0.9: 135   >=0.9: 66
+        worst: t1_0132.txt 0.00 (x 14),  t3_0239.txt 0.00 (x 15),  t3_0224.txt 0.00 (x 18),  t3_0200.txt 0.00 (x 20),  t1_0282.txt 0.00 (x 22)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  6.41  coins  4.2  goal 0.53  max_x  46.5  len  291
+        tier 1     20 levels   return  7.87  coins  4.5  goal 0.72  max_x  42.7
+        tier 2     20 levels   return  7.34  coins  4.8  goal 0.59  max_x  52.7
+        tier 3     20 levels   return  4.03  coins  3.2  goal 0.29  max_x  44.2
+        levels by goal rate:  0: 8   <0.5: 21   0.5-0.9: 20   >=0.9: 11
+        worst: t3_0014.txt 0.00 (x 5),  t3_0005.txt 0.00 (x 13),  t3_0047.txt 0.00 (x 21),  t1_0051.txt 0.00 (x 38),  t3_0032.txt 0.00 (x 40)
+upd   41/762  steps   5,373,952  SPAWN eps  3081 return  6.01 coins  4.0 goal 0.50 max_x  43.9 len   265 | ALL return  5.61 goal 0.58 | ent 0.86 v_loss 0.226   584,272 sps
+upd   42/762  steps   5,505,024  SPAWN eps  3068 return  6.13 coins  4.1 goal 0.51 max_x  44.6 len   271 | ALL return  5.70 goal 0.58 | ent 0.83 v_loss 0.219   585,048 sps
+upd   43/762  steps   5,636,096  SPAWN eps  3048 return  6.21 coins  4.1 goal 0.51 max_x  44.9 len   273 | ALL return  5.81 goal 0.59 | ent 0.82 v_loss 0.222   584,768 sps
+upd   44/762  steps   5,767,168  SPAWN eps  3051 return  6.28 coins  4.2 goal 0.52 max_x  45.1 len   274 | ALL return  5.87 goal 0.60 | ent 0.79 v_loss 0.239   585,939 sps
+upd   45/762  steps   5,898,240  SPAWN eps  3030 return  6.36 coins  4.2 goal 0.53 max_x  45.4 len   276 | ALL return  5.91 goal 0.60 | ent 0.79 v_loss 0.234   585,619 sps
+upd   46/762  steps   6,029,312  SPAWN eps  2987 return  6.47 coins  4.2 goal 0.54 max_x  45.8 len   278 | ALL return  5.99 goal 0.61 | ent 0.80 v_loss 0.235   586,004 sps
+upd   47/762  steps   6,160,384  SPAWN eps  2973 return  6.55 coins  4.3 goal 0.55 max_x  46.0 len   278 | ALL return  6.08 goal 0.62 | ent 0.80 v_loss 0.228   585,636 sps
+upd   48/762  steps   6,291,456  SPAWN eps  2981 return  6.50 coins  4.3 goal 0.54 max_x  46.0 len   278 | ALL return  6.09 goal 0.62 | ent 0.78 v_loss 0.244   584,264 sps
+upd   49/762  steps   6,422,528  SPAWN eps  2988 return  6.47 coins  4.2 goal 0.54 max_x  45.8 len   275 | ALL return  6.07 goal 0.62 | ent 0.76 v_loss 0.225   585,462 sps
+upd   50/762  steps   6,553,600  SPAWN eps  2971 return  6.61 coins  4.3 goal 0.55 max_x  46.3 len   276 | ALL return  6.16 goal 0.63 | ent 0.74 v_loss 0.206   584,682 sps
+upd   51/762  steps   6,684,672  SPAWN eps  2990 return  6.60 coins  4.3 goal 0.55 max_x  46.3 len   274 | ALL return  6.18 goal 0.63 | ent 0.73 v_loss 0.231   583,944 sps
+upd   52/762  steps   6,815,744  SPAWN eps  2987 return  6.67 coins  4.4 goal 0.55 max_x  46.1 len   273 | ALL return  6.23 goal 0.63 | ent 0.72 v_loss 0.216   584,767 sps
+upd   53/762  steps   6,946,816  SPAWN eps  2998 return  6.77 coins  4.4 goal 0.56 max_x  46.3 len   273 | ALL return  6.28 goal 0.64 | ent 0.70 v_loss 0.226   585,426 sps
+upd   54/762  steps   7,077,888  SPAWN eps  3034 return  6.79 coins  4.4 goal 0.57 max_x  46.4 len   273 | ALL return  6.28 goal 0.64 | ent 0.71 v_loss 0.246   585,003 sps
+upd   55/762  steps   7,208,960  SPAWN eps  3052 return  6.82 coins  4.4 goal 0.57 max_x  46.5 len   272 | ALL return  6.34 goal 0.64 | ent 0.70 v_loss 0.231   586,244 sps
+upd   56/762  steps   7,340,032  SPAWN eps  3029 return  6.89 coins  4.4 goal 0.58 max_x  46.6 len   272 | ALL return  6.41 goal 0.65 | ent 0.70 v_loss 0.204   585,089 sps
+upd   57/762  steps   7,471,104  SPAWN eps  3036 return  6.97 coins  4.5 goal 0.58 max_x  46.9 len   273 | ALL return  6.48 goal 0.66 | ent 0.70 v_loss 0.204   585,998 sps
+upd   58/762  steps   7,602,176  SPAWN eps  3015 return  7.10 coins  4.5 goal 0.60 max_x  47.2 len   274 | ALL return  6.57 goal 0.67 | ent 0.71 v_loss 0.200   585,347 sps
+upd   59/762  steps   7,733,248  SPAWN eps  3000 return  7.17 coins  4.5 goal 0.61 max_x  47.5 len   276 | ALL return  6.60 goal 0.67 | ent 0.71 v_loss 0.206   586,701 sps
+upd   60/762  steps   7,864,320  SPAWN eps  2991 return  7.12 coins  4.5 goal 0.60 max_x  47.4 len   276 | ALL return  6.60 goal 0.67 | ent 0.70 v_loss 0.198   585,329 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  7.24  coins  4.5  goal 0.60  max_x  48.4  len  334
+        tier 1    100 levels   return  7.95  coins  4.8  goal 0.67  max_x  41.1
+        tier 2    100 levels   return  7.85  coins  4.6  goal 0.69  max_x  52.3
+        tier 3    100 levels   return  5.93  coins  4.1  goal 0.45  max_x  51.8
+        levels by goal rate:  0: 54   <0.5: 37   0.5-0.9: 100   >=0.9: 109
+        worst: t3_0068.txt 0.00 (x 12),  t1_0048.txt 0.00 (x 15),  t1_0219.txt 0.00 (x 15),  t2_0118.txt 0.00 (x 15),  t3_0224.txt 0.00 (x 15)
+    EVAL sampled  1200 fresh episodes, random phases:  return  7.85  coins  4.8  goal 0.67  max_x  50.4  len  300
+        tier 1    100 levels   return  9.43  coins  5.4  goal 0.85  max_x  44.6
+        tier 2    100 levels   return  8.04  coins  4.8  goal 0.70  max_x  53.7
+        tier 3    100 levels   return  6.08  coins  4.2  goal 0.47  max_x  52.8
+        levels by goal rate:  0: 11   <0.5: 47   0.5-0.9: 140   >=0.9: 102
+        worst: t3_0164.txt 0.00 (x 15),  t3_0062.txt 0.00 (x 21),  t1_0282.txt 0.00 (x 22),  t3_0107.txt 0.00 (x 26),  t3_0218.txt 0.00 (x 30)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  6.86  coins  4.3  goal 0.57  max_x  48.0  len  327
+        tier 1     20 levels   return  7.70  coins  4.6  goal 0.67  max_x  41.7
+        tier 2     20 levels   return  8.54  coins  5.1  goal 0.74  max_x  55.6
+        tier 3     20 levels   return  4.33  coins  3.4  goal 0.30  max_x  46.8
+        levels by goal rate:  0: 8   <0.5: 17   0.5-0.9: 21   >=0.9: 14
+        worst: t3_0035.txt 0.00 (x 12),  t3_0005.txt 0.00 (x 14),  t3_0047.txt 0.00 (x 17),  t1_0051.txt 0.00 (x 36),  t3_0053.txt 0.00 (x 38)
+upd   61/762  steps   7,995,392  SPAWN eps  2959 return  7.23 coins  4.5 goal 0.62 max_x  47.7 len   277 | ALL return  6.69 goal 0.68 | ent 0.69 v_loss 0.187   584,028 sps
+upd   62/762  steps   8,126,464  SPAWN eps  2941 return  7.31 coins  4.6 goal 0.62 max_x  48.1 len   280 | ALL return  6.77 goal 0.69 | ent 0.68 v_loss 0.203   583,788 sps
+upd   63/762  steps   8,257,536  SPAWN eps  2894 return  7.36 coins  4.6 goal 0.63 max_x  48.4 len   282 | ALL return  6.83 goal 0.70 | ent 0.67 v_loss 0.184   585,010 sps
+upd   64/762  steps   8,388,608  SPAWN eps  2839 return  7.49 coins  4.6 goal 0.64 max_x  48.7 len   284 | ALL return  6.97 goal 0.71 | ent 0.66 v_loss 0.181   584,395 sps
+upd   65/762  steps   8,519,680  SPAWN eps  2795 return  7.57 coins  4.7 goal 0.65 max_x  49.1 len   287 | ALL return  7.01 goal 0.72 | ent 0.66 v_loss 0.193   584,760 sps
+upd   66/762  steps   8,650,752  SPAWN eps  2825 return  7.61 coins  4.7 goal 0.65 max_x  49.4 len   289 | ALL return  7.04 goal 0.72 | ent 0.64 v_loss 0.188   585,001 sps
+upd   67/762  steps   8,781,824  SPAWN eps  2788 return  7.67 coins  4.7 goal 0.66 max_x  49.4 len   290 | ALL return  7.07 goal 0.72 | ent 0.64 v_loss 0.196   585,930 sps
+upd   68/762  steps   8,912,896  SPAWN eps  2781 return  7.78 coins  4.8 goal 0.67 max_x  50.0 len   293 | ALL return  7.13 goal 0.73 | ent 0.63 v_loss 0.170   585,450 sps
+upd   69/762  steps   9,043,968  SPAWN eps  2778 return  7.87 coins  4.8 goal 0.67 max_x  50.3 len   295 | ALL return  7.21 goal 0.73 | ent 0.62 v_loss 0.188   585,357 sps
+upd   70/762  steps   9,175,040  SPAWN eps  2798 return  7.97 coins  4.9 goal 0.68 max_x  50.6 len   296 | ALL return  7.25 goal 0.74 | ent 0.61 v_loss 0.179   585,107 sps
+upd   71/762  steps   9,306,112  SPAWN eps  2796 return  8.00 coins  4.9 goal 0.68 max_x  50.7 len   296 | ALL return  7.27 goal 0.74 | ent 0.60 v_loss 0.192   585,886 sps
+upd   72/762  steps   9,437,184  SPAWN eps  2784 return  8.00 coins  4.9 goal 0.68 max_x  50.6 len   296 | ALL return  7.27 goal 0.74 | ent 0.58 v_loss 0.194   586,651 sps
+upd   73/762  steps   9,568,256  SPAWN eps  2834 return  7.97 coins  4.9 goal 0.68 max_x  50.6 len   294 | ALL return  7.26 goal 0.74 | ent 0.56 v_loss 0.197   585,407 sps
+upd   74/762  steps   9,699,328  SPAWN eps  2839 return  8.00 coins  4.9 goal 0.69 max_x  50.8 len   295 | ALL return  7.28 goal 0.74 | ent 0.55 v_loss 0.183   585,630 sps
+upd   75/762  steps   9,830,400  SPAWN eps  2843 return  8.03 coins  4.9 goal 0.69 max_x  51.0 len   295 | ALL return  7.29 goal 0.74 | ent 0.55 v_loss 0.185   585,074 sps
+upd   76/762  steps   9,961,472  SPAWN eps  2819 return  8.08 coins  4.9 goal 0.70 max_x  51.2 len   294 | ALL return  7.35 goal 0.75 | ent 0.54 v_loss 0.161   584,906 sps
+upd   77/762  steps  10,092,544  SPAWN eps  2839 return  8.12 coins  4.9 goal 0.70 max_x  51.3 len   295 | ALL return  7.42 goal 0.75 | ent 0.54 v_loss 0.165   584,050 sps
+upd   78/762  steps  10,223,616  SPAWN eps  2850 return  8.10 coins  4.9 goal 0.70 max_x  51.2 len   293 | ALL return  7.39 goal 0.75 | ent 0.55 v_loss 0.178   584,146 sps
+upd   79/762  steps  10,354,688  SPAWN eps  2823 return  8.14 coins  4.9 goal 0.70 max_x  51.3 len   293 | ALL return  7.42 goal 0.75 | ent 0.54 v_loss 0.160   583,997 sps
+upd   80/762  steps  10,485,760  SPAWN eps  2792 return  8.19 coins  4.9 goal 0.71 max_x  51.5 len   294 | ALL return  7.48 goal 0.76 | ent 0.54 v_loss 0.166   585,425 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  8.31  coins  5.0  goal 0.72  max_x  51.8  len  308
+        tier 1    100 levels   return  9.07  coins  5.2  goal 0.80  max_x  43.3
+        tier 2    100 levels   return  8.76  coins  5.1  goal 0.78  max_x  55.2
+        tier 3    100 levels   return  7.10  coins  4.6  goal 0.58  max_x  57.0
+        levels by goal rate:  0: 23   <0.5: 32   0.5-0.9: 105   >=0.9: 140
+        worst: t3_0047.txt 0.00 (x 6),  t3_0068.txt 0.00 (x 12),  t2_0118.txt 0.00 (x 15),  t1_0024.txt 0.00 (x 15),  t1_0279.txt 0.00 (x 16)
+    EVAL sampled  1200 fresh episodes, random phases:  return  8.70  coins  5.1  goal 0.77  max_x  53.2  len  309
+        tier 1    100 levels   return  9.61  coins  5.5  goal 0.86  max_x  44.8
+        tier 2    100 levels   return  9.05  coins  5.1  goal 0.82  max_x  56.5
+        tier 3    100 levels   return  7.43  coins  4.7  goal 0.62  max_x  58.2
+        levels by goal rate:  0: 8   <0.5: 29   0.5-0.9: 121   >=0.9: 142
+        worst: t1_0132.txt 0.00 (x 15),  t3_0062.txt 0.00 (x 20),  t3_0182.txt 0.00 (x 23),  t1_0159.txt 0.00 (x 27),  t3_0281.txt 0.00 (x 33)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  7.64  coins  4.7  goal 0.65  max_x  50.6  len  318
+        tier 1     20 levels   return  7.72  coins  4.6  goal 0.66  max_x  40.8
+        tier 2     20 levels   return  9.11  coins  5.3  goal 0.79  max_x  57.2
+        tier 3     20 levels   return  6.10  coins  4.1  goal 0.49  max_x  53.9
+        levels by goal rate:  0: 4   <0.5: 16   0.5-0.9: 23   >=0.9: 17
+        worst: t1_0051.txt 0.00 (x 43),  t1_0045.txt 0.00 (x 43),  t2_0043.txt 0.00 (x 47),  t3_0020.txt 0.00 (x 48),  t3_0005.txt 0.11 (x 23)
+upd   81/762  steps  10,616,832  SPAWN eps  2780 return  8.23 coins  5.0 goal 0.71 max_x  51.7 len   295 | ALL return  7.51 goal 0.76 | ent 0.53 v_loss 0.161   584,516 sps
+upd   82/762  steps  10,747,904  SPAWN eps  2770 return  8.27 coins  5.0 goal 0.72 max_x  52.1 len   297 | ALL return  7.55 goal 0.77 | ent 0.50 v_loss 0.156   584,017 sps
+upd   83/762  steps  10,878,976  SPAWN eps  2737 return  8.37 coins  5.0 goal 0.73 max_x  52.5 len   300 | ALL return  7.62 goal 0.78 | ent 0.51 v_loss 0.154   585,130 sps
+upd   84/762  steps  11,010,048  SPAWN eps  2718 return  8.47 coins  5.0 goal 0.74 max_x  52.9 len   303 | ALL return  7.69 goal 0.78 | ent 0.51 v_loss 0.131   585,105 sps
+upd   85/762  steps  11,141,120  SPAWN eps  2709 return  8.54 coins  5.1 goal 0.74 max_x  53.0 len   304 | ALL return  7.76 goal 0.79 | ent 0.51 v_loss 0.146   586,062 sps
+upd   86/762  steps  11,272,192  SPAWN eps  2697 return  8.57 coins  5.1 goal 0.75 max_x  53.0 len   306 | ALL return  7.78 goal 0.79 | ent 0.51 v_loss 0.146   584,436 sps
+upd   87/762  steps  11,403,264  SPAWN eps  2674 return  8.58 coins  5.1 goal 0.75 max_x  53.1 len   307 | ALL return  7.77 goal 0.79 | ent 0.50 v_loss 0.156   585,227 sps
+upd   88/762  steps  11,534,336  SPAWN eps  2671 return  8.62 coins  5.1 goal 0.75 max_x  53.4 len   309 | ALL return  7.83 goal 0.80 | ent 0.49 v_loss 0.153   585,347 sps
+upd   89/762  steps  11,665,408  SPAWN eps  2677 return  8.67 coins  5.1 goal 0.76 max_x  53.5 len   309 | ALL return  7.87 goal 0.80 | ent 0.48 v_loss 0.141   585,594 sps
+upd   90/762  steps  11,796,480  SPAWN eps  2704 return  8.64 coins  5.1 goal 0.76 max_x  53.3 len   308 | ALL return  7.88 goal 0.81 | ent 0.48 v_loss 0.163   585,743 sps
+upd   91/762  steps  11,927,552  SPAWN eps  2674 return  8.66 coins  5.1 goal 0.76 max_x  53.4 len   308 | ALL return  7.88 goal 0.81 | ent 0.48 v_loss 0.155   586,207 sps
+upd   92/762  steps  12,058,624  SPAWN eps  2652 return  8.66 coins  5.1 goal 0.76 max_x  53.3 len   306 | ALL return  7.90 goal 0.81 | ent 0.48 v_loss 0.147   585,531 sps
+upd   93/762  steps  12,189,696  SPAWN eps  2649 return  8.69 coins  5.1 goal 0.77 max_x  53.3 len   306 | ALL return  7.90 goal 0.81 | ent 0.47 v_loss 0.158   585,534 sps
+upd   94/762  steps  12,320,768  SPAWN eps  2650 return  8.67 coins  5.1 goal 0.76 max_x  53.1 len   304 | ALL return  7.88 goal 0.81 | ent 0.47 v_loss 0.147   585,856 sps
+upd   95/762  steps  12,451,840  SPAWN eps  2645 return  8.73 coins  5.1 goal 0.77 max_x  53.3 len   305 | ALL return  7.89 goal 0.81 | ent 0.47 v_loss 0.153   585,570 sps
+upd   96/762  steps  12,582,912  SPAWN eps  2667 return  8.81 coins  5.2 goal 0.78 max_x  53.6 len   305 | ALL return  7.91 goal 0.81 | ent 0.47 v_loss 0.137   584,627 sps
+upd   97/762  steps  12,713,984  SPAWN eps  2675 return  8.80 coins  5.2 goal 0.77 max_x  53.7 len   305 | ALL return  7.92 goal 0.81 | ent 0.47 v_loss 0.137   585,030 sps
+upd   98/762  steps  12,845,056  SPAWN eps  2667 return  8.78 coins  5.1 goal 0.77 max_x  53.5 len   304 | ALL return  7.92 goal 0.81 | ent 0.46 v_loss 0.144   585,524 sps
+upd   99/762  steps  12,976,128  SPAWN eps  2679 return  8.79 coins  5.2 goal 0.77 max_x  53.7 len   305 | ALL return  7.93 goal 0.81 | ent 0.46 v_loss 0.138   587,130 sps
+upd  100/762  steps  13,107,200  SPAWN eps  2684 return  8.83 coins  5.2 goal 0.78 max_x  53.9 len   305 | ALL return  7.96 goal 0.81 | ent 0.46 v_loss 0.143   586,297 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  8.88  coins  5.2  goal 0.79  max_x  54.0  len  294
+        tier 1    100 levels   return  9.63  coins  5.4  goal 0.87  max_x  45.1
+        tier 2    100 levels   return  9.37  coins  5.2  goal 0.85  max_x  57.6
+        tier 3    100 levels   return  7.64  coins  4.8  goal 0.64  max_x  59.4
+        levels by goal rate:  0: 4   <0.5: 33   0.5-0.9: 94   >=0.9: 169
+        worst: t3_0068.txt 0.00 (x 11),  t3_0224.txt 0.00 (x 19),  t3_0272.txt 0.00 (x 24),  t2_0079.txt 0.00 (x 45),  t1_0006.txt 0.25 (x 21)
+    EVAL sampled  1200 fresh episodes, random phases:  return  9.15  coins  5.3  goal 0.81  max_x  55.0  len  312
+        tier 1    100 levels   return 10.14  coins  5.7  goal 0.91  max_x  46.3
+        tier 2    100 levels   return  9.35  coins  5.2  goal 0.85  max_x  57.6
+        tier 3    100 levels   return  7.95  coins  5.0  goal 0.65  max_x  61.1
+        levels by goal rate:  0: 4   <0.5: 20   0.5-0.9: 121   >=0.9: 155
+        worst: t1_0024.txt 0.00 (x 27),  t3_0023.txt 0.00 (x 35),  t3_0014.txt 0.00 (x 44),  t3_0077.txt 0.00 (x 52),  t1_0132.txt 0.25 (x 23)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  8.41  coins  4.9  goal 0.75  max_x  53.0  len  285
+        tier 1     20 levels   return  8.99  coins  5.1  goal 0.82  max_x  44.1
+        tier 2     20 levels   return  9.58  coins  5.4  goal 0.86  max_x  58.2
+        tier 3     20 levels   return  6.66  coins  4.3  goal 0.56  max_x  56.8
+        levels by goal rate:  0: 0   <0.5: 14   0.5-0.9: 24   >=0.9: 22
+        worst: t3_0047.txt 0.11 (x 24),  t1_0027.txt 0.11 (x 42),  t3_0005.txt 0.22 (x 31),  t3_0041.txt 0.22 (x 53),  t1_0030.txt 0.33 (x 29)
+upd  101/762  steps  13,238,272  SPAWN eps  2713 return  8.93 coins  5.2 goal 0.79 max_x  54.1 len   306 | ALL return  8.01 goal 0.82 | ent 0.46 v_loss 0.136   580,546 sps
+upd  102/762  steps  13,369,344  SPAWN eps  2723 return  8.99 coins  5.2 goal 0.79 max_x  54.4 len   308 | ALL return  8.04 goal 0.82 | ent 0.45 v_loss 0.138   583,248 sps
+upd  103/762  steps  13,500,416  SPAWN eps  2738 return  8.99 coins  5.2 goal 0.80 max_x  54.4 len   308 | ALL return  8.06 goal 0.83 | ent 0.45 v_loss 0.138   584,401 sps
+upd  104/762  steps  13,631,488  SPAWN eps  2721 return  8.97 coins  5.2 goal 0.80 max_x  54.4 len   307 | ALL return  8.07 goal 0.83 | ent 0.44 v_loss 0.139   583,959 sps
+upd  105/762  steps  13,762,560  SPAWN eps  2710 return  8.99 coins  5.2 goal 0.80 max_x  54.8 len   310 | ALL return  8.12 goal 0.83 | ent 0.44 v_loss 0.120   584,607 sps
+upd  106/762  steps  13,893,632  SPAWN eps  2705 return  9.03 coins  5.2 goal 0.80 max_x  55.0 len   311 | ALL return  8.15 goal 0.83 | ent 0.45 v_loss 0.126   583,739 sps
+upd  107/762  steps  14,024,704  SPAWN eps  2685 return  9.14 coins  5.3 goal 0.81 max_x  55.2 len   312 | ALL return  8.21 goal 0.84 | ent 0.45 v_loss 0.123   585,254 sps
+upd  108/762  steps  14,155,776  SPAWN eps  2665 return  9.19 coins  5.3 goal 0.82 max_x  55.5 len   313 | ALL return  8.23 goal 0.84 | ent 0.45 v_loss 0.138   584,321 sps
+upd  109/762  steps  14,286,848  SPAWN eps  2657 return  9.22 coins  5.3 goal 0.82 max_x  55.6 len   314 | ALL return  8.25 goal 0.85 | ent 0.44 v_loss 0.123   583,814 sps
+upd  110/762  steps  14,417,920  SPAWN eps  2630 return  9.27 coins  5.3 goal 0.82 max_x  55.9 len   316 | ALL return  8.28 goal 0.85 | ent 0.44 v_loss 0.128   584,702 sps
+upd  111/762  steps  14,548,992  SPAWN eps  2631 return  9.32 coins  5.4 goal 0.82 max_x  55.9 len   317 | ALL return  8.32 goal 0.85 | ent 0.44 v_loss 0.126   584,155 sps
+upd  112/762  steps  14,680,064  SPAWN eps  2656 return  9.35 coins  5.4 goal 0.82 max_x  56.1 len   317 | ALL return  8.36 goal 0.85 | ent 0.43 v_loss 0.135   582,764 sps
+upd  113/762  steps  14,811,136  SPAWN eps  2648 return  9.39 coins  5.4 goal 0.83 max_x  56.2 len   317 | ALL return  8.39 goal 0.86 | ent 0.43 v_loss 0.122   581,836 sps
+upd  114/762  steps  14,942,208  SPAWN eps  2670 return  9.38 coins  5.4 goal 0.83 max_x  56.2 len   317 | ALL return  8.40 goal 0.86 | ent 0.43 v_loss 0.131   583,669 sps
+upd  115/762  steps  15,073,280  SPAWN eps  2670 return  9.38 coins  5.4 goal 0.83 max_x  56.0 len   316 | ALL return  8.40 goal 0.86 | ent 0.43 v_loss 0.127   584,551 sps
+upd  116/762  steps  15,204,352  SPAWN eps  2670 return  9.37 coins  5.4 goal 0.83 max_x  55.8 len   314 | ALL return  8.41 goal 0.86 | ent 0.43 v_loss 0.126   584,769 sps
+upd  117/762  steps  15,335,424  SPAWN eps  2710 return  9.31 coins  5.4 goal 0.82 max_x  55.7 len   314 | ALL return  8.38 goal 0.85 | ent 0.43 v_loss 0.133   584,949 sps
+upd  118/762  steps  15,466,496  SPAWN eps  2717 return  9.35 coins  5.4 goal 0.83 max_x  55.8 len   313 | ALL return  8.39 goal 0.86 | ent 0.43 v_loss 0.124   584,564 sps
+upd  119/762  steps  15,597,568  SPAWN eps  2697 return  9.36 coins  5.4 goal 0.83 max_x  55.7 len   312 | ALL return  8.39 goal 0.86 | ent 0.42 v_loss 0.135   584,926 sps
+upd  120/762  steps  15,728,640  SPAWN eps  2691 return  9.34 coins  5.4 goal 0.83 max_x  55.4 len   309 | ALL return  8.38 goal 0.86 | ent 0.42 v_loss 0.135   585,276 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.18  coins  5.3  goal 0.82  max_x  55.4  len  301
+        tier 1    100 levels   return 10.14  coins  5.6  goal 0.93  max_x  46.4
+        tier 2    100 levels   return  9.23  coins  5.2  goal 0.84  max_x  57.3
+        tier 3    100 levels   return  8.18  coins  5.0  goal 0.69  max_x  62.5
+        levels by goal rate:  0: 3   <0.5: 21   0.5-0.9: 106   >=0.9: 170
+        worst: t3_0047.txt 0.00 (x 6),  t3_0206.txt 0.00 (x 25),  t3_0197.txt 0.00 (x 56),  t1_0270.txt 0.25 (x 20),  t3_0068.txt 0.25 (x 28)
+    EVAL sampled  1200 fresh episodes, random phases:  return  9.45  coins  5.4  goal 0.85  max_x  56.1  len  310
+        tier 1    100 levels   return 10.32  coins  5.7  goal 0.94  max_x  46.9
+        tier 2    100 levels   return  9.57  coins  5.3  goal 0.88  max_x  58.4
+        tier 3    100 levels   return  8.47  coins  5.2  goal 0.72  max_x  63.1
+        levels by goal rate:  0: 3   <0.5: 13   0.5-0.9: 105   >=0.9: 179
+        worst: t3_0029.txt 0.00 (x 39),  t3_0014.txt 0.00 (x 42),  t3_0242.txt 0.00 (x 47),  t2_0109.txt 0.25 (x 34),  t3_0041.txt 0.25 (x 34)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  8.41  coins  4.9  goal 0.75  max_x  53.1  len  293
+        tier 1     20 levels   return  9.12  coins  5.1  goal 0.83  max_x  44.5
+        tier 2     20 levels   return  9.38  coins  5.4  goal 0.83  max_x  57.1
+        tier 3     20 levels   return  6.73  coins  4.3  goal 0.58  max_x  57.8
+        levels by goal rate:  0: 0   <0.5: 11   0.5-0.9: 31   >=0.9: 18
+        worst: t3_0047.txt 0.11 (x 22),  t3_0032.txt 0.11 (x 43),  t1_0030.txt 0.22 (x 26),  t3_0017.txt 0.22 (x 42),  t3_0041.txt 0.22 (x 47)
+upd  121/762  steps  15,859,712  SPAWN eps  2680 return  9.28 coins  5.3 goal 0.83 max_x  55.4 len   308 | ALL return  8.35 goal 0.86 | ent 0.42 v_loss 0.114   584,927 sps
+upd  122/762  steps  15,990,784  SPAWN eps  2658 return  9.28 coins  5.3 goal 0.83 max_x  55.5 len   308 | ALL return  8.33 goal 0.86 | ent 0.42 v_loss 0.128   584,992 sps
+upd  123/762  steps  16,121,856  SPAWN eps  2620 return  9.28 coins  5.3 goal 0.83 max_x  55.6 len   309 | ALL return  8.31 goal 0.86 | ent 0.42 v_loss 0.116   585,003 sps
+upd  124/762  steps  16,252,928  SPAWN eps  2627 return  9.37 coins  5.3 goal 0.84 max_x  55.8 len   309 | ALL return  8.34 goal 0.86 | ent 0.42 v_loss 0.128   584,386 sps
+upd  125/762  steps  16,384,000  SPAWN eps  2637 return  9.44 coins  5.4 goal 0.84 max_x  55.9 len   309 | ALL return  8.36 goal 0.86 | ent 0.42 v_loss 0.110   584,331 sps
+upd  126/762  steps  16,515,072  SPAWN eps  2621 return  9.45 coins  5.4 goal 0.85 max_x  56.0 len   309 | ALL return  8.36 goal 0.86 | ent 0.42 v_loss 0.122   583,575 sps
+upd  127/762  steps  16,646,144  SPAWN eps  2623 return  9.51 coins  5.4 goal 0.85 max_x  55.9 len   309 | ALL return  8.39 goal 0.87 | ent 0.43 v_loss 0.126   583,997 sps
+upd  128/762  steps  16,777,216  SPAWN eps  2611 return  9.46 coins  5.3 goal 0.85 max_x  55.9 len   309 | ALL return  8.39 goal 0.87 | ent 0.42 v_loss 0.113   584,160 sps
+upd  129/762  steps  16,908,288  SPAWN eps  2624 return  9.50 coins  5.3 goal 0.86 max_x  56.2 len   311 | ALL return  8.42 goal 0.87 | ent 0.43 v_loss 0.111   584,220 sps
+upd  130/762  steps  17,039,360  SPAWN eps  2640 return  9.57 coins  5.4 goal 0.87 max_x  56.6 len   314 | ALL return  8.48 goal 0.88 | ent 0.45 v_loss 0.108   583,592 sps
+upd  131/762  steps  17,170,432  SPAWN eps  2635 return  9.61 coins  5.4 goal 0.87 max_x  56.7 len   315 | ALL return  8.48 goal 0.88 | ent 0.44 v_loss 0.119   583,281 sps
+upd  132/762  steps  17,301,504  SPAWN eps  2636 return  9.62 coins  5.4 goal 0.87 max_x  56.5 len   314 | ALL return  8.49 goal 0.88 | ent 0.44 v_loss 0.113   582,484 sps
+upd  133/762  steps  17,432,576  SPAWN eps  2640 return  9.65 coins  5.4 goal 0.87 max_x  56.5 len   315 | ALL return  8.54 goal 0.88 | ent 0.43 v_loss 0.110   583,453 sps
+upd  134/762  steps  17,563,648  SPAWN eps  2645 return  9.64 coins  5.4 goal 0.87 max_x  56.6 len   316 | ALL return  8.57 goal 0.88 | ent 0.43 v_loss 0.111   582,655 sps
+upd  135/762  steps  17,694,720  SPAWN eps  2621 return  9.62 coins  5.4 goal 0.87 max_x  56.6 len   317 | ALL return  8.58 goal 0.88 | ent 0.43 v_loss 0.107   585,320 sps
+upd  136/762  steps  17,825,792  SPAWN eps  2649 return  9.59 coins  5.4 goal 0.87 max_x  56.5 len   317 | ALL return  8.57 goal 0.88 | ent 0.44 v_loss 0.116   584,771 sps
+upd  137/762  steps  17,956,864  SPAWN eps  2639 return  9.59 coins  5.4 goal 0.87 max_x  56.5 len   317 | ALL return  8.57 goal 0.88 | ent 0.44 v_loss 0.115   584,943 sps
+upd  138/762  steps  18,087,936  SPAWN eps  2642 return  9.66 coins  5.4 goal 0.87 max_x  56.7 len   319 | ALL return  8.62 goal 0.89 | ent 0.44 v_loss 0.099   585,582 sps
+upd  139/762  steps  18,219,008  SPAWN eps  2641 return  9.65 coins  5.4 goal 0.87 max_x  56.6 len   318 | ALL return  8.62 goal 0.89 | ent 0.44 v_loss 0.106   585,207 sps
+upd  140/762  steps  18,350,080  SPAWN eps  2612 return  9.67 coins  5.4 goal 0.87 max_x  56.6 len   318 | ALL return  8.63 goal 0.89 | ent 0.44 v_loss 0.091   585,190 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.63  coins  5.4  goal 0.87  max_x  56.7  len  314
+        tier 1    100 levels   return 10.30  coins  5.7  goal 0.94  max_x  46.6
+        tier 2    100 levels   return  9.72  coins  5.4  goal 0.89  max_x  58.9
+        tier 3    100 levels   return  8.86  coins  5.2  goal 0.78  max_x  64.5
+        levels by goal rate:  0: 3   <0.5: 4   0.5-0.9: 101   >=0.9: 192
+        worst: t3_0047.txt 0.00 (x 6),  t3_0041.txt 0.00 (x 16),  t3_0128.txt 0.00 (x 44),  t2_0073.txt 0.25 (x 28),  t3_0134.txt 0.25 (x 49)
+    EVAL sampled  1200 fresh episodes, random phases:  return  9.62  coins  5.4  goal 0.86  max_x  56.7  len  319
+        tier 1    100 levels   return 10.34  coins  5.7  goal 0.94  max_x  46.9
+        tier 2    100 levels   return  9.78  coins  5.4  goal 0.90  max_x  59.1
+        tier 3    100 levels   return  8.73  coins  5.2  goal 0.75  max_x  63.9
+        levels by goal rate:  0: 0   <0.5: 5   0.5-0.9: 117   >=0.9: 178
+        worst: t2_0175.txt 0.25 (x 31),  t1_0261.txt 0.25 (x 33),  t3_0215.txt 0.25 (x 41),  t3_0164.txt 0.25 (x 41),  t3_0065.txt 0.25 (x 45)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.15  coins  5.1  goal 0.84  max_x  55.7  len  302
+        tier 1     20 levels   return  9.73  coins  5.3  goal 0.91  max_x  46.3
+        tier 2     20 levels   return 10.08  coins  5.6  goal 0.91  max_x  59.7
+        tier 3     20 levels   return  7.65  coins  4.5  goal 0.69  max_x  61.1
+        levels by goal rate:  0: 0   <0.5: 7   0.5-0.9: 26   >=0.9: 27
+        worst: t3_0047.txt 0.22 (x 28),  t3_0017.txt 0.33 (x 41),  t3_0041.txt 0.33 (x 52),  t3_0032.txt 0.33 (x 53),  t1_0054.txt 0.44 (x 40)
+upd  141/762  steps  18,481,152  SPAWN eps  2593 return  9.64 coins  5.4 goal 0.87 max_x  56.6 len   318 | ALL return  8.64 goal 0.89 | ent 0.44 v_loss 0.108   584,475 sps
+upd  142/762  steps  18,612,224  SPAWN eps  2595 return  9.67 coins  5.4 goal 0.87 max_x  56.9 len   319 | ALL return  8.69 goal 0.89 | ent 0.43 v_loss 0.105   584,710 sps
+upd  143/762  steps  18,743,296  SPAWN eps  2620 return  9.71 coins  5.4 goal 0.88 max_x  57.0 len   320 | ALL return  8.68 goal 0.89 | ent 0.44 v_loss 0.110   584,701 sps
+upd  144/762  steps  18,874,368  SPAWN eps  2591 return  9.73 coins  5.5 goal 0.88 max_x  56.8 len   319 | ALL return  8.69 goal 0.89 | ent 0.44 v_loss 0.099   585,566 sps
+upd  145/762  steps  19,005,440  SPAWN eps  2612 return  9.69 coins  5.4 goal 0.88 max_x  56.8 len   319 | ALL return  8.69 goal 0.89 | ent 0.44 v_loss 0.099   584,628 sps
+upd  146/762  steps  19,136,512  SPAWN eps  2609 return  9.74 coins  5.5 goal 0.88 max_x  56.8 len   319 | ALL return  8.71 goal 0.89 | ent 0.43 v_loss 0.108   585,314 sps
+upd  147/762  steps  19,267,584  SPAWN eps  2565 return  9.77 coins  5.5 goal 0.88 max_x  56.9 len   320 | ALL return  8.74 goal 0.90 | ent 0.43 v_loss 0.097   584,678 sps
+upd  148/762  steps  19,398,656  SPAWN eps  2566 return  9.80 coins  5.5 goal 0.88 max_x  56.9 len   321 | ALL return  8.75 goal 0.90 | ent 0.42 v_loss 0.098   583,664 sps
+upd  149/762  steps  19,529,728  SPAWN eps  2551 return  9.79 coins  5.5 goal 0.88 max_x  56.8 len   320 | ALL return  8.75 goal 0.90 | ent 0.43 v_loss 0.106   584,593 sps
+upd  150/762  steps  19,660,800  SPAWN eps  2580 return  9.76 coins  5.5 goal 0.88 max_x  56.8 len   321 | ALL return  8.73 goal 0.89 | ent 0.43 v_loss 0.113   584,020 sps
+upd  151/762  steps  19,791,872  SPAWN eps  2588 return  9.78 coins  5.5 goal 0.88 max_x  57.0 len   322 | ALL return  8.75 goal 0.90 | ent 0.42 v_loss 0.103   584,238 sps
+upd  152/762  steps  19,922,944  SPAWN eps  2574 return  9.81 coins  5.5 goal 0.89 max_x  57.1 len   322 | ALL return  8.75 goal 0.90 | ent 0.43 v_loss 0.096   584,147 sps
+upd  153/762  steps  20,054,016  SPAWN eps  2565 return  9.75 coins  5.5 goal 0.88 max_x  56.9 len   321 | ALL return  8.75 goal 0.90 | ent 0.43 v_loss 0.105   584,177 sps
+upd  154/762  steps  20,185,088  SPAWN eps  2558 return  9.75 coins  5.5 goal 0.88 max_x  57.0 len   322 | ALL return  8.73 goal 0.89 | ent 0.43 v_loss 0.105   583,980 sps
+upd  155/762  steps  20,316,160  SPAWN eps  2519 return  9.78 coins  5.5 goal 0.89 max_x  57.1 len   321 | ALL return  8.74 goal 0.90 | ent 0.42 v_loss 0.087   584,372 sps
+upd  156/762  steps  20,447,232  SPAWN eps  2514 return  9.78 coins  5.5 goal 0.89 max_x  57.3 len   323 | ALL return  8.74 goal 0.90 | ent 0.42 v_loss 0.104   582,880 sps
+upd  157/762  steps  20,578,304  SPAWN eps  2537 return  9.76 coins  5.4 goal 0.89 max_x  57.4 len   323 | ALL return  8.73 goal 0.90 | ent 0.43 v_loss 0.101   583,972 sps
+upd  158/762  steps  20,709,376  SPAWN eps  2555 return  9.72 coins  5.4 goal 0.88 max_x  57.3 len   322 | ALL return  8.72 goal 0.90 | ent 0.43 v_loss 0.098   583,969 sps
+upd  159/762  steps  20,840,448  SPAWN eps  2577 return  9.75 coins  5.4 goal 0.89 max_x  57.5 len   322 | ALL return  8.74 goal 0.90 | ent 0.43 v_loss 0.094   583,550 sps
+upd  160/762  steps  20,971,520  SPAWN eps  2565 return  9.76 coins  5.4 goal 0.89 max_x  57.4 len   321 | ALL return  8.72 goal 0.90 | ent 0.43 v_loss 0.114   583,458 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.77  coins  5.5  goal 0.88  max_x  57.2  len  311
+        tier 1    100 levels   return 10.52  coins  5.8  goal 0.96  max_x  47.1
+        tier 2    100 levels   return  9.84  coins  5.4  goal 0.90  max_x  59.3
+        tier 3    100 levels   return  8.94  coins  5.3  goal 0.77  max_x  65.2
+        levels by goal rate:  0: 1   <0.5: 6   0.5-0.9: 92   >=0.9: 201
+        worst: t3_0068.txt 0.00 (x 10),  t2_0073.txt 0.25 (x 28),  t2_0175.txt 0.25 (x 29),  t3_0041.txt 0.25 (x 33),  t3_0071.txt 0.25 (x 47)
+    EVAL sampled  1200 fresh episodes, random phases:  return  9.76  coins  5.5  goal 0.88  max_x  57.2  len  318
+        tier 1    100 levels   return 10.52  coins  5.8  goal 0.95  max_x  47.3
+        tier 2    100 levels   return  9.81  coins  5.4  goal 0.90  max_x  59.2
+        tier 3    100 levels   return  8.94  coins  5.3  goal 0.78  max_x  64.9
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 109   >=0.9: 189
+        worst: t3_0029.txt 0.25 (x 45),  t3_0065.txt 0.25 (x 51),  t1_0222.txt 0.50 (x 35),  t1_0024.txt 0.50 (x 41),  t2_0073.txt 0.50 (x 41)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  8.81  coins  5.0  goal 0.80  max_x  54.2  len  295
+        tier 1     20 levels   return  9.31  coins  5.1  goal 0.86  max_x  45.0
+        tier 2     20 levels   return  9.79  coins  5.6  goal 0.87  max_x  58.8
+        tier 3     20 levels   return  7.32  coins  4.3  goal 0.67  max_x  58.8
+        levels by goal rate:  0: 0   <0.5: 9   0.5-0.9: 27   >=0.9: 24
+        worst: t3_0047.txt 0.11 (x 19),  t3_0017.txt 0.22 (x 31),  t3_0020.txt 0.22 (x 57),  t1_0030.txt 0.33 (x 30),  t2_0001.txt 0.33 (x 47)
+upd  161/762  steps  21,102,592  SPAWN eps  2586 return  9.83 coins  5.5 goal 0.89 max_x  57.4 len   321 | ALL return  8.75 goal 0.90 | ent 0.43 v_loss 0.099   583,866 sps
+upd  162/762  steps  21,233,664  SPAWN eps  2573 return  9.81 coins  5.5 goal 0.89 max_x  57.4 len   321 | ALL return  8.74 goal 0.90 | ent 0.43 v_loss 0.090   583,110 sps
+upd  163/762  steps  21,364,736  SPAWN eps  2548 return  9.86 coins  5.5 goal 0.89 max_x  57.5 len   321 | ALL return  8.73 goal 0.90 | ent 0.42 v_loss 0.106   583,922 sps
+upd  164/762  steps  21,495,808  SPAWN eps  2565 return  9.87 coins  5.5 goal 0.89 max_x  57.6 len   321 | ALL return  8.75 goal 0.90 | ent 0.43 v_loss 0.102   584,254 sps
+upd  165/762  steps  21,626,880  SPAWN eps  2617 return  9.87 coins  5.5 goal 0.89 max_x  57.6 len   321 | ALL return  8.77 goal 0.90 | ent 0.43 v_loss 0.102   585,509 sps
+upd  166/762  steps  21,757,952  SPAWN eps  2593 return  9.82 coins  5.5 goal 0.89 max_x  57.2 len   319 | ALL return  8.74 goal 0.90 | ent 0.43 v_loss 0.107   585,317 sps
+upd  167/762  steps  21,889,024  SPAWN eps  2620 return  9.78 coins  5.5 goal 0.88 max_x  57.2 len   318 | ALL return  8.70 goal 0.90 | ent 0.43 v_loss 0.114   584,673 sps
+upd  168/762  steps  22,020,096  SPAWN eps  2613 return  9.76 coins  5.5 goal 0.88 max_x  57.2 len   319 | ALL return  8.69 goal 0.89 | ent 0.43 v_loss 0.106   585,016 sps
+upd  169/762  steps  22,151,168  SPAWN eps  2579 return  9.72 coins  5.5 goal 0.88 max_x  57.2 len   319 | ALL return  8.66 goal 0.89 | ent 0.44 v_loss 0.107   585,408 sps
+upd  170/762  steps  22,282,240  SPAWN eps  2559 return  9.75 coins  5.5 goal 0.88 max_x  57.4 len   319 | ALL return  8.69 goal 0.89 | ent 0.44 v_loss 0.099   584,690 sps
+upd  171/762  steps  22,413,312  SPAWN eps  2550 return  9.75 coins  5.5 goal 0.88 max_x  57.3 len   318 | ALL return  8.71 goal 0.89 | ent 0.44 v_loss 0.095   583,914 sps
+upd  172/762  steps  22,544,384  SPAWN eps  2600 return  9.76 coins  5.5 goal 0.88 max_x  57.2 len   318 | ALL return  8.72 goal 0.89 | ent 0.43 v_loss 0.103   584,974 sps
+upd  173/762  steps  22,675,456  SPAWN eps  2612 return  9.76 coins  5.5 goal 0.88 max_x  57.2 len   318 | ALL return  8.73 goal 0.89 | ent 0.43 v_loss 0.103   584,689 sps
+upd  174/762  steps  22,806,528  SPAWN eps  2616 return  9.78 coins  5.5 goal 0.88 max_x  57.1 len   317 | ALL return  8.72 goal 0.89 | ent 0.43 v_loss 0.104   584,179 sps
+upd  175/762  steps  22,937,600  SPAWN eps  2597 return  9.77 coins  5.5 goal 0.88 max_x  57.1 len   317 | ALL return  8.71 goal 0.89 | ent 0.43 v_loss 0.103   584,488 sps
+upd  176/762  steps  23,068,672  SPAWN eps  2610 return  9.79 coins  5.5 goal 0.88 max_x  57.2 len   319 | ALL return  8.74 goal 0.89 | ent 0.42 v_loss 0.105   583,995 sps
+upd  177/762  steps  23,199,744  SPAWN eps  2585 return  9.82 coins  5.5 goal 0.88 max_x  57.3 len   319 | ALL return  8.76 goal 0.90 | ent 0.42 v_loss 0.106   583,399 sps
+upd  178/762  steps  23,330,816  SPAWN eps  2597 return  9.87 coins  5.5 goal 0.89 max_x  57.3 len   318 | ALL return  8.78 goal 0.90 | ent 0.42 v_loss 0.091   584,257 sps
+upd  179/762  steps  23,461,888  SPAWN eps  2617 return  9.91 coins  5.6 goal 0.89 max_x  57.2 len   317 | ALL return  8.78 goal 0.90 | ent 0.41 v_loss 0.097   583,606 sps
+upd  180/762  steps  23,592,960  SPAWN eps  2622 return  9.91 coins  5.6 goal 0.89 max_x  57.1 len   317 | ALL return  8.77 goal 0.90 | ent 0.42 v_loss 0.097   583,908 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.79  coins  5.5  goal 0.88  max_x  57.5  len  318
+        tier 1    100 levels   return 10.34  coins  5.7  goal 0.93  max_x  46.9
+        tier 2    100 levels   return  9.78  coins  5.4  goal 0.89  max_x  59.1
+        tier 3    100 levels   return  9.26  coins  5.4  goal 0.81  max_x  66.4
+        levels by goal rate:  0: 9   <0.5: 4   0.5-0.9: 78   >=0.9: 209
+        worst: t3_0041.txt 0.00 (x 17),  t1_0231.txt 0.00 (x 22),  t3_0047.txt 0.00 (x 29),  t2_0235.txt 0.00 (x 37),  t1_0054.txt 0.00 (x 41)
+    EVAL sampled  1200 fresh episodes, random phases:  return  9.98  coins  5.6  goal 0.90  max_x  58.1  len  322
+        tier 1    100 levels   return 10.48  coins  5.8  goal 0.95  max_x  47.2
+        tier 2    100 levels   return 10.04  coins  5.5  goal 0.93  max_x  60.0
+        tier 3    100 levels   return  9.40  coins  5.4  goal 0.83  max_x  67.1
+        levels by goal rate:  0: 0   <0.5: 6   0.5-0.9: 80   >=0.9: 214
+        worst: t2_0073.txt 0.25 (x 28),  t3_0113.txt 0.25 (x 33),  t3_0080.txt 0.25 (x 37),  t1_0024.txt 0.25 (x 38),  t3_0281.txt 0.25 (x 48)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.29  coins  5.2  goal 0.86  max_x  56.1  len  304
+        tier 1     20 levels   return  9.92  coins  5.3  goal 0.93  max_x  47.0
+        tier 2     20 levels   return 10.26  coins  5.7  goal 0.93  max_x  60.6
+        tier 3     20 levels   return  7.71  coins  4.4  goal 0.71  max_x  60.9
+        levels by goal rate:  0: 0   <0.5: 5   0.5-0.9: 28   >=0.9: 27
+        worst: t3_0047.txt 0.11 (x 27),  t3_0017.txt 0.22 (x 36),  t3_0041.txt 0.33 (x 51),  t3_0056.txt 0.44 (x 45),  t3_0044.txt 0.44 (x 67)
+upd  181/762  steps  23,724,032  SPAWN eps  2625 return  9.85 coins  5.5 goal 0.89 max_x  57.2 len   317 | ALL return  8.73 goal 0.90 | ent 0.42 v_loss 0.105   583,889 sps
+upd  182/762  steps  23,855,104  SPAWN eps  2588 return  9.83 coins  5.5 goal 0.89 max_x  57.2 len   316 | ALL return  8.72 goal 0.90 | ent 0.42 v_loss 0.096   583,798 sps
+upd  183/762  steps  23,986,176  SPAWN eps  2611 return  9.83 coins  5.5 goal 0.89 max_x  57.3 len   317 | ALL return  8.73 goal 0.90 | ent 0.42 v_loss 0.099   582,521 sps
+upd  184/762  steps  24,117,248  SPAWN eps  2590 return  9.84 coins  5.5 goal 0.88 max_x  57.4 len   318 | ALL return  8.76 goal 0.90 | ent 0.42 v_loss 0.100   583,164 sps
+upd  185/762  steps  24,248,320  SPAWN eps  2605 return  9.88 coins  5.6 goal 0.89 max_x  57.3 len   318 | ALL return  8.76 goal 0.90 | ent 0.42 v_loss 0.091   584,260 sps
+upd  186/762  steps  24,379,392  SPAWN eps  2584 return  9.94 coins  5.6 goal 0.89 max_x  57.5 len   317 | ALL return  8.77 goal 0.90 | ent 0.41 v_loss 0.102   584,827 sps
+upd  187/762  steps  24,510,464  SPAWN eps  2575 return  9.94 coins  5.6 goal 0.89 max_x  57.4 len   317 | ALL return  8.79 goal 0.90 | ent 0.42 v_loss 0.097   584,749 sps
+upd  188/762  steps  24,641,536  SPAWN eps  2582 return  9.91 coins  5.6 goal 0.89 max_x  57.5 len   318 | ALL return  8.77 goal 0.90 | ent 0.41 v_loss 0.098   584,802 sps
+upd  189/762  steps  24,772,608  SPAWN eps  2581 return  9.89 coins  5.6 goal 0.89 max_x  57.6 len   319 | ALL return  8.79 goal 0.90 | ent 0.42 v_loss 0.101   584,794 sps
+upd  190/762  steps  24,903,680  SPAWN eps  2616 return  9.94 coins  5.6 goal 0.89 max_x  57.7 len   320 | ALL return  8.83 goal 0.90 | ent 0.41 v_loss 0.077   585,388 sps
+upd  191/762  steps  25,034,752  SPAWN eps  2623 return  9.98 coins  5.6 goal 0.89 max_x  57.7 len   320 | ALL return  8.86 goal 0.91 | ent 0.42 v_loss 0.097   584,330 sps
+upd  192/762  steps  25,165,824  SPAWN eps  2629 return 10.02 coins  5.6 goal 0.90 max_x  57.6 len   319 | ALL return  8.90 goal 0.91 | ent 0.41 v_loss 0.091   584,789 sps
+upd  193/762  steps  25,296,896  SPAWN eps  2623 return  9.97 coins  5.6 goal 0.89 max_x  57.5 len   318 | ALL return  8.86 goal 0.91 | ent 0.41 v_loss 0.112   585,208 sps
+upd  194/762  steps  25,427,968  SPAWN eps  2655 return  9.94 coins  5.6 goal 0.89 max_x  57.5 len   318 | ALL return  8.85 goal 0.91 | ent 0.41 v_loss 0.098   585,015 sps
+upd  195/762  steps  25,559,040  SPAWN eps  2625 return  9.97 coins  5.6 goal 0.90 max_x  57.5 len   318 | ALL return  8.86 goal 0.91 | ent 0.41 v_loss 0.090   585,196 sps
+upd  196/762  steps  25,690,112  SPAWN eps  2644 return  9.95 coins  5.6 goal 0.90 max_x  57.6 len   319 | ALL return  8.85 goal 0.91 | ent 0.41 v_loss 0.107   584,014 sps
+upd  197/762  steps  25,821,184  SPAWN eps  2619 return  9.98 coins  5.6 goal 0.90 max_x  57.7 len   319 | ALL return  8.86 goal 0.91 | ent 0.42 v_loss 0.105   584,166 sps
+upd  198/762  steps  25,952,256  SPAWN eps  2614 return  9.98 coins  5.6 goal 0.90 max_x  57.5 len   317 | ALL return  8.86 goal 0.91 | ent 0.42 v_loss 0.106   584,317 sps
+upd  199/762  steps  26,083,328  SPAWN eps  2611 return  9.97 coins  5.6 goal 0.90 max_x  57.5 len   317 | ALL return  8.87 goal 0.91 | ent 0.42 v_loss 0.087   584,141 sps
+upd  200/762  steps  26,214,400  SPAWN eps  2577 return  9.92 coins  5.5 goal 0.89 max_x  57.4 len   317 | ALL return  8.83 goal 0.91 | ent 0.42 v_loss 0.099   584,362 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.87  coins  5.5  goal 0.89  max_x  57.7  len  316
+        tier 1    100 levels   return 10.48  coins  5.8  goal 0.95  max_x  47.2
+        tier 2    100 levels   return  9.90  coins  5.4  goal 0.91  max_x  59.4
+        tier 3    100 levels   return  9.22  coins  5.3  goal 0.81  max_x  66.4
+        levels by goal rate:  0: 3   <0.5: 5   0.5-0.9: 83   >=0.9: 209
+        worst: t3_0047.txt 0.00 (x 6),  t2_0109.txt 0.00 (x 35),  t3_0128.txt 0.00 (x 57),  t2_0073.txt 0.25 (x 28),  t3_0041.txt 0.25 (x 34)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.01  coins  5.6  goal 0.90  max_x  58.1  len  321
+        tier 1    100 levels   return 10.50  coins  5.8  goal 0.95  max_x  47.2
+        tier 2    100 levels   return 10.17  coins  5.5  goal 0.94  max_x  60.6
+        tier 3    100 levels   return  9.35  coins  5.4  goal 0.82  max_x  66.6
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 86   >=0.9: 211
+        worst: t3_0128.txt 0.25 (x 46),  t3_0245.txt 0.25 (x 53),  t3_0263.txt 0.25 (x 61),  t1_0270.txt 0.50 (x 31),  t1_0261.txt 0.50 (x 35)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.16  coins  5.2  goal 0.84  max_x  55.9  len  302
+        tier 1     20 levels   return  9.57  coins  5.3  goal 0.88  max_x  46.0
+        tier 2     20 levels   return 10.25  coins  5.7  goal 0.92  max_x  60.6
+        tier 3     20 levels   return  7.66  coins  4.5  goal 0.70  max_x  61.2
+        levels by goal rate:  0: 0   <0.5: 7   0.5-0.9: 27   >=0.9: 26
+        worst: t3_0017.txt 0.11 (x 33),  t3_0047.txt 0.22 (x 30),  t1_0027.txt 0.44 (x 48),  t3_0032.txt 0.44 (x 53),  t3_0041.txt 0.44 (x 57)
+upd  201/762  steps  26,345,472  SPAWN eps  2572 return  9.90 coins  5.5 goal 0.89 max_x  57.5 len   316 | ALL return  8.82 goal 0.91 | ent 0.42 v_loss 0.092   583,684 sps
+upd  202/762  steps  26,476,544  SPAWN eps  2573 return  9.85 coins  5.5 goal 0.89 max_x  57.6 len   317 | ALL return  8.80 goal 0.90 | ent 0.43 v_loss 0.100   584,568 sps
+upd  203/762  steps  26,607,616  SPAWN eps  2589 return  9.90 coins  5.5 goal 0.90 max_x  57.8 len   318 | ALL return  8.83 goal 0.91 | ent 0.43 v_loss 0.104   584,673 sps
+upd  204/762  steps  26,738,688  SPAWN eps  2552 return  9.91 coins  5.5 goal 0.90 max_x  57.8 len   318 | ALL return  8.85 goal 0.91 | ent 0.44 v_loss 0.078   584,922 sps
+upd  205/762  steps  26,869,760  SPAWN eps  2565 return  9.91 coins  5.5 goal 0.90 max_x  57.8 len   319 | ALL return  8.87 goal 0.91 | ent 0.45 v_loss 0.073   584,763 sps
+upd  206/762  steps  27,000,832  SPAWN eps  2554 return  9.96 coins  5.5 goal 0.90 max_x  57.9 len   319 | ALL return  8.90 goal 0.92 | ent 0.45 v_loss 0.079   584,761 sps
+upd  207/762  steps  27,131,904  SPAWN eps  2593 return  9.94 coins  5.5 goal 0.91 max_x  57.9 len   320 | ALL return  8.88 goal 0.92 | ent 0.44 v_loss 0.093   584,333 sps
+upd  208/762  steps  27,262,976  SPAWN eps  2554 return  9.96 coins  5.5 goal 0.91 max_x  58.1 len   322 | ALL return  8.88 goal 0.92 | ent 0.44 v_loss 0.089   584,299 sps
+upd  209/762  steps  27,394,048  SPAWN eps  2574 return  9.98 coins  5.5 goal 0.91 max_x  58.3 len   323 | ALL return  8.91 goal 0.92 | ent 0.44 v_loss 0.074   584,103 sps
+upd  210/762  steps  27,525,120  SPAWN eps  2557 return  9.97 coins  5.5 goal 0.91 max_x  58.1 len   321 | ALL return  8.91 goal 0.92 | ent 0.43 v_loss 0.081   584,393 sps
+upd  211/762  steps  27,656,192  SPAWN eps  2575 return  9.95 coins  5.5 goal 0.91 max_x  58.0 len   322 | ALL return  8.90 goal 0.92 | ent 0.43 v_loss 0.097   584,129 sps
+upd  212/762  steps  27,787,264  SPAWN eps  2562 return 10.00 coins  5.5 goal 0.91 max_x  57.9 len   322 | ALL return  8.92 goal 0.92 | ent 0.43 v_loss 0.100   584,478 sps
+upd  213/762  steps  27,918,336  SPAWN eps  2549 return 10.00 coins  5.5 goal 0.91 max_x  57.9 len   321 | ALL return  8.93 goal 0.92 | ent 0.44 v_loss 0.094   584,298 sps
+upd  214/762  steps  28,049,408  SPAWN eps  2566 return 10.02 coins  5.6 goal 0.91 max_x  58.0 len   322 | ALL return  8.92 goal 0.92 | ent 0.44 v_loss 0.098   584,257 sps
+upd  215/762  steps  28,180,480  SPAWN eps  2552 return 10.02 coins  5.6 goal 0.90 max_x  57.9 len   321 | ALL return  8.92 goal 0.92 | ent 0.44 v_loss 0.086   582,611 sps
+upd  216/762  steps  28,311,552  SPAWN eps  2597 return  9.96 coins  5.6 goal 0.90 max_x  57.8 len   320 | ALL return  8.91 goal 0.91 | ent 0.44 v_loss 0.096   584,084 sps
+upd  217/762  steps  28,442,624  SPAWN eps  2588 return  9.95 coins  5.6 goal 0.89 max_x  57.8 len   319 | ALL return  8.91 goal 0.91 | ent 0.44 v_loss 0.094   584,312 sps
+upd  218/762  steps  28,573,696  SPAWN eps  2632 return  9.99 coins  5.6 goal 0.90 max_x  57.6 len   318 | ALL return  8.95 goal 0.91 | ent 0.44 v_loss 0.090   583,971 sps
+upd  219/762  steps  28,704,768  SPAWN eps  2604 return 10.01 coins  5.6 goal 0.90 max_x  57.8 len   318 | ALL return  8.92 goal 0.91 | ent 0.44 v_loss 0.089   581,722 sps
+upd  220/762  steps  28,835,840  SPAWN eps  2619 return 10.01 coins  5.6 goal 0.89 max_x  57.9 len   319 | ALL return  8.92 goal 0.91 | ent 0.43 v_loss 0.091   582,639 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.98  coins  5.6  goal 0.90  max_x  57.9  len  315
+        tier 1    100 levels   return 10.64  coins  5.8  goal 0.97  max_x  47.6
+        tier 2    100 levels   return  9.94  coins  5.4  goal 0.92  max_x  59.6
+        tier 3    100 levels   return  9.37  coins  5.4  goal 0.83  max_x  66.7
+        levels by goal rate:  0: 1   <0.5: 6   0.5-0.9: 74   >=0.9: 219
+        worst: t2_0109.txt 0.00 (x 55),  t1_0270.txt 0.25 (x 20),  t2_0073.txt 0.25 (x 28),  t3_0029.txt 0.25 (x 43),  t3_0065.txt 0.25 (x 55)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.01  coins  5.6  goal 0.91  max_x  58.2  len  321
+        tier 1    100 levels   return 10.60  coins  5.8  goal 0.96  max_x  47.5
+        tier 2    100 levels   return 10.03  coins  5.5  goal 0.93  max_x  60.1
+        tier 3    100 levels   return  9.40  coins  5.4  goal 0.83  max_x  66.9
+        levels by goal rate:  0: 0   <0.5: 5   0.5-0.9: 82   >=0.9: 213
+        worst: t3_0041.txt 0.25 (x 34),  t3_0068.txt 0.25 (x 42),  t3_0065.txt 0.25 (x 48),  t3_0038.txt 0.25 (x 49),  t3_0071.txt 0.25 (x 56)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.46  coins  5.3  goal 0.86  max_x  57.1  len  310
+        tier 1     20 levels   return  9.80  coins  5.4  goal 0.91  max_x  46.7
+        tier 2     20 levels   return 10.15  coins  5.7  goal 0.91  max_x  60.0
+        tier 3     20 levels   return  8.43  coins  4.8  goal 0.78  max_x  64.5
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 33   >=0.9: 25
+        worst: t1_0027.txt 0.22 (x 44),  t3_0047.txt 0.33 (x 34),  t2_0037.txt 0.56 (x 52),  t3_0044.txt 0.56 (x 71),  t3_0017.txt 0.67 (x 52)
+upd  221/762  steps  28,966,912  SPAWN eps  2579 return 10.06 coins  5.7 goal 0.90 max_x  58.1 len   320 | ALL return  8.92 goal 0.91 | ent 0.45 v_loss 0.090   582,632 sps
+upd  222/762  steps  29,097,984  SPAWN eps  2607 return 10.07 coins  5.7 goal 0.90 max_x  58.0 len   319 | ALL return  8.94 goal 0.91 | ent 0.44 v_loss 0.091   581,699 sps
+upd  223/762  steps  29,229,056  SPAWN eps  2590 return 10.07 coins  5.7 goal 0.90 max_x  57.9 len   319 | ALL return  8.94 goal 0.92 | ent 0.44 v_loss 0.088   582,426 sps
+upd  224/762  steps  29,360,128  SPAWN eps  2578 return 10.06 coins  5.7 goal 0.90 max_x  57.8 len   317 | ALL return  8.92 goal 0.91 | ent 0.45 v_loss 0.094   581,949 sps
+upd  225/762  steps  29,491,200  SPAWN eps  2598 return 10.02 coins  5.6 goal 0.90 max_x  57.9 len   318 | ALL return  8.89 goal 0.91 | ent 0.44 v_loss 0.086   583,623 sps
+upd  226/762  steps  29,622,272  SPAWN eps  2571 return 10.06 coins  5.6 goal 0.91 max_x  58.1 len   320 | ALL return  8.90 goal 0.92 | ent 0.44 v_loss 0.086   582,197 sps
+upd  227/762  steps  29,753,344  SPAWN eps  2586 return 10.07 coins  5.6 goal 0.91 max_x  57.9 len   319 | ALL return  8.90 goal 0.92 | ent 0.43 v_loss 0.097   582,012 sps
+upd  228/762  steps  29,884,416  SPAWN eps  2564 return 10.01 coins  5.6 goal 0.90 max_x  57.9 len   319 | ALL return  8.85 goal 0.92 | ent 0.43 v_loss 0.095   582,864 sps
+upd  229/762  steps  30,015,488  SPAWN eps  2576 return 10.01 coins  5.6 goal 0.90 max_x  57.7 len   318 | ALL return  8.87 goal 0.91 | ent 0.43 v_loss 0.085   582,043 sps
+upd  230/762  steps  30,146,560  SPAWN eps  2599 return 10.03 coins  5.6 goal 0.90 max_x  57.7 len   317 | ALL return  8.89 goal 0.92 | ent 0.43 v_loss 0.079   581,052 sps
+upd  231/762  steps  30,277,632  SPAWN eps  2598 return 10.01 coins  5.6 goal 0.90 max_x  57.7 len   318 | ALL return  8.90 goal 0.92 | ent 0.43 v_loss 0.087   581,965 sps
+upd  232/762  steps  30,408,704  SPAWN eps  2579 return 10.00 coins  5.6 goal 0.90 max_x  57.6 len   318 | ALL return  8.88 goal 0.92 | ent 0.44 v_loss 0.089   583,634 sps
+upd  233/762  steps  30,539,776  SPAWN eps  2583 return 10.01 coins  5.6 goal 0.90 max_x  57.9 len   319 | ALL return  8.88 goal 0.92 | ent 0.43 v_loss 0.085   584,004 sps
+upd  234/762  steps  30,670,848  SPAWN eps  2589 return 10.03 coins  5.6 goal 0.91 max_x  58.1 len   320 | ALL return  8.92 goal 0.92 | ent 0.42 v_loss 0.079   583,877 sps
+upd  235/762  steps  30,801,920  SPAWN eps  2600 return 10.06 coins  5.6 goal 0.91 max_x  58.0 len   320 | ALL return  8.94 goal 0.92 | ent 0.43 v_loss 0.088   583,603 sps
+upd  236/762  steps  30,932,992  SPAWN eps  2592 return  9.99 coins  5.6 goal 0.90 max_x  57.8 len   318 | ALL return  8.92 goal 0.92 | ent 0.42 v_loss 0.091   582,705 sps
+upd  237/762  steps  31,064,064  SPAWN eps  2582 return 10.04 coins  5.6 goal 0.90 max_x  58.0 len   319 | ALL return  8.96 goal 0.92 | ent 0.43 v_loss 0.085   582,785 sps
+upd  238/762  steps  31,195,136  SPAWN eps  2572 return 10.08 coins  5.6 goal 0.91 max_x  58.2 len   320 | ALL return  8.99 goal 0.92 | ent 0.42 v_loss 0.090   582,029 sps
+upd  239/762  steps  31,326,208  SPAWN eps  2582 return 10.10 coins  5.6 goal 0.91 max_x  58.2 len   320 | ALL return  9.00 goal 0.92 | ent 0.43 v_loss 0.088   581,889 sps
+upd  240/762  steps  31,457,280  SPAWN eps  2540 return 10.09 coins  5.6 goal 0.91 max_x  58.3 len   320 | ALL return  9.01 goal 0.92 | ent 0.43 v_loss 0.083   582,068 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.09  coins  5.6  goal 0.92  max_x  58.5  len  315
+        tier 1    100 levels   return 10.66  coins  5.9  goal 0.97  max_x  47.7
+        tier 2    100 levels   return 10.06  coins  5.5  goal 0.93  max_x  60.1
+        tier 3    100 levels   return  9.55  coins  5.4  goal 0.85  max_x  67.6
+        levels by goal rate:  0: 0   <0.5: 5   0.5-0.9: 67   >=0.9: 228
+        worst: t2_0073.txt 0.25 (x 28),  t3_0041.txt 0.25 (x 34),  t2_0184.txt 0.25 (x 36),  t3_0281.txt 0.25 (x 45),  t3_0023.txt 0.25 (x 46)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.14  coins  5.6  goal 0.92  max_x  58.5  len  321
+        tier 1    100 levels   return 10.71  coins  5.9  goal 0.97  max_x  47.8
+        tier 2    100 levels   return 10.21  coins  5.5  goal 0.95  max_x  60.6
+        tier 3    100 levels   return  9.51  coins  5.4  goal 0.85  max_x  67.0
+        levels by goal rate:  0: 1   <0.5: 3   0.5-0.9: 68   >=0.9: 228
+        worst: t3_0128.txt 0.00 (x 55),  t3_0041.txt 0.25 (x 41),  t2_0079.txt 0.25 (x 59),  t3_0197.txt 0.25 (x 63),  t1_0261.txt 0.50 (x 35)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.19  coins  5.2  goal 0.84  max_x  56.1  len  302
+        tier 1     20 levels   return  9.72  coins  5.3  goal 0.90  max_x  46.6
+        tier 2     20 levels   return 10.42  coins  5.8  goal 0.94  max_x  61.0
+        tier 3     20 levels   return  7.44  coins  4.4  goal 0.67  max_x  60.6
+        levels by goal rate:  0: 0   <0.5: 8   0.5-0.9: 29   >=0.9: 23
+        worst: t3_0047.txt 0.33 (x 33),  t3_0017.txt 0.33 (x 37),  t1_0027.txt 0.33 (x 45),  t3_0026.txt 0.33 (x 62),  t3_0020.txt 0.33 (x 70)
+upd  241/762  steps  31,588,352  SPAWN eps  2595 return 10.10 coins  5.6 goal 0.91 max_x  58.2 len   320 | ALL return  9.04 goal 0.92 | ent 0.43 v_loss 0.074   583,062 sps
+upd  242/762  steps  31,719,424  SPAWN eps  2583 return 10.10 coins  5.6 goal 0.91 max_x  58.3 len   321 | ALL return  9.04 goal 0.92 | ent 0.43 v_loss 0.084   583,288 sps
+upd  243/762  steps  31,850,496  SPAWN eps  2597 return 10.10 coins  5.6 goal 0.91 max_x  58.2 len   320 | ALL return  9.04 goal 0.93 | ent 0.44 v_loss 0.078   583,739 sps
+upd  244/762  steps  31,981,568  SPAWN eps  2598 return 10.09 coins  5.6 goal 0.91 max_x  58.2 len   320 | ALL return  9.05 goal 0.93 | ent 0.44 v_loss 0.080   582,812 sps
+upd  245/762  steps  32,112,640  SPAWN eps  2583 return 10.10 coins  5.6 goal 0.91 max_x  58.3 len   321 | ALL return  9.06 goal 0.93 | ent 0.43 v_loss 0.090   582,976 sps
+upd  246/762  steps  32,243,712  SPAWN eps  2595 return 10.17 coins  5.7 goal 0.92 max_x  58.5 len   322 | ALL return  9.07 goal 0.93 | ent 0.43 v_loss 0.092   582,405 sps
+upd  247/762  steps  32,374,784  SPAWN eps  2580 return 10.14 coins  5.6 goal 0.92 max_x  58.6 len   323 | ALL return  9.03 goal 0.92 | ent 0.44 v_loss 0.086   582,180 sps
+upd  248/762  steps  32,505,856  SPAWN eps  2599 return 10.12 coins  5.6 goal 0.92 max_x  58.5 len   322 | ALL return  9.03 goal 0.92 | ent 0.43 v_loss 0.084   582,165 sps
+upd  249/762  steps  32,636,928  SPAWN eps  2599 return 10.11 coins  5.6 goal 0.92 max_x  58.6 len   323 | ALL return  9.02 goal 0.92 | ent 0.43 v_loss 0.085   581,254 sps
+upd  250/762  steps  32,768,000  SPAWN eps  2611 return 10.11 coins  5.6 goal 0.92 max_x  58.6 len   322 | ALL return  9.01 goal 0.92 | ent 0.44 v_loss 0.081   583,166 sps
+upd  251/762  steps  32,899,072  SPAWN eps  2581 return 10.14 coins  5.7 goal 0.91 max_x  58.6 len   322 | ALL return  9.00 goal 0.92 | ent 0.43 v_loss 0.082   582,039 sps
+upd  252/762  steps  33,030,144  SPAWN eps  2574 return 10.16 coins  5.7 goal 0.92 max_x  58.6 len   322 | ALL return  9.05 goal 0.92 | ent 0.44 v_loss 0.073   582,259 sps
+upd  253/762  steps  33,161,216  SPAWN eps  2584 return 10.18 coins  5.7 goal 0.92 max_x  58.8 len   324 | ALL return  9.06 goal 0.92 | ent 0.44 v_loss 0.071   581,234 sps
+upd  254/762  steps  33,292,288  SPAWN eps  2588 return 10.22 coins  5.7 goal 0.92 max_x  58.9 len   325 | ALL return  9.06 goal 0.93 | ent 0.44 v_loss 0.073   583,055 sps
+upd  255/762  steps  33,423,360  SPAWN eps  2598 return 10.19 coins  5.7 goal 0.92 max_x  58.9 len   324 | ALL return  9.03 goal 0.93 | ent 0.43 v_loss 0.086   583,472 sps
+upd  256/762  steps  33,554,432  SPAWN eps  2571 return 10.17 coins  5.7 goal 0.92 max_x  58.8 len   324 | ALL return  9.03 goal 0.93 | ent 0.44 v_loss 0.078   583,375 sps
+upd  257/762  steps  33,685,504  SPAWN eps  2584 return 10.17 coins  5.7 goal 0.92 max_x  58.8 len   324 | ALL return  9.05 goal 0.93 | ent 0.43 v_loss 0.078   583,418 sps
+upd  258/762  steps  33,816,576  SPAWN eps  2566 return 10.21 coins  5.7 goal 0.92 max_x  58.9 len   325 | ALL return  9.06 goal 0.93 | ent 0.43 v_loss 0.080   582,725 sps
+upd  259/762  steps  33,947,648  SPAWN eps  2550 return 10.17 coins  5.7 goal 0.92 max_x  58.8 len   325 | ALL return  9.05 goal 0.93 | ent 0.43 v_loss 0.079   583,087 sps
+upd  260/762  steps  34,078,720  SPAWN eps  2560 return 10.18 coins  5.7 goal 0.92 max_x  59.0 len   326 | ALL return  9.05 goal 0.93 | ent 0.43 v_loss 0.089   581,987 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.93  coins  5.5  goal 0.90  max_x  57.9  len  314
+        tier 1    100 levels   return 10.45  coins  5.7  goal 0.95  max_x  47.3
+        tier 2    100 levels   return  9.97  coins  5.5  goal 0.92  max_x  59.6
+        tier 3    100 levels   return  9.37  coins  5.4  goal 0.83  max_x  66.8
+        levels by goal rate:  0: 3   <0.5: 3   0.5-0.9: 80   >=0.9: 214
+        worst: t3_0041.txt 0.00 (x 19),  t2_0109.txt 0.00 (x 35),  t3_0065.txt 0.00 (x 48),  t2_0073.txt 0.25 (x 28),  t3_0068.txt 0.25 (x 34)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.07  coins  5.6  goal 0.91  max_x  58.2  len  318
+        tier 1    100 levels   return 10.65  coins  5.8  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.10  coins  5.5  goal 0.94  max_x  60.1
+        tier 3    100 levels   return  9.45  coins  5.4  goal 0.84  max_x  67.0
+        levels by goal rate:  0: 1   <0.5: 3   0.5-0.9: 75   >=0.9: 221
+        worst: t3_0203.txt 0.00 (x 49),  t3_0041.txt 0.25 (x 32),  t3_0128.txt 0.25 (x 47),  t3_0038.txt 0.25 (x 52),  t1_0261.txt 0.50 (x 35)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.23  coins  5.2  goal 0.84  max_x  56.2  len  304
+        tier 1     20 levels   return  9.83  coins  5.3  goal 0.92  max_x  46.7
+        tier 2     20 levels   return 10.13  coins  5.7  goal 0.91  max_x  60.4
+        tier 3     20 levels   return  7.73  coins  4.5  goal 0.70  max_x  61.5
+        levels by goal rate:  0: 0   <0.5: 4   0.5-0.9: 33   >=0.9: 23
+        worst: t3_0017.txt 0.22 (x 36),  t3_0047.txt 0.33 (x 33),  t3_0044.txt 0.33 (x 58),  t1_0027.txt 0.44 (x 46),  t3_0056.txt 0.56 (x 51)
+upd  261/762  steps  34,209,792  SPAWN eps  2557 return 10.14 coins  5.6 goal 0.92 max_x  58.8 len   325 | ALL return  9.02 goal 0.93 | ent 0.43 v_loss 0.102   581,419 sps
+upd  262/762  steps  34,340,864  SPAWN eps  2553 return 10.09 coins  5.6 goal 0.91 max_x  58.8 len   324 | ALL return  8.96 goal 0.93 | ent 0.43 v_loss 0.083   579,489 sps
+upd  263/762  steps  34,471,936  SPAWN eps  2559 return 10.05 coins  5.6 goal 0.91 max_x  58.7 len   323 | ALL return  8.95 goal 0.92 | ent 0.43 v_loss 0.087   583,741 sps
+upd  264/762  steps  34,603,008  SPAWN eps  2542 return 10.01 coins  5.6 goal 0.91 max_x  58.7 len   323 | ALL return  8.92 goal 0.92 | ent 0.43 v_loss 0.078   583,086 sps
+upd  265/762  steps  34,734,080  SPAWN eps  2535 return  9.99 coins  5.6 goal 0.91 max_x  58.6 len   322 | ALL return  8.89 goal 0.92 | ent 0.43 v_loss 0.089   582,343 sps
+upd  266/762  steps  34,865,152  SPAWN eps  2557 return  9.99 coins  5.6 goal 0.91 max_x  58.6 len   321 | ALL return  8.90 goal 0.92 | ent 0.44 v_loss 0.084   582,660 sps
+upd  267/762  steps  34,996,224  SPAWN eps  2567 return  9.98 coins  5.6 goal 0.90 max_x  58.4 len   320 | ALL return  8.87 goal 0.92 | ent 0.44 v_loss 0.092   580,769 sps
+upd  268/762  steps  35,127,296  SPAWN eps  2579 return  9.93 coins  5.5 goal 0.90 max_x  58.2 len   318 | ALL return  8.87 goal 0.92 | ent 0.43 v_loss 0.087   581,204 sps
+upd  269/762  steps  35,258,368  SPAWN eps  2603 return  9.91 coins  5.5 goal 0.90 max_x  58.1 len   318 | ALL return  8.88 goal 0.92 | ent 0.43 v_loss 0.094   582,276 sps
+upd  270/762  steps  35,389,440  SPAWN eps  2624 return  9.95 coins  5.5 goal 0.90 max_x  58.0 len   317 | ALL return  8.88 goal 0.92 | ent 0.44 v_loss 0.089   584,265 sps
+upd  271/762  steps  35,520,512  SPAWN eps  2597 return  9.94 coins  5.5 goal 0.90 max_x  57.9 len   317 | ALL return  8.89 goal 0.92 | ent 0.44 v_loss 0.091   582,366 sps
+upd  272/762  steps  35,651,584  SPAWN eps  2625 return  9.99 coins  5.6 goal 0.90 max_x  57.9 len   317 | ALL return  8.94 goal 0.92 | ent 0.44 v_loss 0.080   583,963 sps
+upd  273/762  steps  35,782,656  SPAWN eps  2633 return 10.04 coins  5.6 goal 0.91 max_x  57.9 len   317 | ALL return  8.97 goal 0.92 | ent 0.44 v_loss 0.083   583,525 sps
+upd  274/762  steps  35,913,728  SPAWN eps  2660 return 10.00 coins  5.6 goal 0.91 max_x  57.6 len   315 | ALL return  8.98 goal 0.92 | ent 0.44 v_loss 0.088   582,925 sps
+upd  275/762  steps  36,044,800  SPAWN eps  2660 return 10.00 coins  5.6 goal 0.91 max_x  57.5 len   315 | ALL return  8.99 goal 0.92 | ent 0.45 v_loss 0.091   582,944 sps
+upd  276/762  steps  36,175,872  SPAWN eps  2628 return 10.03 coins  5.6 goal 0.91 max_x  57.7 len   316 | ALL return  9.01 goal 0.92 | ent 0.45 v_loss 0.075   582,508 sps
+upd  277/762  steps  36,306,944  SPAWN eps  2617 return 10.12 coins  5.6 goal 0.91 max_x  57.9 len   317 | ALL return  9.08 goal 0.92 | ent 0.45 v_loss 0.067   581,704 sps
+upd  278/762  steps  36,438,016  SPAWN eps  2596 return 10.15 coins  5.7 goal 0.91 max_x  58.1 len   318 | ALL return  9.08 goal 0.93 | ent 0.45 v_loss 0.087   580,740 sps
+upd  279/762  steps  36,569,088  SPAWN eps  2562 return 10.22 coins  5.7 goal 0.92 max_x  58.3 len   320 | ALL return  9.11 goal 0.93 | ent 0.45 v_loss 0.076   582,641 sps
+upd  280/762  steps  36,700,160  SPAWN eps  2558 return 10.19 coins  5.7 goal 0.92 max_x  58.4 len   320 | ALL return  9.09 goal 0.93 | ent 0.45 v_loss 0.086   583,198 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.00  coins  5.5  goal 0.91  max_x  58.0  len  316
+        tier 1    100 levels   return 10.56  coins  5.8  goal 0.96  max_x  47.4
+        tier 2    100 levels   return  9.97  coins  5.5  goal 0.92  max_x  59.5
+        tier 3    100 levels   return  9.47  coins  5.4  goal 0.85  max_x  67.0
+        levels by goal rate:  0: 2   <0.5: 2   0.5-0.9: 76   >=0.9: 220
+        worst: t3_0041.txt 0.00 (x 17),  t2_0262.txt 0.00 (x 37),  t3_0080.txt 0.25 (x 45),  t3_0233.txt 0.25 (x 54),  t1_0135.txt 0.50 (x 36)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.20  coins  5.6  goal 0.93  max_x  58.8  len  322
+        tier 1    100 levels   return 10.76  coins  5.9  goal 0.98  max_x  48.0
+        tier 2    100 levels   return 10.06  coins  5.5  goal 0.93  max_x  60.0
+        tier 3    100 levels   return  9.80  coins  5.5  goal 0.88  max_x  68.4
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 67   >=0.9: 230
+        worst: t3_0041.txt 0.25 (x 32),  t3_0065.txt 0.25 (x 45),  t3_0128.txt 0.25 (x 57),  t2_0160.txt 0.50 (x 39),  t2_0298.txt 0.50 (x 40)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.26  coins  5.2  goal 0.84  max_x  56.4  len  305
+        tier 1     20 levels   return  9.71  coins  5.3  goal 0.91  max_x  46.3
+        tier 2     20 levels   return 10.19  coins  5.7  goal 0.91  max_x  60.4
+        tier 3     20 levels   return  7.87  coins  4.7  goal 0.70  max_x  62.5
+        levels by goal rate:  0: 0   <0.5: 4   0.5-0.9: 31   >=0.9: 25
+        worst: t3_0026.txt 0.11 (x 62),  t3_0047.txt 0.33 (x 34),  t3_0017.txt 0.44 (x 46),  t1_0027.txt 0.44 (x 46),  t2_0037.txt 0.56 (x 50)
+upd  281/762  steps  36,831,232  SPAWN eps  2573 return 10.17 coins  5.7 goal 0.92 max_x  58.6 len   322 | ALL return  9.08 goal 0.93 | ent 0.45 v_loss 0.078   583,256 sps
+upd  282/762  steps  36,962,304  SPAWN eps  2604 return 10.16 coins  5.6 goal 0.92 max_x  58.6 len   322 | ALL return  9.07 goal 0.93 | ent 0.44 v_loss 0.082   582,180 sps
+upd  283/762  steps  37,093,376  SPAWN eps  2564 return 10.18 coins  5.6 goal 0.92 max_x  58.5 len   321 | ALL return  9.07 goal 0.93 | ent 0.44 v_loss 0.077   581,046 sps
+upd  284/762  steps  37,224,448  SPAWN eps  2553 return 10.22 coins  5.7 goal 0.92 max_x  58.8 len   323 | ALL return  9.07 goal 0.93 | ent 0.45 v_loss 0.088   581,132 sps
+upd  285/762  steps  37,355,520  SPAWN eps  2544 return 10.26 coins  5.7 goal 0.93 max_x  59.0 len   324 | ALL return  9.10 goal 0.93 | ent 0.45 v_loss 0.079   582,484 sps
+upd  286/762  steps  37,486,592  SPAWN eps  2569 return 10.18 coins  5.7 goal 0.92 max_x  58.8 len   324 | ALL return  9.05 goal 0.93 | ent 0.44 v_loss 0.091   583,609 sps
+upd  287/762  steps  37,617,664  SPAWN eps  2571 return 10.13 coins  5.6 goal 0.92 max_x  58.8 len   323 | ALL return  9.01 goal 0.93 | ent 0.44 v_loss 0.067   582,971 sps
+upd  288/762  steps  37,748,736  SPAWN eps  2590 return 10.15 coins  5.6 goal 0.92 max_x  58.8 len   324 | ALL return  9.02 goal 0.93 | ent 0.43 v_loss 0.078   583,673 sps
+upd  289/762  steps  37,879,808  SPAWN eps  2635 return 10.06 coins  5.6 goal 0.92 max_x  58.7 len   322 | ALL return  8.98 goal 0.93 | ent 0.44 v_loss 0.092   583,437 sps
+upd  290/762  steps  38,010,880  SPAWN eps  2613 return 10.08 coins  5.6 goal 0.92 max_x  58.7 len   322 | ALL return  8.99 goal 0.93 | ent 0.44 v_loss 0.077   582,280 sps
+upd  291/762  steps  38,141,952  SPAWN eps  2605 return 10.11 coins  5.6 goal 0.92 max_x  58.6 len   322 | ALL return  9.00 goal 0.93 | ent 0.44 v_loss 0.071   582,478 sps
+upd  292/762  steps  38,273,024  SPAWN eps  2562 return 10.14 coins  5.6 goal 0.92 max_x  58.7 len   322 | ALL return  9.03 goal 0.94 | ent 0.44 v_loss 0.062   581,494 sps
+upd  293/762  steps  38,404,096  SPAWN eps  2561 return 10.10 coins  5.6 goal 0.92 max_x  58.7 len   323 | ALL return  9.00 goal 0.93 | ent 0.45 v_loss 0.070   582,452 sps
+upd  294/762  steps  38,535,168  SPAWN eps  2555 return 10.13 coins  5.6 goal 0.92 max_x  58.7 len   323 | ALL return  9.01 goal 0.93 | ent 0.44 v_loss 0.072   581,955 sps
+upd  295/762  steps  38,666,240  SPAWN eps  2590 return 10.13 coins  5.6 goal 0.93 max_x  58.7 len   324 | ALL return  9.03 goal 0.94 | ent 0.45 v_loss 0.073   582,778 sps
+upd  296/762  steps  38,797,312  SPAWN eps  2560 return 10.20 coins  5.6 goal 0.93 max_x  58.7 len   323 | ALL return  9.06 goal 0.94 | ent 0.44 v_loss 0.068   583,446 sps
+upd  297/762  steps  38,928,384  SPAWN eps  2546 return 10.21 coins  5.6 goal 0.93 max_x  58.8 len   323 | ALL return  9.06 goal 0.94 | ent 0.44 v_loss 0.079   582,943 sps
+upd  298/762  steps  39,059,456  SPAWN eps  2562 return 10.19 coins  5.6 goal 0.93 max_x  58.8 len   323 | ALL return  9.05 goal 0.94 | ent 0.44 v_loss 0.079   583,566 sps
+upd  299/762  steps  39,190,528  SPAWN eps  2531 return 10.29 coins  5.7 goal 0.94 max_x  59.0 len   324 | ALL return  9.08 goal 0.94 | ent 0.44 v_loss 0.074   582,554 sps
+upd  300/762  steps  39,321,600  SPAWN eps  2527 return 10.28 coins  5.6 goal 0.94 max_x  58.9 len   324 | ALL return  9.07 goal 0.94 | ent 0.44 v_loss 0.084   582,077 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return  9.96  coins  5.5  goal 0.90  max_x  58.0  len  311
+        tier 1    100 levels   return 10.42  coins  5.7  goal 0.95  max_x  47.0
+        tier 2    100 levels   return  9.90  coins  5.4  goal 0.91  max_x  59.5
+        tier 3    100 levels   return  9.56  coins  5.4  goal 0.86  max_x  67.5
+        levels by goal rate:  0: 0   <0.5: 5   0.5-0.9: 86   >=0.9: 209
+        worst: t3_0041.txt 0.25 (x 34),  t2_0142.txt 0.25 (x 36),  t3_0068.txt 0.25 (x 38),  t3_0080.txt 0.25 (x 38),  t3_0014.txt 0.25 (x 47)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.18  coins  5.6  goal 0.93  max_x  58.7  len  321
+        tier 1    100 levels   return 10.64  coins  5.8  goal 0.96  max_x  47.6
+        tier 2    100 levels   return 10.12  coins  5.5  goal 0.94  max_x  60.3
+        tier 3    100 levels   return  9.77  coins  5.5  goal 0.88  max_x  68.4
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 69   >=0.9: 230
+        worst: t3_0032.txt 0.25 (x 57),  t2_0133.txt 0.50 (x 30),  t1_0222.txt 0.50 (x 38),  t2_0160.txt 0.50 (x 39),  t2_0298.txt 0.50 (x 40)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.19  coins  5.2  goal 0.83  max_x  56.1  len  301
+        tier 1     20 levels   return  9.30  coins  5.2  goal 0.86  max_x  45.0
+        tier 2     20 levels   return 10.22  coins  5.7  goal 0.92  max_x  60.5
+        tier 3     20 levels   return  8.04  coins  4.7  goal 0.72  max_x  62.9
+        levels by goal rate:  0: 0   <0.5: 5   0.5-0.9: 30   >=0.9: 25
+        worst: t3_0026.txt 0.11 (x 59),  t1_0030.txt 0.33 (x 28),  t1_0027.txt 0.33 (x 46),  t3_0047.txt 0.44 (x 39),  t3_0044.txt 0.44 (x 70)
+upd  301/762  steps  39,452,672  SPAWN eps  2538 return 10.24 coins  5.6 goal 0.93 max_x  58.8 len   323 | ALL return  9.05 goal 0.94 | ent 0.44 v_loss 0.082   581,976 sps
+upd  302/762  steps  39,583,744  SPAWN eps  2544 return 10.20 coins  5.6 goal 0.93 max_x  58.7 len   322 | ALL return  9.00 goal 0.94 | ent 0.45 v_loss 0.074   581,470 sps
+upd  303/762  steps  39,714,816  SPAWN eps  2522 return 10.20 coins  5.6 goal 0.93 max_x  58.8 len   322 | ALL return  9.00 goal 0.93 | ent 0.46 v_loss 0.074   582,817 sps
+upd  304/762  steps  39,845,888  SPAWN eps  2526 return 10.21 coins  5.6 goal 0.93 max_x  58.8 len   322 | ALL return  9.01 goal 0.94 | ent 0.45 v_loss 0.067   583,815 sps
+upd  305/762  steps  39,976,960  SPAWN eps  2484 return 10.22 coins  5.6 goal 0.93 max_x  58.8 len   321 | ALL return  8.99 goal 0.94 | ent 0.46 v_loss 0.077   583,332 sps
+upd  306/762  steps  40,108,032  SPAWN eps  2523 return 10.23 coins  5.6 goal 0.93 max_x  58.8 len   322 | ALL return  9.01 goal 0.94 | ent 0.46 v_loss 0.067   583,734 sps
+upd  307/762  steps  40,239,104  SPAWN eps  2532 return 10.21 coins  5.6 goal 0.93 max_x  58.8 len   322 | ALL return  8.99 goal 0.94 | ent 0.45 v_loss 0.078   582,146 sps
+upd  308/762  steps  40,370,176  SPAWN eps  2512 return 10.20 coins  5.6 goal 0.93 max_x  58.7 len   322 | ALL return  8.98 goal 0.94 | ent 0.45 v_loss 0.080   581,973 sps
+upd  309/762  steps  40,501,248  SPAWN eps  2519 return 10.15 coins  5.6 goal 0.92 max_x  58.6 len   321 | ALL return  8.98 goal 0.93 | ent 0.45 v_loss 0.074   583,227 sps
+upd  310/762  steps  40,632,320  SPAWN eps  2531 return 10.16 coins  5.6 goal 0.93 max_x  58.8 len   323 | ALL return  8.99 goal 0.94 | ent 0.45 v_loss 0.080   582,108 sps
+upd  311/762  steps  40,763,392  SPAWN eps  2538 return 10.21 coins  5.6 goal 0.93 max_x  58.9 len   323 | ALL return  9.01 goal 0.94 | ent 0.46 v_loss 0.072   581,270 sps
+upd  312/762  steps  40,894,464  SPAWN eps  2549 return 10.25 coins  5.7 goal 0.93 max_x  59.0 len   324 | ALL return  9.03 goal 0.94 | ent 0.45 v_loss 0.076   581,397 sps
+upd  313/762  steps  41,025,536  SPAWN eps  2578 return 10.21 coins  5.6 goal 0.93 max_x  58.8 len   323 | ALL return  9.01 goal 0.93 | ent 0.45 v_loss 0.086   582,841 sps
+upd  314/762  steps  41,156,608  SPAWN eps  2576 return 10.15 coins  5.6 goal 0.92 max_x  58.6 len   322 | ALL return  8.97 goal 0.93 | ent 0.45 v_loss 0.092   583,573 sps
+upd  315/762  steps  41,287,680  SPAWN eps  2584 return 10.13 coins  5.6 goal 0.92 max_x  58.5 len   321 | ALL return  8.97 goal 0.93 | ent 0.45 v_loss 0.076   583,204 sps
+upd  316/762  steps  41,418,752  SPAWN eps  2579 return 10.08 coins  5.6 goal 0.92 max_x  58.3 len   320 | ALL return  8.96 goal 0.93 | ent 0.45 v_loss 0.078   582,498 sps
+upd  317/762  steps  41,549,824  SPAWN eps  2595 return 10.07 coins  5.6 goal 0.92 max_x  58.4 len   320 | ALL return  9.00 goal 0.93 | ent 0.44 v_loss 0.069   583,485 sps
+upd  318/762  steps  41,680,896  SPAWN eps  2601 return 10.11 coins  5.6 goal 0.92 max_x  58.5 len   321 | ALL return  9.02 goal 0.93 | ent 0.45 v_loss 0.072   582,175 sps
+upd  319/762  steps  41,811,968  SPAWN eps  2606 return 10.11 coins  5.6 goal 0.92 max_x  58.5 len   321 | ALL return  9.02 goal 0.93 | ent 0.45 v_loss 0.080   581,933 sps
+upd  320/762  steps  41,943,040  SPAWN eps  2610 return 10.12 coins  5.6 goal 0.92 max_x  58.4 len   321 | ALL return  9.01 goal 0.93 | ent 0.45 v_loss 0.079   581,378 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.33  coins  5.7  goal 0.94  max_x  59.2  len  319
+        tier 1    100 levels   return 10.73  coins  5.9  goal 0.97  max_x  47.8
+        tier 2    100 levels   return 10.32  coins  5.6  goal 0.96  max_x  60.9
+        tier 3    100 levels   return  9.94  coins  5.6  goal 0.89  max_x  69.0
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 55   >=0.9: 244
+        worst: t2_0073.txt 0.25 (x 28),  t1_0222.txt 0.50 (x 36),  t3_0080.txt 0.50 (x 41),  t1_0153.txt 0.50 (x 43),  t1_0024.txt 0.50 (x 43)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.22  coins  5.6  goal 0.93  max_x  58.9  len  322
+        tier 1    100 levels   return 10.59  coins  5.8  goal 0.96  max_x  47.5
+        tier 2    100 levels   return 10.29  coins  5.6  goal 0.95  max_x  60.9
+        tier 3    100 levels   return  9.79  coins  5.5  goal 0.88  max_x  68.3
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 70   >=0.9: 229
+        worst: t3_0023.txt 0.25 (x 42),  t2_0133.txt 0.50 (x 30),  t1_0270.txt 0.50 (x 31),  t1_0222.txt 0.50 (x 36),  t3_0215.txt 0.50 (x 45)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.62  coins  5.3  goal 0.89  max_x  57.4  len  310
+        tier 1     20 levels   return  9.82  coins  5.4  goal 0.91  max_x  46.5
+        tier 2     20 levels   return 10.37  coins  5.8  goal 0.93  max_x  60.8
+        tier 3     20 levels   return  8.67  coins  4.8  goal 0.82  max_x  64.9
+        levels by goal rate:  0: 0   <0.5: 4   0.5-0.9: 23   >=0.9: 33
+        worst: t3_0047.txt 0.33 (x 35),  t3_0017.txt 0.33 (x 45),  t1_0030.txt 0.44 (x 33),  t1_0027.txt 0.44 (x 47),  t2_0037.txt 0.56 (x 50)
+upd  321/762  steps  42,074,112  SPAWN eps  2630 return 10.10 coins  5.6 goal 0.92 max_x  58.4 len   321 | ALL return  9.00 goal 0.93 | ent 0.44 v_loss 0.081   583,191 sps
+upd  322/762  steps  42,205,184  SPAWN eps  2616 return 10.07 coins  5.6 goal 0.92 max_x  58.2 len   319 | ALL return  9.00 goal 0.93 | ent 0.45 v_loss 0.077   583,806 sps
+upd  323/762  steps  42,336,256  SPAWN eps  2636 return 10.12 coins  5.6 goal 0.92 max_x  58.5 len   320 | ALL return  9.05 goal 0.93 | ent 0.44 v_loss 0.083   582,487 sps
+upd  324/762  steps  42,467,328  SPAWN eps  2632 return 10.16 coins  5.6 goal 0.92 max_x  58.4 len   320 | ALL return  9.09 goal 0.93 | ent 0.44 v_loss 0.077   583,076 sps
+upd  325/762  steps  42,598,400  SPAWN eps  2637 return 10.20 coins  5.6 goal 0.93 max_x  58.5 len   320 | ALL return  9.12 goal 0.93 | ent 0.44 v_loss 0.067   583,233 sps
+upd  326/762  steps  42,729,472  SPAWN eps  2629 return 10.22 coins  5.7 goal 0.93 max_x  58.5 len   320 | ALL return  9.11 goal 0.93 | ent 0.43 v_loss 0.083   582,631 sps
+upd  327/762  steps  42,860,544  SPAWN eps  2603 return 10.27 coins  5.7 goal 0.93 max_x  58.5 len   320 | ALL return  9.12 goal 0.93 | ent 0.45 v_loss 0.063   582,754 sps
+upd  328/762  steps  42,991,616  SPAWN eps  2610 return 10.26 coins  5.7 goal 0.93 max_x  58.4 len   319 | ALL return  9.11 goal 0.93 | ent 0.44 v_loss 0.079   582,834 sps
+upd  329/762  steps  43,122,688  SPAWN eps  2584 return 10.28 coins  5.7 goal 0.93 max_x  58.5 len   319 | ALL return  9.10 goal 0.93 | ent 0.43 v_loss 0.072   582,621 sps
+upd  330/762  steps  43,253,760  SPAWN eps  2558 return 10.26 coins  5.7 goal 0.93 max_x  58.4 len   318 | ALL return  9.09 goal 0.94 | ent 0.43 v_loss 0.074   581,014 sps
+upd  331/762  steps  43,384,832  SPAWN eps  2541 return 10.24 coins  5.6 goal 0.93 max_x  58.5 len   319 | ALL return  9.11 goal 0.94 | ent 0.43 v_loss 0.082   583,229 sps
+upd  332/762  steps  43,515,904  SPAWN eps  2551 return 10.28 coins  5.7 goal 0.94 max_x  58.6 len   320 | ALL return  9.14 goal 0.94 | ent 0.42 v_loss 0.061   583,770 sps
+upd  333/762  steps  43,646,976  SPAWN eps  2524 return 10.27 coins  5.7 goal 0.94 max_x  58.5 len   321 | ALL return  9.13 goal 0.94 | ent 0.42 v_loss 0.076   583,961 sps
+upd  334/762  steps  43,778,048  SPAWN eps  2529 return 10.26 coins  5.6 goal 0.94 max_x  58.5 len   320 | ALL return  9.10 goal 0.94 | ent 0.42 v_loss 0.079   583,175 sps
+upd  335/762  steps  43,909,120  SPAWN eps  2523 return 10.23 coins  5.6 goal 0.93 max_x  58.6 len   321 | ALL return  9.10 goal 0.94 | ent 0.42 v_loss 0.070   582,821 sps
+upd  336/762  steps  44,040,192  SPAWN eps  2529 return 10.21 coins  5.6 goal 0.93 max_x  58.7 len   322 | ALL return  9.10 goal 0.94 | ent 0.43 v_loss 0.077   583,178 sps
+upd  337/762  steps  44,171,264  SPAWN eps  2559 return 10.15 coins  5.6 goal 0.93 max_x  58.7 len   322 | ALL return  9.07 goal 0.94 | ent 0.43 v_loss 0.079   582,234 sps
+upd  338/762  steps  44,302,336  SPAWN eps  2543 return 10.16 coins  5.6 goal 0.93 max_x  58.7 len   322 | ALL return  9.08 goal 0.94 | ent 0.43 v_loss 0.067   581,839 sps
+upd  339/762  steps  44,433,408  SPAWN eps  2578 return 10.16 coins  5.6 goal 0.93 max_x  58.7 len   322 | ALL return  9.11 goal 0.94 | ent 0.43 v_loss 0.072   581,100 sps
+upd  340/762  steps  44,564,480  SPAWN eps  2588 return 10.18 coins  5.6 goal 0.93 max_x  58.8 len   322 | ALL return  9.12 goal 0.94 | ent 0.44 v_loss 0.069   581,854 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.19  coins  5.6  goal 0.93  max_x  58.8  len  316
+        tier 1    100 levels   return 10.66  coins  5.8  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.12  coins  5.5  goal 0.94  max_x  60.2
+        tier 3    100 levels   return  9.80  coins  5.5  goal 0.88  max_x  68.4
+        levels by goal rate:  0: 1   <0.5: 0   0.5-0.9: 70   >=0.9: 229
+        worst: t3_0041.txt 0.00 (x 18),  t1_0270.txt 0.50 (x 31),  t1_0279.txt 0.50 (x 33),  t2_0148.txt 0.50 (x 33),  t2_0175.txt 0.50 (x 42)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.14  coins  5.6  goal 0.92  max_x  58.5  len  320
+        tier 1    100 levels   return 10.71  coins  5.9  goal 0.98  max_x  47.8
+        tier 2    100 levels   return 10.10  coins  5.5  goal 0.93  max_x  60.2
+        tier 3    100 levels   return  9.62  coins  5.4  goal 0.86  max_x  67.5
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 72   >=0.9: 226
+        worst: t3_0041.txt 0.25 (x 33),  t3_0101.txt 0.25 (x 56),  t1_0270.txt 0.50 (x 31),  t2_0004.txt 0.50 (x 39),  t2_0220.txt 0.50 (x 45)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.41  coins  5.3  goal 0.86  max_x  56.8  len  306
+        tier 1     20 levels   return  9.82  coins  5.3  goal 0.92  max_x  46.4
+        tier 2     20 levels   return 10.36  coins  5.8  goal 0.93  max_x  61.0
+        tier 3     20 levels   return  8.06  coins  4.7  goal 0.73  max_x  63.0
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 29   >=0.9: 28
+        worst: t3_0026.txt 0.22 (x 63),  t3_0047.txt 0.33 (x 34),  t3_0017.txt 0.33 (x 42),  t1_0030.txt 0.56 (x 38),  t3_0032.txt 0.56 (x 51)
+upd  341/762  steps  44,695,552  SPAWN eps  2576 return 10.22 coins  5.6 goal 0.93 max_x  58.8 len   322 | ALL return  9.14 goal 0.94 | ent 0.44 v_loss 0.069   583,925 sps
+upd  342/762  steps  44,826,624  SPAWN eps  2581 return 10.23 coins  5.7 goal 0.93 max_x  58.8 len   322 | ALL return  9.13 goal 0.94 | ent 0.43 v_loss 0.066   582,662 sps
+upd  343/762  steps  44,957,696  SPAWN eps  2577 return 10.19 coins  5.6 goal 0.93 max_x  59.0 len   322 | ALL return  9.11 goal 0.94 | ent 0.43 v_loss 0.075   582,899 sps
+upd  344/762  steps  45,088,768  SPAWN eps  2580 return 10.18 coins  5.6 goal 0.93 max_x  59.0 len   323 | ALL return  9.14 goal 0.94 | ent 0.43 v_loss 0.073   582,638 sps
+upd  345/762  steps  45,219,840  SPAWN eps  2573 return 10.19 coins  5.6 goal 0.93 max_x  59.1 len   323 | ALL return  9.14 goal 0.94 | ent 0.44 v_loss 0.069   581,058 sps
+upd  346/762  steps  45,350,912  SPAWN eps  2577 return 10.23 coins  5.6 goal 0.94 max_x  59.1 len   323 | ALL return  9.15 goal 0.94 | ent 0.44 v_loss 0.066   580,686 sps
+upd  347/762  steps  45,481,984  SPAWN eps  2543 return 10.24 coins  5.6 goal 0.94 max_x  59.0 len   323 | ALL return  9.13 goal 0.94 | ent 0.44 v_loss 0.086   582,885 sps
+upd  348/762  steps  45,613,056  SPAWN eps  2552 return 10.23 coins  5.6 goal 0.93 max_x  59.0 len   323 | ALL return  9.12 goal 0.94 | ent 0.43 v_loss 0.079   582,610 sps
+upd  349/762  steps  45,744,128  SPAWN eps  2508 return 10.21 coins  5.6 goal 0.93 max_x  58.9 len   322 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.073   583,652 sps
+upd  350/762  steps  45,875,200  SPAWN eps  2515 return 10.18 coins  5.6 goal 0.93 max_x  58.7 len   322 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.094   583,833 sps
+upd  351/762  steps  46,006,272  SPAWN eps  2541 return 10.15 coins  5.6 goal 0.93 max_x  58.6 len   321 | ALL return  9.08 goal 0.94 | ent 0.44 v_loss 0.076   583,536 sps
+upd  352/762  steps  46,137,344  SPAWN eps  2529 return 10.10 coins  5.6 goal 0.93 max_x  58.4 len   320 | ALL return  9.05 goal 0.94 | ent 0.44 v_loss 0.077   583,853 sps
+upd  353/762  steps  46,268,416  SPAWN eps  2506 return 10.14 coins  5.6 goal 0.92 max_x  58.3 len   319 | ALL return  9.06 goal 0.94 | ent 0.45 v_loss 0.071   583,496 sps
+upd  354/762  steps  46,399,488  SPAWN eps  2519 return 10.19 coins  5.6 goal 0.93 max_x  58.5 len   320 | ALL return  9.06 goal 0.94 | ent 0.44 v_loss 0.077   582,634 sps
+upd  355/762  steps  46,530,560  SPAWN eps  2524 return 10.18 coins  5.6 goal 0.92 max_x  58.5 len   320 | ALL return  9.06 goal 0.93 | ent 0.45 v_loss 0.080   583,138 sps
+upd  356/762  steps  46,661,632  SPAWN eps  2517 return 10.18 coins  5.6 goal 0.92 max_x  58.5 len   320 | ALL return  9.05 goal 0.93 | ent 0.45 v_loss 0.075   582,106 sps
+upd  357/762  steps  46,792,704  SPAWN eps  2520 return 10.24 coins  5.7 goal 0.93 max_x  58.7 len   321 | ALL return  9.11 goal 0.94 | ent 0.44 v_loss 0.067   582,918 sps
+upd  358/762  steps  46,923,776  SPAWN eps  2519 return 10.24 coins  5.7 goal 0.93 max_x  58.7 len   321 | ALL return  9.13 goal 0.94 | ent 0.44 v_loss 0.074   581,983 sps
+upd  359/762  steps  47,054,848  SPAWN eps  2555 return 10.27 coins  5.7 goal 0.93 max_x  58.9 len   322 | ALL return  9.15 goal 0.94 | ent 0.45 v_loss 0.061   582,060 sps
+upd  360/762  steps  47,185,920  SPAWN eps  2561 return 10.31 coins  5.7 goal 0.94 max_x  59.0 len   323 | ALL return  9.18 goal 0.94 | ent 0.45 v_loss 0.077   583,410 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.11  coins  5.6  goal 0.92  max_x  58.5  len  314
+        tier 1    100 levels   return 10.51  coins  5.8  goal 0.95  max_x  47.1
+        tier 2    100 levels   return 10.10  coins  5.5  goal 0.93  max_x  60.1
+        tier 3    100 levels   return  9.73  coins  5.5  goal 0.87  max_x  68.3
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 79   >=0.9: 219
+        worst: t2_0073.txt 0.25 (x 28),  t3_0119.txt 0.25 (x 59),  t1_0204.txt 0.50 (x 30),  t1_0270.txt 0.50 (x 31),  t1_0279.txt 0.50 (x 34)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.20  coins  5.6  goal 0.93  max_x  58.8  len  321
+        tier 1    100 levels   return 10.76  coins  5.9  goal 0.98  max_x  47.9
+        tier 2    100 levels   return 10.09  coins  5.5  goal 0.93  max_x  60.2
+        tier 3    100 levels   return  9.76  coins  5.5  goal 0.88  max_x  68.1
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 71   >=0.9: 229
+        worst: t2_0148.txt 0.50 (x 34),  t2_0160.txt 0.50 (x 39),  t3_0215.txt 0.50 (x 44),  t3_0185.txt 0.50 (x 46),  t3_0041.txt 0.50 (x 49)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.45  coins  5.3  goal 0.86  max_x  57.0  len  308
+        tier 1     20 levels   return  9.65  coins  5.3  goal 0.89  max_x  46.1
+        tier 2     20 levels   return 10.49  coins  5.8  goal 0.94  max_x  61.4
+        tier 3     20 levels   return  8.20  coins  4.7  goal 0.76  max_x  63.4
+        levels by goal rate:  0: 1   <0.5: 2   0.5-0.9: 29   >=0.9: 28
+        worst: t3_0017.txt 0.00 (x 26),  t1_0027.txt 0.33 (x 47),  t3_0026.txt 0.44 (x 65),  t1_0030.txt 0.56 (x 38),  t3_0047.txt 0.56 (x 46)
+upd  361/762  steps  47,316,992  SPAWN eps  2515 return 10.33 coins  5.7 goal 0.94 max_x  59.2 len   324 | ALL return  9.17 goal 0.94 | ent 0.45 v_loss 0.059   583,507 sps
+upd  362/762  steps  47,448,064  SPAWN eps  2547 return 10.27 coins  5.7 goal 0.93 max_x  59.2 len   324 | ALL return  9.13 goal 0.94 | ent 0.45 v_loss 0.080   582,599 sps
+upd  363/762  steps  47,579,136  SPAWN eps  2565 return 10.26 coins  5.6 goal 0.94 max_x  59.3 len   325 | ALL return  9.13 goal 0.94 | ent 0.44 v_loss 0.080   581,749 sps
+upd  364/762  steps  47,710,208  SPAWN eps  2552 return 10.26 coins  5.7 goal 0.93 max_x  59.1 len   323 | ALL return  9.11 goal 0.94 | ent 0.45 v_loss 0.074   582,606 sps
+upd  365/762  steps  47,841,280  SPAWN eps  2571 return 10.27 coins  5.7 goal 0.94 max_x  59.0 len   323 | ALL return  9.11 goal 0.94 | ent 0.45 v_loss 0.074   580,332 sps
+upd  366/762  steps  47,972,352  SPAWN eps  2536 return 10.25 coins  5.7 goal 0.93 max_x  59.0 len   322 | ALL return  9.10 goal 0.94 | ent 0.45 v_loss 0.079   581,697 sps
+upd  367/762  steps  48,103,424  SPAWN eps  2539 return 10.22 coins  5.6 goal 0.93 max_x  58.8 len   321 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.075   582,706 sps
+upd  368/762  steps  48,234,496  SPAWN eps  2537 return 10.27 coins  5.7 goal 0.93 max_x  58.8 len   320 | ALL return  9.09 goal 0.94 | ent 0.45 v_loss 0.078   583,128 sps
+upd  369/762  steps  48,365,568  SPAWN eps  2522 return 10.18 coins  5.6 goal 0.92 max_x  58.5 len   318 | ALL return  9.06 goal 0.94 | ent 0.46 v_loss 0.073   583,772 sps
+upd  370/762  steps  48,496,640  SPAWN eps  2518 return 10.21 coins  5.6 goal 0.93 max_x  58.6 len   318 | ALL return  9.07 goal 0.94 | ent 0.45 v_loss 0.061   583,353 sps
+upd  371/762  steps  48,627,712  SPAWN eps  2555 return 10.20 coins  5.6 goal 0.93 max_x  58.5 len   318 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.072   582,634 sps
+upd  372/762  steps  48,758,784  SPAWN eps  2537 return 10.26 coins  5.7 goal 0.93 max_x  58.8 len   320 | ALL return  9.12 goal 0.94 | ent 0.45 v_loss 0.067   582,119 sps
+upd  373/762  steps  48,889,856  SPAWN eps  2562 return 10.26 coins  5.7 goal 0.93 max_x  58.7 len   320 | ALL return  9.11 goal 0.94 | ent 0.45 v_loss 0.080   582,789 sps
+upd  374/762  steps  49,020,928  SPAWN eps  2541 return 10.26 coins  5.7 goal 0.93 max_x  58.9 len   321 | ALL return  9.11 goal 0.94 | ent 0.45 v_loss 0.075   582,600 sps
+upd  375/762  steps  49,152,000  SPAWN eps  2525 return 10.21 coins  5.6 goal 0.93 max_x  58.8 len   321 | ALL return  9.11 goal 0.94 | ent 0.46 v_loss 0.085   581,340 sps
+upd  376/762  steps  49,283,072  SPAWN eps  2582 return 10.20 coins  5.6 goal 0.93 max_x  58.9 len   322 | ALL return  9.11 goal 0.94 | ent 0.45 v_loss 0.067   580,773 sps
+upd  377/762  steps  49,414,144  SPAWN eps  2580 return 10.18 coins  5.6 goal 0.93 max_x  58.9 len   321 | ALL return  9.10 goal 0.94 | ent 0.45 v_loss 0.081   582,767 sps
+upd  378/762  steps  49,545,216  SPAWN eps  2595 return 10.11 coins  5.5 goal 0.93 max_x  58.9 len   322 | ALL return  9.06 goal 0.94 | ent 0.44 v_loss 0.086   583,875 sps
+upd  379/762  steps  49,676,288  SPAWN eps  2594 return 10.18 coins  5.6 goal 0.93 max_x  59.1 len   323 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.066   583,944 sps
+upd  380/762  steps  49,807,360  SPAWN eps  2585 return 10.14 coins  5.6 goal 0.93 max_x  59.0 len   322 | ALL return  9.08 goal 0.94 | ent 0.44 v_loss 0.071   583,628 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.26  coins  5.6  goal 0.94  max_x  58.9  len  317
+        tier 1    100 levels   return 10.64  coins  5.8  goal 0.96  max_x  47.5
+        tier 2    100 levels   return 10.21  coins  5.5  goal 0.94  max_x  60.4
+        tier 3    100 levels   return  9.92  coins  5.5  goal 0.89  max_x  68.7
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 60   >=0.9: 238
+        worst: t2_0073.txt 0.25 (x 28),  t3_0128.txt 0.25 (x 44),  t1_0060.txt 0.50 (x 32),  t1_0279.txt 0.50 (x 33),  t2_0148.txt 0.50 (x 34)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.37  coins  5.7  goal 0.95  max_x  59.3  len  324
+        tier 1    100 levels   return 10.77  coins  5.9  goal 0.98  max_x  47.9
+        tier 2    100 levels   return 10.15  coins  5.5  goal 0.94  max_x  60.4
+        tier 3    100 levels   return 10.19  coins  5.6  goal 0.93  max_x  69.7
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 51   >=0.9: 248
+        worst: t3_0068.txt 0.25 (x 34),  t2_0073.txt 0.50 (x 41),  t3_0029.txt 0.50 (x 52),  t2_0106.txt 0.50 (x 56),  t3_0254.txt 0.50 (x 57)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.66  coins  5.3  goal 0.89  max_x  57.7  len  312
+        tier 1     20 levels   return  9.90  coins  5.3  goal 0.93  max_x  46.8
+        tier 2     20 levels   return 10.35  coins  5.7  goal 0.93  max_x  60.6
+        tier 3     20 levels   return  8.72  coins  4.8  goal 0.81  max_x  65.7
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 30   >=0.9: 29
+        worst: t3_0017.txt 0.44 (x 47),  t3_0047.txt 0.56 (x 46),  t3_0032.txt 0.56 (x 55),  t3_0044.txt 0.56 (x 71),  t1_0027.txt 0.67 (x 49)
+upd  381/762  steps  49,938,432  SPAWN eps  2561 return 10.16 coins  5.6 goal 0.93 max_x  59.1 len   322 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.063   582,987 sps
+upd  382/762  steps  50,069,504  SPAWN eps  2552 return 10.15 coins  5.6 goal 0.93 max_x  58.8 len   320 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.074   581,808 sps
+upd  383/762  steps  50,200,576  SPAWN eps  2543 return 10.16 coins  5.6 goal 0.93 max_x  59.0 len   321 | ALL return  9.12 goal 0.94 | ent 0.44 v_loss 0.066   581,280 sps
+upd  384/762  steps  50,331,648  SPAWN eps  2561 return 10.16 coins  5.6 goal 0.93 max_x  58.9 len   320 | ALL return  9.13 goal 0.94 | ent 0.45 v_loss 0.082   581,673 sps
+upd  385/762  steps  50,462,720  SPAWN eps  2564 return 10.19 coins  5.6 goal 0.93 max_x  59.1 len   321 | ALL return  9.14 goal 0.94 | ent 0.45 v_loss 0.078   583,294 sps
+upd  386/762  steps  50,593,792  SPAWN eps  2552 return 10.20 coins  5.6 goal 0.93 max_x  58.9 len   321 | ALL return  9.15 goal 0.94 | ent 0.45 v_loss 0.080   583,454 sps
+upd  387/762  steps  50,724,864  SPAWN eps  2544 return 10.24 coins  5.7 goal 0.93 max_x  59.1 len   321 | ALL return  9.15 goal 0.94 | ent 0.45 v_loss 0.067   583,993 sps
+upd  388/762  steps  50,855,936  SPAWN eps  2545 return 10.27 coins  5.7 goal 0.93 max_x  58.9 len   321 | ALL return  9.18 goal 0.94 | ent 0.45 v_loss 0.075   583,726 sps
+upd  389/762  steps  50,987,008  SPAWN eps  2555 return 10.25 coins  5.7 goal 0.93 max_x  58.8 len   321 | ALL return  9.17 goal 0.94 | ent 0.45 v_loss 0.072   582,496 sps
+upd  390/762  steps  51,118,080  SPAWN eps  2535 return 10.23 coins  5.7 goal 0.93 max_x  58.9 len   322 | ALL return  9.12 goal 0.94 | ent 0.46 v_loss 0.083   582,536 sps
+upd  391/762  steps  51,249,152  SPAWN eps  2546 return 10.22 coins  5.7 goal 0.93 max_x  58.8 len   322 | ALL return  9.10 goal 0.94 | ent 0.45 v_loss 0.080   582,909 sps
+upd  392/762  steps  51,380,224  SPAWN eps  2544 return 10.25 coins  5.7 goal 0.93 max_x  59.0 len   323 | ALL return  9.10 goal 0.94 | ent 0.45 v_loss 0.073   582,251 sps
+upd  393/762  steps  51,511,296  SPAWN eps  2566 return 10.21 coins  5.7 goal 0.92 max_x  58.7 len   321 | ALL return  9.09 goal 0.93 | ent 0.45 v_loss 0.084   582,391 sps
+upd  394/762  steps  51,642,368  SPAWN eps  2574 return 10.22 coins  5.7 goal 0.93 max_x  58.7 len   321 | ALL return  9.08 goal 0.93 | ent 0.45 v_loss 0.079   580,724 sps
+upd  395/762  steps  51,773,440  SPAWN eps  2597 return 10.22 coins  5.7 goal 0.93 max_x  58.6 len   320 | ALL return  9.06 goal 0.93 | ent 0.46 v_loss 0.079   583,077 sps
+upd  396/762  steps  51,904,512  SPAWN eps  2593 return 10.22 coins  5.7 goal 0.93 max_x  58.6 len   319 | ALL return  9.08 goal 0.93 | ent 0.45 v_loss 0.070   583,930 sps
+upd  397/762  steps  52,035,584  SPAWN eps  2612 return 10.20 coins  5.7 goal 0.92 max_x  58.6 len   319 | ALL return  9.08 goal 0.93 | ent 0.46 v_loss 0.078   583,694 sps
+upd  398/762  steps  52,166,656  SPAWN eps  2579 return 10.21 coins  5.7 goal 0.93 max_x  58.8 len   320 | ALL return  9.07 goal 0.93 | ent 0.46 v_loss 0.070   583,553 sps
+upd  399/762  steps  52,297,728  SPAWN eps  2588 return 10.20 coins  5.7 goal 0.92 max_x  58.8 len   320 | ALL return  9.06 goal 0.93 | ent 0.45 v_loss 0.079   582,431 sps
+upd  400/762  steps  52,428,800  SPAWN eps  2622 return 10.19 coins  5.7 goal 0.92 max_x  58.6 len   318 | ALL return  9.11 goal 0.93 | ent 0.45 v_loss 0.078   583,145 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.23  coins  5.6  goal 0.93  max_x  58.7  len  315
+        tier 1    100 levels   return 10.68  coins  5.9  goal 0.97  max_x  47.7
+        tier 2    100 levels   return 10.22  coins  5.5  goal 0.95  max_x  60.5
+        tier 3    100 levels   return  9.78  coins  5.5  goal 0.88  max_x  68.0
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 70   >=0.9: 229
+        worst: t3_0041.txt 0.25 (x 34),  t1_0159.txt 0.50 (x 33),  t2_0175.txt 0.50 (x 38),  t1_0024.txt 0.50 (x 39),  t3_0068.txt 0.50 (x 48)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.17  coins  5.6  goal 0.93  max_x  58.5  len  317
+        tier 1    100 levels   return 10.80  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return  9.99  coins  5.5  goal 0.92  max_x  59.7
+        tier 3    100 levels   return  9.71  coins  5.5  goal 0.87  max_x  67.7
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 66   >=0.9: 232
+        worst: t3_0041.txt 0.25 (x 33),  t3_0128.txt 0.25 (x 47),  t2_0220.txt 0.50 (x 39),  t2_0004.txt 0.50 (x 43),  t2_0184.txt 0.50 (x 45)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.45  coins  5.3  goal 0.86  max_x  57.3  len  308
+        tier 1     20 levels   return  9.68  coins  5.3  goal 0.90  max_x  46.0
+        tier 2     20 levels   return 10.59  coins  5.9  goal 0.96  max_x  62.1
+        tier 3     20 levels   return  8.09  coins  4.7  goal 0.74  max_x  63.7
+        levels by goal rate:  0: 0   <0.5: 5   0.5-0.9: 25   >=0.9: 30
+        worst: t3_0026.txt 0.22 (x 63),  t3_0047.txt 0.33 (x 39),  t3_0041.txt 0.33 (x 58),  t1_0030.txt 0.44 (x 32),  t3_0017.txt 0.44 (x 47)
+upd  401/762  steps  52,559,872  SPAWN eps  2616 return 10.22 coins  5.7 goal 0.92 max_x  58.7 len   318 | ALL return  9.13 goal 0.93 | ent 0.46 v_loss 0.071   581,790 sps
+upd  402/762  steps  52,690,944  SPAWN eps  2617 return 10.19 coins  5.6 goal 0.92 max_x  58.8 len   319 | ALL return  9.13 goal 0.93 | ent 0.46 v_loss 0.073   582,979 sps
+upd  403/762  steps  52,822,016  SPAWN eps  2619 return 10.25 coins  5.7 goal 0.93 max_x  59.0 len   320 | ALL return  9.15 goal 0.94 | ent 0.46 v_loss 0.074   581,218 sps
+upd  404/762  steps  52,953,088  SPAWN eps  2589 return 10.25 coins  5.7 goal 0.93 max_x  59.1 len   321 | ALL return  9.16 goal 0.94 | ent 0.45 v_loss 0.068   582,070 sps
+upd  405/762  steps  53,084,160  SPAWN eps  2581 return 10.29 coins  5.7 goal 0.93 max_x  59.2 len   322 | ALL return  9.19 goal 0.94 | ent 0.45 v_loss 0.066   581,673 sps
+upd  406/762  steps  53,215,232  SPAWN eps  2560 return 10.25 coins  5.7 goal 0.93 max_x  59.2 len   322 | ALL return  9.14 goal 0.94 | ent 0.45 v_loss 0.090   582,868 sps
+upd  407/762  steps  53,346,304  SPAWN eps  2570 return 10.22 coins  5.7 goal 0.93 max_x  59.0 len   321 | ALL return  9.12 goal 0.94 | ent 0.45 v_loss 0.072   583,128 sps
+upd  408/762  steps  53,477,376  SPAWN eps  2588 return 10.22 coins  5.7 goal 0.93 max_x  59.0 len   321 | ALL return  9.15 goal 0.94 | ent 0.45 v_loss 0.066   583,717 sps
+upd  409/762  steps  53,608,448  SPAWN eps  2592 return 10.22 coins  5.7 goal 0.93 max_x  59.1 len   322 | ALL return  9.16 goal 0.94 | ent 0.45 v_loss 0.080   582,534 sps
+upd  410/762  steps  53,739,520  SPAWN eps  2582 return 10.27 coins  5.7 goal 0.93 max_x  59.2 len   322 | ALL return  9.14 goal 0.94 | ent 0.45 v_loss 0.070   582,225 sps
+upd  411/762  steps  53,870,592  SPAWN eps  2599 return 10.26 coins  5.7 goal 0.93 max_x  59.2 len   322 | ALL return  9.15 goal 0.94 | ent 0.45 v_loss 0.073   581,137 sps
+upd  412/762  steps  54,001,664  SPAWN eps  2620 return 10.26 coins  5.7 goal 0.93 max_x  58.9 len   321 | ALL return  9.16 goal 0.94 | ent 0.45 v_loss 0.070   582,902 sps
+upd  413/762  steps  54,132,736  SPAWN eps  2583 return 10.25 coins  5.7 goal 0.93 max_x  58.9 len   320 | ALL return  9.15 goal 0.94 | ent 0.45 v_loss 0.065   582,349 sps
+upd  414/762  steps  54,263,808  SPAWN eps  2615 return 10.24 coins  5.6 goal 0.93 max_x  58.7 len   319 | ALL return  9.15 goal 0.94 | ent 0.44 v_loss 0.074   580,978 sps
+upd  415/762  steps  54,394,880  SPAWN eps  2617 return 10.15 coins  5.6 goal 0.93 max_x  58.5 len   318 | ALL return  9.09 goal 0.94 | ent 0.44 v_loss 0.086   582,764 sps
+upd  416/762  steps  54,525,952  SPAWN eps  2624 return 10.20 coins  5.6 goal 0.93 max_x  58.7 len   319 | ALL return  9.12 goal 0.94 | ent 0.44 v_loss 0.064   583,888 sps
+upd  417/762  steps  54,657,024  SPAWN eps  2629 return 10.24 coins  5.6 goal 0.93 max_x  58.8 len   320 | ALL return  9.16 goal 0.94 | ent 0.44 v_loss 0.073   584,007 sps
+upd  418/762  steps  54,788,096  SPAWN eps  2638 return 10.22 coins  5.6 goal 0.93 max_x  58.8 len   319 | ALL return  9.13 goal 0.94 | ent 0.44 v_loss 0.079   582,847 sps
+upd  419/762  steps  54,919,168  SPAWN eps  2630 return 10.21 coins  5.6 goal 0.93 max_x  58.7 len   318 | ALL return  9.12 goal 0.94 | ent 0.45 v_loss 0.082   583,133 sps
+upd  420/762  steps  55,050,240  SPAWN eps  2617 return 10.18 coins  5.6 goal 0.93 max_x  58.7 len   319 | ALL return  9.10 goal 0.94 | ent 0.46 v_loss 0.083   582,875 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.09  coins  5.6  goal 0.92  max_x  58.2  len  312
+        tier 1    100 levels   return 10.66  coins  5.8  goal 0.98  max_x  47.5
+        tier 2    100 levels   return 10.02  coins  5.5  goal 0.93  max_x  59.8
+        tier 3    100 levels   return  9.57  coins  5.4  goal 0.86  max_x  67.3
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 76   >=0.9: 222
+        worst: t2_0175.txt 0.25 (x 29),  t3_0128.txt 0.25 (x 57),  t1_0204.txt 0.50 (x 30),  t1_0270.txt 0.50 (x 31),  t2_0160.txt 0.50 (x 39)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.24  coins  5.6  goal 0.93  max_x  58.9  len  320
+        tier 1    100 levels   return 10.66  coins  5.8  goal 0.97  max_x  47.7
+        tier 2    100 levels   return 10.13  coins  5.5  goal 0.94  max_x  60.2
+        tier 3    100 levels   return  9.92  coins  5.5  goal 0.89  max_x  68.7
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 69   >=0.9: 231
+        worst: t1_0270.txt 0.50 (x 31),  t2_0160.txt 0.50 (x 39),  t3_0095.txt 0.50 (x 47),  t3_0278.txt 0.50 (x 52),  t2_0100.txt 0.50 (x 53)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.43  coins  5.2  goal 0.86  max_x  56.9  len  307
+        tier 1     20 levels   return  9.96  coins  5.3  goal 0.94  max_x  46.9
+        tier 2     20 levels   return 10.21  coins  5.7  goal 0.92  max_x  60.4
+        tier 3     20 levels   return  8.13  coins  4.7  goal 0.74  max_x  63.3
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 33   >=0.9: 24
+        worst: t3_0017.txt 0.22 (x 35),  t3_0026.txt 0.22 (x 63),  t3_0047.txt 0.44 (x 43),  t3_0050.txt 0.56 (x 48),  t3_0005.txt 0.56 (x 55)
+upd  421/762  steps  55,181,312  SPAWN eps  2631 return 10.17 coins  5.6 goal 0.93 max_x  58.8 len   320 | ALL return  9.09 goal 0.94 | ent 0.45 v_loss 0.079   581,421 sps
+upd  422/762  steps  55,312,384  SPAWN eps  2637 return 10.20 coins  5.6 goal 0.93 max_x  58.8 len   320 | ALL return  9.10 goal 0.94 | ent 0.46 v_loss 0.064   582,694 sps
+upd  423/762  steps  55,443,456  SPAWN eps  2642 return 10.20 coins  5.6 goal 0.93 max_x  58.9 len   320 | ALL return  9.10 goal 0.94 | ent 0.46 v_loss 0.063   583,758 sps
+upd  424/762  steps  55,574,528  SPAWN eps  2614 return 10.22 coins  5.6 goal 0.93 max_x  58.9 len   321 | ALL return  9.12 goal 0.94 | ent 0.45 v_loss 0.069   583,878 sps
+upd  425/762  steps  55,705,600  SPAWN eps  2608 return 10.23 coins  5.6 goal 0.93 max_x  58.9 len   320 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.079   583,383 sps
+upd  426/762  steps  55,836,672  SPAWN eps  2600 return 10.20 coins  5.6 goal 0.93 max_x  58.9 len   320 | ALL return  9.13 goal 0.94 | ent 0.45 v_loss 0.073   581,959 sps
+upd  427/762  steps  55,967,744  SPAWN eps  2610 return 10.23 coins  5.6 goal 0.93 max_x  58.9 len   320 | ALL return  9.15 goal 0.94 | ent 0.46 v_loss 0.064   582,591 sps
+upd  428/762  steps  56,098,816  SPAWN eps  2618 return 10.28 coins  5.7 goal 0.94 max_x  59.0 len   321 | ALL return  9.17 goal 0.94 | ent 0.45 v_loss 0.075   583,065 sps
+upd  429/762  steps  56,229,888  SPAWN eps  2575 return 10.32 coins  5.7 goal 0.94 max_x  59.1 len   321 | ALL return  9.18 goal 0.94 | ent 0.45 v_loss 0.071   583,927 sps
+upd  430/762  steps  56,360,960  SPAWN eps  2589 return 10.35 coins  5.7 goal 0.94 max_x  59.1 len   321 | ALL return  9.21 goal 0.95 | ent 0.45 v_loss 0.075   583,485 sps
+upd  431/762  steps  56,492,032  SPAWN eps  2575 return 10.37 coins  5.7 goal 0.94 max_x  59.0 len   320 | ALL return  9.20 goal 0.94 | ent 0.45 v_loss 0.068   583,240 sps
+upd  432/762  steps  56,623,104  SPAWN eps  2561 return 10.33 coins  5.7 goal 0.94 max_x  59.0 len   320 | ALL return  9.18 goal 0.94 | ent 0.45 v_loss 0.081   582,244 sps
+upd  433/762  steps  56,754,176  SPAWN eps  2574 return 10.31 coins  5.7 goal 0.94 max_x  58.9 len   319 | ALL return  9.17 goal 0.94 | ent 0.45 v_loss 0.080   582,672 sps
+upd  434/762  steps  56,885,248  SPAWN eps  2569 return 10.28 coins  5.7 goal 0.93 max_x  58.9 len   318 | ALL return  9.12 goal 0.94 | ent 0.45 v_loss 0.077   582,404 sps
+upd  435/762  steps  57,016,320  SPAWN eps  2581 return 10.30 coins  5.7 goal 0.94 max_x  59.1 len   319 | ALL return  9.14 goal 0.94 | ent 0.45 v_loss 0.070   582,425 sps
+upd  436/762  steps  57,147,392  SPAWN eps  2609 return 10.28 coins  5.7 goal 0.94 max_x  58.9 len   319 | ALL return  9.12 goal 0.94 | ent 0.45 v_loss 0.078   581,408 sps
+upd  437/762  steps  57,278,464  SPAWN eps  2568 return 10.25 coins  5.7 goal 0.93 max_x  58.9 len   318 | ALL return  9.07 goal 0.94 | ent 0.45 v_loss 0.075   582,170 sps
+upd  438/762  steps  57,409,536  SPAWN eps  2563 return 10.22 coins  5.6 goal 0.93 max_x  58.8 len   318 | ALL return  9.05 goal 0.94 | ent 0.46 v_loss 0.081   582,472 sps
+upd  439/762  steps  57,540,608  SPAWN eps  2591 return 10.23 coins  5.6 goal 0.93 max_x  58.7 len   317 | ALL return  9.05 goal 0.94 | ent 0.45 v_loss 0.066   583,290 sps
+upd  440/762  steps  57,671,680  SPAWN eps  2579 return 10.21 coins  5.6 goal 0.93 max_x  58.5 len   316 | ALL return  9.02 goal 0.94 | ent 0.46 v_loss 0.079   582,503 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.03  coins  5.6  goal 0.91  max_x  58.2  len  309
+        tier 1    100 levels   return 10.63  coins  5.8  goal 0.97  max_x  47.5
+        tier 2    100 levels   return  9.91  coins  5.4  goal 0.92  max_x  59.3
+        tier 3    100 levels   return  9.56  coins  5.5  goal 0.84  max_x  67.7
+        levels by goal rate:  0: 1   <0.5: 6   0.5-0.9: 77   >=0.9: 216
+        worst: t3_0119.txt 0.00 (x 53),  t2_0073.txt 0.25 (x 28),  t3_0068.txt 0.25 (x 42),  t3_0128.txt 0.25 (x 45),  t3_0065.txt 0.25 (x 55)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.17  coins  5.6  goal 0.92  max_x  58.7  len  316
+        tier 1    100 levels   return 10.68  coins  5.9  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.16  coins  5.5  goal 0.94  max_x  60.4
+        tier 3    100 levels   return  9.66  coins  5.5  goal 0.86  max_x  67.9
+        levels by goal rate:  0: 1   <0.5: 3   0.5-0.9: 72   >=0.9: 224
+        worst: t3_0128.txt 0.00 (x 39),  t3_0068.txt 0.25 (x 42),  t3_0077.txt 0.25 (x 61),  t3_0137.txt 0.25 (x 63),  t2_0073.txt 0.50 (x 41)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.46  coins  5.3  goal 0.86  max_x  57.0  len  305
+        tier 1     20 levels   return  9.74  coins  5.3  goal 0.91  max_x  46.2
+        tier 2     20 levels   return 10.33  coins  5.8  goal 0.93  max_x  60.8
+        tier 3     20 levels   return  8.32  coins  4.8  goal 0.76  max_x  64.1
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 28   >=0.9: 29
+        worst: t3_0047.txt 0.33 (x 39),  t3_0026.txt 0.33 (x 64),  t3_0017.txt 0.44 (x 44),  t1_0030.txt 0.56 (x 37),  t3_0002.txt 0.56 (x 49)
+upd  441/762  steps  57,802,752  SPAWN eps  2593 return 10.19 coins  5.6 goal 0.93 max_x  58.5 len   316 | ALL return  9.03 goal 0.94 | ent 0.45 v_loss 0.073   582,466 sps
+upd  442/762  steps  57,933,824  SPAWN eps  2586 return 10.17 coins  5.6 goal 0.93 max_x  58.4 len   315 | ALL return  9.02 goal 0.94 | ent 0.45 v_loss 0.083   581,266 sps
+upd  443/762  steps  58,064,896  SPAWN eps  2617 return 10.16 coins  5.6 goal 0.93 max_x  58.2 len   314 | ALL return  9.01 goal 0.94 | ent 0.45 v_loss 0.089   581,651 sps
+upd  444/762  steps  58,195,968  SPAWN eps  2659 return 10.17 coins  5.6 goal 0.93 max_x  58.2 len   314 | ALL return  9.04 goal 0.93 | ent 0.46 v_loss 0.082   583,353 sps
+upd  445/762  steps  58,327,040  SPAWN eps  2627 return 10.18 coins  5.7 goal 0.92 max_x  58.0 len   313 | ALL return  9.01 goal 0.93 | ent 0.45 v_loss 0.081   584,038 sps
+upd  446/762  steps  58,458,112  SPAWN eps  2600 return 10.21 coins  5.7 goal 0.92 max_x  57.9 len   311 | ALL return  9.04 goal 0.93 | ent 0.46 v_loss 0.088   583,042 sps
+upd  447/762  steps  58,589,184  SPAWN eps  2640 return 10.20 coins  5.7 goal 0.92 max_x  57.9 len   312 | ALL return  9.05 goal 0.93 | ent 0.46 v_loss 0.078   583,360 sps
+upd  448/762  steps  58,720,256  SPAWN eps  2650 return 10.16 coins  5.7 goal 0.92 max_x  57.9 len   312 | ALL return  9.07 goal 0.93 | ent 0.46 v_loss 0.073   582,364 sps
+upd  449/762  steps  58,851,328  SPAWN eps  2665 return 10.17 coins  5.7 goal 0.92 max_x  57.9 len   312 | ALL return  9.07 goal 0.93 | ent 0.47 v_loss 0.072   582,746 sps
+upd  450/762  steps  58,982,400  SPAWN eps  2673 return 10.17 coins  5.7 goal 0.92 max_x  58.1 len   314 | ALL return  9.08 goal 0.93 | ent 0.46 v_loss 0.073   582,746 sps
+upd  451/762  steps  59,113,472  SPAWN eps  2664 return 10.16 coins  5.7 goal 0.92 max_x  58.1 len   314 | ALL return  9.06 goal 0.93 | ent 0.46 v_loss 0.077   581,781 sps
+upd  452/762  steps  59,244,544  SPAWN eps  2647 return 10.20 coins  5.7 goal 0.92 max_x  58.3 len   315 | ALL return  9.07 goal 0.93 | ent 0.46 v_loss 0.067   580,895 sps
+upd  453/762  steps  59,375,616  SPAWN eps  2613 return 10.25 coins  5.7 goal 0.93 max_x  58.6 len   316 | ALL return  9.11 goal 0.94 | ent 0.47 v_loss 0.072   581,433 sps
+upd  454/762  steps  59,506,688  SPAWN eps  2596 return 10.26 coins  5.7 goal 0.93 max_x  58.6 len   317 | ALL return  9.11 goal 0.94 | ent 0.47 v_loss 0.071   582,862 sps
+upd  455/762  steps  59,637,760  SPAWN eps  2616 return 10.26 coins  5.7 goal 0.93 max_x  58.8 len   318 | ALL return  9.12 goal 0.94 | ent 0.47 v_loss 0.085   583,604 sps
+upd  456/762  steps  59,768,832  SPAWN eps  2637 return 10.27 coins  5.7 goal 0.93 max_x  59.1 len   321 | ALL return  9.12 goal 0.94 | ent 0.46 v_loss 0.066   583,889 sps
+upd  457/762  steps  59,899,904  SPAWN eps  2617 return 10.29 coins  5.7 goal 0.94 max_x  59.2 len   321 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.053   582,146 sps
+upd  458/762  steps  60,030,976  SPAWN eps  2590 return 10.27 coins  5.7 goal 0.94 max_x  59.1 len   321 | ALL return  9.12 goal 0.94 | ent 0.46 v_loss 0.080   582,862 sps
+upd  459/762  steps  60,162,048  SPAWN eps  2594 return 10.24 coins  5.6 goal 0.93 max_x  59.2 len   322 | ALL return  9.12 goal 0.94 | ent 0.46 v_loss 0.079   582,566 sps
+upd  460/762  steps  60,293,120  SPAWN eps  2617 return 10.24 coins  5.6 goal 0.93 max_x  59.0 len   320 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.071   581,955 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.21  coins  5.6  goal 0.93  max_x  58.8  len  314
+        tier 1    100 levels   return 10.73  coins  5.9  goal 0.98  max_x  47.8
+        tier 2    100 levels   return  9.97  coins  5.5  goal 0.92  max_x  59.7
+        tier 3    100 levels   return  9.93  coins  5.6  goal 0.89  max_x  68.9
+        levels by goal rate:  0: 1   <0.5: 2   0.5-0.9: 65   >=0.9: 232
+        worst: t3_0119.txt 0.00 (x 41),  t2_0073.txt 0.25 (x 28),  t3_0065.txt 0.25 (x 51),  t1_0174.txt 0.50 (x 27),  t1_0222.txt 0.50 (x 38)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.19  coins  5.6  goal 0.93  max_x  58.7  len  317
+        tier 1    100 levels   return 10.64  coins  5.8  goal 0.97  max_x  47.5
+        tier 2    100 levels   return 10.11  coins  5.5  goal 0.94  max_x  60.1
+        tier 3    100 levels   return  9.81  coins  5.5  goal 0.88  max_x  68.4
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 67   >=0.9: 230
+        worst: t3_0041.txt 0.25 (x 31),  t3_0068.txt 0.25 (x 37),  t3_0128.txt 0.25 (x 59),  t1_0192.txt 0.50 (x 30),  t2_0142.txt 0.50 (x 39)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.56  coins  5.3  goal 0.88  max_x  57.3  len  307
+        tier 1     20 levels   return 10.01  coins  5.4  goal 0.94  max_x  46.8
+        tier 2     20 levels   return 10.33  coins  5.8  goal 0.93  max_x  60.9
+        tier 3     20 levels   return  8.35  coins  4.8  goal 0.77  max_x  64.3
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 30   >=0.9: 28
+        worst: t3_0017.txt 0.33 (x 40),  t3_0047.txt 0.44 (x 41),  t3_0032.txt 0.56 (x 57),  t3_0026.txt 0.56 (x 66),  t3_0044.txt 0.56 (x 67)
+upd  461/762  steps  60,424,192  SPAWN eps  2593 return 10.25 coins  5.7 goal 0.93 max_x  59.0 len   320 | ALL return  9.12 goal 0.94 | ent 0.46 v_loss 0.076   583,053 sps
+upd  462/762  steps  60,555,264  SPAWN eps  2581 return 10.23 coins  5.7 goal 0.93 max_x  58.8 len   318 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.068   583,607 sps
+upd  463/762  steps  60,686,336  SPAWN eps  2610 return 10.20 coins  5.6 goal 0.93 max_x  58.7 len   318 | ALL return  9.11 goal 0.94 | ent 0.45 v_loss 0.073   583,937 sps
+upd  464/762  steps  60,817,408  SPAWN eps  2614 return 10.20 coins  5.6 goal 0.93 max_x  58.6 len   318 | ALL return  9.12 goal 0.94 | ent 0.47 v_loss 0.075   583,545 sps
+upd  465/762  steps  60,948,480  SPAWN eps  2593 return 10.22 coins  5.6 goal 0.93 max_x  58.6 len   317 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.081   583,735 sps
+upd  466/762  steps  61,079,552  SPAWN eps  2584 return 10.20 coins  5.6 goal 0.93 max_x  58.5 len   316 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.077   582,772 sps
+upd  467/762  steps  61,210,624  SPAWN eps  2576 return 10.20 coins  5.6 goal 0.93 max_x  58.4 len   316 | ALL return  9.10 goal 0.94 | ent 0.46 v_loss 0.074   583,183 sps
+upd  468/762  steps  61,341,696  SPAWN eps  2587 return 10.22 coins  5.7 goal 0.93 max_x  58.6 len   316 | ALL return  9.12 goal 0.94 | ent 0.47 v_loss 0.079   581,603 sps
+upd  469/762  steps  61,472,768  SPAWN eps  2583 return 10.21 coins  5.7 goal 0.93 max_x  58.3 len   314 | ALL return  9.09 goal 0.94 | ent 0.46 v_loss 0.079   582,578 sps
+upd  470/762  steps  61,603,840  SPAWN eps  2582 return 10.19 coins  5.6 goal 0.92 max_x  58.4 len   315 | ALL return  9.10 goal 0.93 | ent 0.47 v_loss 0.077   580,825 sps
+upd  471/762  steps  61,734,912  SPAWN eps  2588 return 10.17 coins  5.6 goal 0.92 max_x  58.4 len   315 | ALL return  9.08 goal 0.93 | ent 0.47 v_loss 0.078   582,731 sps
+upd  472/762  steps  61,865,984  SPAWN eps  2597 return 10.16 coins  5.6 goal 0.93 max_x  58.6 len   316 | ALL return  9.07 goal 0.94 | ent 0.46 v_loss 0.063   584,041 sps
+upd  473/762  steps  61,997,056  SPAWN eps  2594 return 10.15 coins  5.6 goal 0.92 max_x  58.6 len   316 | ALL return  9.08 goal 0.93 | ent 0.46 v_loss 0.069   584,387 sps
+upd  474/762  steps  62,128,128  SPAWN eps  2590 return 10.15 coins  5.6 goal 0.92 max_x  58.7 len   316 | ALL return  9.08 goal 0.94 | ent 0.46 v_loss 0.069   582,911 sps
+upd  475/762  steps  62,259,200  SPAWN eps  2630 return 10.12 coins  5.6 goal 0.92 max_x  58.5 len   315 | ALL return  9.08 goal 0.94 | ent 0.45 v_loss 0.071   583,779 sps
+upd  476/762  steps  62,390,272  SPAWN eps  2641 return 10.12 coins  5.6 goal 0.92 max_x  58.4 len   314 | ALL return  9.09 goal 0.94 | ent 0.45 v_loss 0.076   581,136 sps
+upd  477/762  steps  62,521,344  SPAWN eps  2646 return 10.13 coins  5.6 goal 0.92 max_x  58.5 len   314 | ALL return  9.10 goal 0.94 | ent 0.46 v_loss 0.075   583,789 sps
+upd  478/762  steps  62,652,416  SPAWN eps  2655 return 10.18 coins  5.6 goal 0.93 max_x  58.6 len   315 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.071   583,700 sps
+upd  479/762  steps  62,783,488  SPAWN eps  2654 return 10.17 coins  5.6 goal 0.92 max_x  58.7 len   315 | ALL return  9.15 goal 0.94 | ent 0.47 v_loss 0.084   583,594 sps
+upd  480/762  steps  62,914,560  SPAWN eps  2630 return 10.21 coins  5.6 goal 0.93 max_x  58.7 len   316 | ALL return  9.15 goal 0.94 | ent 0.46 v_loss 0.064   583,704 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.38  coins  5.7  goal 0.95  max_x  59.4  len  317
+        tier 1    100 levels   return 10.62  coins  5.8  goal 0.97  max_x  47.4
+        tier 2    100 levels   return 10.35  coins  5.6  goal 0.96  max_x  61.0
+        tier 3    100 levels   return 10.16  coins  5.6  goal 0.92  max_x  69.7
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 53   >=0.9: 247
+        worst: t1_0087.txt 0.50 (x 28),  t2_0073.txt 0.50 (x 41),  t3_0131.txt 0.50 (x 46),  t3_0206.txt 0.50 (x 48),  t3_0245.txt 0.50 (x 54)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.36  coins  5.7  goal 0.95  max_x  59.2  len  321
+        tier 1    100 levels   return 10.66  coins  5.8  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.39  coins  5.6  goal 0.97  max_x  61.1
+        tier 3    100 levels   return 10.03  coins  5.6  goal 0.91  max_x  69.0
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 53   >=0.9: 247
+        worst: t1_0147.txt 0.50 (x 34),  t2_0142.txt 0.50 (x 39),  t3_0068.txt 0.50 (x 43),  t3_0041.txt 0.50 (x 49),  t3_0011.txt 0.50 (x 49)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.84  coins  5.4  goal 0.91  max_x  58.3  len  313
+        tier 1     20 levels   return 10.05  coins  5.4  goal 0.94  max_x  47.2
+        tier 2     20 levels   return 10.57  coins  5.8  goal 0.96  max_x  61.8
+        tier 3     20 levels   return  8.90  coins  4.9  goal 0.84  max_x  65.9
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 27   >=0.9: 32
+        worst: t3_0047.txt 0.33 (x 37),  t2_0037.txt 0.67 (x 53),  t3_0050.txt 0.67 (x 54),  t3_0005.txt 0.67 (x 57),  t1_0024.txt 0.78 (x 44)
+upd  481/762  steps  63,045,632  SPAWN eps  2664 return 10.24 coins  5.7 goal 0.93 max_x  58.8 len   317 | ALL return  9.18 goal 0.94 | ent 0.47 v_loss 0.074   582,317 sps
+upd  482/762  steps  63,176,704  SPAWN eps  2667 return 10.27 coins  5.7 goal 0.93 max_x  58.8 len   316 | ALL return  9.16 goal 0.94 | ent 0.47 v_loss 0.071   581,997 sps
+upd  483/762  steps  63,307,776  SPAWN eps  2639 return 10.27 coins  5.7 goal 0.93 max_x  58.7 len   316 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.073   582,467 sps
+upd  484/762  steps  63,438,848  SPAWN eps  2644 return 10.29 coins  5.7 goal 0.93 max_x  58.8 len   316 | ALL return  9.14 goal 0.94 | ent 0.47 v_loss 0.070   571,208 sps
+upd  485/762  steps  63,569,920  SPAWN eps  2605 return 10.32 coins  5.7 goal 0.93 max_x  59.0 len   317 | ALL return  9.13 goal 0.94 | ent 0.47 v_loss 0.071   582,241 sps
+upd  486/762  steps  63,700,992  SPAWN eps  2628 return 10.31 coins  5.7 goal 0.94 max_x  59.0 len   318 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.073   582,073 sps
+upd  487/762  steps  63,832,064  SPAWN eps  2619 return 10.29 coins  5.7 goal 0.94 max_x  59.1 len   318 | ALL return  9.13 goal 0.94 | ent 0.47 v_loss 0.064   583,398 sps
+upd  488/762  steps  63,963,136  SPAWN eps  2606 return 10.28 coins  5.6 goal 0.94 max_x  59.0 len   318 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.065   581,628 sps
+upd  489/762  steps  64,094,208  SPAWN eps  2574 return 10.33 coins  5.7 goal 0.95 max_x  59.2 len   319 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.059   581,207 sps
+upd  490/762  steps  64,225,280  SPAWN eps  2580 return 10.32 coins  5.7 goal 0.94 max_x  59.1 len   319 | ALL return  9.14 goal 0.95 | ent 0.46 v_loss 0.066   583,202 sps
+upd  491/762  steps  64,356,352  SPAWN eps  2550 return 10.31 coins  5.7 goal 0.94 max_x  59.0 len   319 | ALL return  9.13 goal 0.95 | ent 0.47 v_loss 0.075   583,226 sps
+upd  492/762  steps  64,487,424  SPAWN eps  2579 return 10.33 coins  5.7 goal 0.94 max_x  59.1 len   320 | ALL return  9.17 goal 0.95 | ent 0.46 v_loss 0.073   583,483 sps
+upd  493/762  steps  64,618,496  SPAWN eps  2580 return 10.32 coins  5.7 goal 0.94 max_x  59.1 len   320 | ALL return  9.17 goal 0.95 | ent 0.46 v_loss 0.066   583,241 sps
+upd  494/762  steps  64,749,568  SPAWN eps  2573 return 10.30 coins  5.7 goal 0.94 max_x  59.1 len   320 | ALL return  9.14 goal 0.95 | ent 0.46 v_loss 0.076   581,373 sps
+upd  495/762  steps  64,880,640  SPAWN eps  2582 return 10.30 coins  5.7 goal 0.94 max_x  59.1 len   319 | ALL return  9.16 goal 0.95 | ent 0.45 v_loss 0.069   581,710 sps
+upd  496/762  steps  65,011,712  SPAWN eps  2563 return 10.31 coins  5.7 goal 0.94 max_x  59.1 len   319 | ALL return  9.16 goal 0.95 | ent 0.46 v_loss 0.065   581,700 sps
+upd  497/762  steps  65,142,784  SPAWN eps  2569 return 10.25 coins  5.6 goal 0.94 max_x  59.0 len   319 | ALL return  9.13 goal 0.95 | ent 0.45 v_loss 0.074   581,336 sps
+upd  498/762  steps  65,273,856  SPAWN eps  2573 return 10.18 coins  5.6 goal 0.93 max_x  59.0 len   319 | ALL return  9.10 goal 0.94 | ent 0.44 v_loss 0.074   583,010 sps
+upd  499/762  steps  65,404,928  SPAWN eps  2595 return 10.17 coins  5.6 goal 0.93 max_x  58.9 len   319 | ALL return  9.09 goal 0.94 | ent 0.45 v_loss 0.066   583,770 sps
+upd  500/762  steps  65,536,000  SPAWN eps  2596 return 10.18 coins  5.6 goal 0.93 max_x  58.9 len   318 | ALL return  9.09 goal 0.94 | ent 0.45 v_loss 0.063   583,262 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.11  coins  5.6  goal 0.92  max_x  58.5  len  310
+        tier 1    100 levels   return 10.68  coins  5.8  goal 0.98  max_x  47.6
+        tier 2    100 levels   return  9.90  coins  5.4  goal 0.91  max_x  59.4
+        tier 3    100 levels   return  9.76  coins  5.5  goal 0.88  max_x  68.4
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 70   >=0.9: 227
+        worst: t2_0073.txt 0.25 (x 28),  t2_0034.txt 0.25 (x 42),  t3_0206.txt 0.25 (x 45),  t1_0087.txt 0.50 (x 28),  t1_0204.txt 0.50 (x 30)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.20  coins  5.6  goal 0.93  max_x  58.7  len  315
+        tier 1    100 levels   return 10.72  coins  5.9  goal 0.98  max_x  47.6
+        tier 2    100 levels   return 10.14  coins  5.5  goal 0.94  max_x  60.2
+        tier 3    100 levels   return  9.76  coins  5.5  goal 0.88  max_x  68.2
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 63   >=0.9: 235
+        worst: t2_0142.txt 0.25 (x 26),  t3_0284.txt 0.25 (x 49),  t2_0160.txt 0.50 (x 39),  t3_0068.txt 0.50 (x 43),  t3_0185.txt 0.50 (x 44)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.41  coins  5.2  goal 0.86  max_x  56.9  len  303
+        tier 1     20 levels   return  9.58  coins  5.2  goal 0.90  max_x  45.6
+        tier 2     20 levels   return 10.32  coins  5.8  goal 0.92  max_x  60.9
+        tier 3     20 levels   return  8.34  coins  4.7  goal 0.77  max_x  64.1
+        levels by goal rate:  0: 0   <0.5: 4   0.5-0.9: 29   >=0.9: 27
+        worst: t3_0017.txt 0.22 (x 38),  t3_0032.txt 0.33 (x 53),  t3_0047.txt 0.44 (x 40),  t3_0026.txt 0.44 (x 65),  t2_0013.txt 0.56 (x 45)
+upd  501/762  steps  65,667,072  SPAWN eps  2585 return 10.17 coins  5.6 goal 0.93 max_x  59.0 len   318 | ALL return  9.09 goal 0.94 | ent 0.45 v_loss 0.072   582,275 sps
+upd  502/762  steps  65,798,144  SPAWN eps  2576 return 10.10 coins  5.5 goal 0.93 max_x  58.8 len   317 | ALL return  9.06 goal 0.94 | ent 0.45 v_loss 0.078   584,138 sps
+upd  503/762  steps  65,929,216  SPAWN eps  2570 return 10.11 coins  5.5 goal 0.93 max_x  58.7 len   316 | ALL return  9.06 goal 0.94 | ent 0.45 v_loss 0.073   583,815 sps
+upd  504/762  steps  66,060,288  SPAWN eps  2589 return 10.11 coins  5.6 goal 0.93 max_x  58.7 len   316 | ALL return  9.10 goal 0.94 | ent 0.45 v_loss 0.076   583,388 sps
+upd  505/762  steps  66,191,360  SPAWN eps  2597 return 10.12 coins  5.6 goal 0.93 max_x  58.6 len   316 | ALL return  9.10 goal 0.94 | ent 0.44 v_loss 0.064   583,162 sps
+upd  506/762  steps  66,322,432  SPAWN eps  2608 return 10.06 coins  5.5 goal 0.92 max_x  58.5 len   315 | ALL return  9.08 goal 0.94 | ent 0.44 v_loss 0.081   583,173 sps
+upd  507/762  steps  66,453,504  SPAWN eps  2588 return 10.10 coins  5.6 goal 0.92 max_x  58.4 len   314 | ALL return  9.12 goal 0.94 | ent 0.45 v_loss 0.067   582,990 sps
+upd  508/762  steps  66,584,576  SPAWN eps  2576 return 10.13 coins  5.6 goal 0.93 max_x  58.3 len   313 | ALL return  9.14 goal 0.94 | ent 0.45 v_loss 0.063   582,388 sps
+upd  509/762  steps  66,715,648  SPAWN eps  2579 return 10.15 coins  5.6 goal 0.92 max_x  58.4 len   314 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.066   582,122 sps
+upd  510/762  steps  66,846,720  SPAWN eps  2590 return 10.17 coins  5.6 goal 0.93 max_x  58.6 len   315 | ALL return  9.14 goal 0.94 | ent 0.45 v_loss 0.064   582,356 sps
+upd  511/762  steps  66,977,792  SPAWN eps  2616 return 10.18 coins  5.6 goal 0.93 max_x  58.5 len   315 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.079   581,028 sps
+upd  512/762  steps  67,108,864  SPAWN eps  2599 return 10.24 coins  5.6 goal 0.93 max_x  58.6 len   316 | ALL return  9.16 goal 0.94 | ent 0.46 v_loss 0.069   583,422 sps
+upd  513/762  steps  67,239,936  SPAWN eps  2601 return 10.25 coins  5.6 goal 0.94 max_x  58.7 len   317 | ALL return  9.19 goal 0.95 | ent 0.45 v_loss 0.058   584,059 sps
+upd  514/762  steps  67,371,008  SPAWN eps  2587 return 10.27 coins  5.7 goal 0.94 max_x  58.8 len   317 | ALL return  9.19 goal 0.94 | ent 0.45 v_loss 0.075   583,605 sps
+upd  515/762  steps  67,502,080  SPAWN eps  2588 return 10.27 coins  5.7 goal 0.94 max_x  58.8 len   317 | ALL return  9.18 goal 0.95 | ent 0.45 v_loss 0.068   582,162 sps
+upd  516/762  steps  67,633,152  SPAWN eps  2581 return 10.34 coins  5.7 goal 0.94 max_x  58.9 len   318 | ALL return  9.21 goal 0.95 | ent 0.46 v_loss 0.070   582,150 sps
+upd  517/762  steps  67,764,224  SPAWN eps  2585 return 10.36 coins  5.7 goal 0.94 max_x  59.0 len   319 | ALL return  9.21 goal 0.95 | ent 0.45 v_loss 0.071   582,486 sps
+upd  518/762  steps  67,895,296  SPAWN eps  2597 return 10.34 coins  5.7 goal 0.94 max_x  59.0 len   319 | ALL return  9.19 goal 0.94 | ent 0.46 v_loss 0.070   583,160 sps
+upd  519/762  steps  68,026,368  SPAWN eps  2628 return 10.32 coins  5.7 goal 0.94 max_x  59.0 len   318 | ALL return  9.19 goal 0.94 | ent 0.45 v_loss 0.078   582,033 sps
+upd  520/762  steps  68,157,440  SPAWN eps  2608 return 10.31 coins  5.7 goal 0.93 max_x  58.8 len   317 | ALL return  9.17 goal 0.94 | ent 0.45 v_loss 0.086   581,212 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.35  coins  5.7  goal 0.94  max_x  59.4  len  317
+        tier 1    100 levels   return 10.74  coins  5.9  goal 0.98  max_x  47.8
+        tier 2    100 levels   return 10.18  coins  5.5  goal 0.94  max_x  60.4
+        tier 3    100 levels   return 10.12  coins  5.6  goal 0.91  max_x  69.9
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 53   >=0.9: 245
+        worst: t2_0073.txt 0.25 (x 28),  t3_0080.txt 0.25 (x 45),  t1_0087.txt 0.50 (x 28),  t2_0175.txt 0.50 (x 47),  t3_0023.txt 0.50 (x 52)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.35  coins  5.7  goal 0.95  max_x  59.2  len  320
+        tier 1    100 levels   return 10.75  coins  5.9  goal 0.98  max_x  47.8
+        tier 2    100 levels   return 10.34  coins  5.6  goal 0.96  max_x  61.0
+        tier 3    100 levels   return  9.97  coins  5.6  goal 0.90  max_x  68.9
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 55   >=0.9: 244
+        worst: t3_0080.txt 0.25 (x 37),  t3_0023.txt 0.50 (x 45),  t3_0068.txt 0.50 (x 47),  t3_0041.txt 0.50 (x 49),  t2_0184.txt 0.50 (x 50)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.72  coins  5.3  goal 0.90  max_x  58.1  len  312
+        tier 1     20 levels   return  9.84  coins  5.3  goal 0.92  max_x  46.7
+        tier 2     20 levels   return 10.56  coins  5.8  goal 0.96  max_x  61.6
+        tier 3     20 levels   return  8.76  coins  4.8  goal 0.82  max_x  66.0
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 25   >=0.9: 33
+        worst: t3_0047.txt 0.33 (x 34),  t3_0026.txt 0.33 (x 64),  t1_0021.txt 0.67 (x 38),  t3_0056.txt 0.67 (x 50),  t3_0050.txt 0.67 (x 54)
+upd  521/762  steps  68,288,512  SPAWN eps  2594 return 10.33 coins  5.7 goal 0.93 max_x  58.9 len   318 | ALL return  9.19 goal 0.94 | ent 0.46 v_loss 0.074   584,136 sps
+upd  522/762  steps  68,419,584  SPAWN eps  2619 return 10.30 coins  5.7 goal 0.93 max_x  58.9 len   318 | ALL return  9.17 goal 0.94 | ent 0.45 v_loss 0.088   583,534 sps
+upd  523/762  steps  68,550,656  SPAWN eps  2608 return 10.26 coins  5.7 goal 0.93 max_x  58.9 len   317 | ALL return  9.13 goal 0.94 | ent 0.46 v_loss 0.071   582,621 sps
+upd  524/762  steps  68,681,728  SPAWN eps  2593 return 10.25 coins  5.7 goal 0.93 max_x  58.7 len   316 | ALL return  9.13 goal 0.94 | ent 0.45 v_loss 0.066   583,026 sps
+upd  525/762  steps  68,812,800  SPAWN eps  2587 return 10.29 coins  5.7 goal 0.93 max_x  59.0 len   317 | ALL return  9.14 goal 0.94 | ent 0.45 v_loss 0.064   582,235 sps
+upd  526/762  steps  68,943,872  SPAWN eps  2582 return 10.27 coins  5.7 goal 0.93 max_x  59.0 len   317 | ALL return  9.13 goal 0.94 | ent 0.45 v_loss 0.065   583,258 sps
+upd  527/762  steps  69,074,944  SPAWN eps  2592 return 10.25 coins  5.7 goal 0.93 max_x  59.1 len   317 | ALL return  9.13 goal 0.94 | ent 0.44 v_loss 0.066   583,713 sps
+upd  528/762  steps  69,206,016  SPAWN eps  2608 return 10.27 coins  5.7 goal 0.93 max_x  59.1 len   318 | ALL return  9.12 goal 0.94 | ent 0.44 v_loss 0.073   582,557 sps
+upd  529/762  steps  69,337,088  SPAWN eps  2592 return 10.29 coins  5.7 goal 0.94 max_x  59.2 len   319 | ALL return  9.16 goal 0.94 | ent 0.44 v_loss 0.063   582,509 sps
+upd  530/762  steps  69,468,160  SPAWN eps  2594 return 10.27 coins  5.7 goal 0.94 max_x  59.1 len   318 | ALL return  9.17 goal 0.94 | ent 0.45 v_loss 0.074   582,425 sps
+upd  531/762  steps  69,599,232  SPAWN eps  2604 return 10.25 coins  5.6 goal 0.94 max_x  59.2 len   319 | ALL return  9.15 goal 0.94 | ent 0.44 v_loss 0.073   580,850 sps
+upd  532/762  steps  69,730,304  SPAWN eps  2590 return 10.27 coins  5.6 goal 0.94 max_x  59.3 len   320 | ALL return  9.16 goal 0.95 | ent 0.44 v_loss 0.067   581,445 sps
+upd  533/762  steps  69,861,376  SPAWN eps  2618 return 10.29 coins  5.7 goal 0.94 max_x  59.3 len   321 | ALL return  9.18 goal 0.95 | ent 0.44 v_loss 0.072   581,320 sps
+upd  534/762  steps  69,992,448  SPAWN eps  2629 return 10.30 coins  5.7 goal 0.94 max_x  59.4 len   321 | ALL return  9.20 goal 0.95 | ent 0.44 v_loss 0.068   583,788 sps
+upd  535/762  steps  70,123,520  SPAWN eps  2648 return 10.26 coins  5.6 goal 0.94 max_x  59.1 len   319 | ALL return  9.18 goal 0.95 | ent 0.45 v_loss 0.068   584,122 sps
+upd  536/762  steps  70,254,592  SPAWN eps  2624 return 10.26 coins  5.6 goal 0.94 max_x  59.0 len   318 | ALL return  9.17 goal 0.94 | ent 0.46 v_loss 0.074   583,371 sps
+upd  537/762  steps  70,385,664  SPAWN eps  2624 return 10.27 coins  5.7 goal 0.94 max_x  58.8 len   317 | ALL return  9.16 goal 0.94 | ent 0.46 v_loss 0.068   583,202 sps
+upd  538/762  steps  70,516,736  SPAWN eps  2587 return 10.30 coins  5.7 goal 0.94 max_x  59.0 len   318 | ALL return  9.17 goal 0.95 | ent 0.46 v_loss 0.064   582,079 sps
+upd  539/762  steps  70,647,808  SPAWN eps  2580 return 10.29 coins  5.7 goal 0.93 max_x  59.0 len   318 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.069   582,010 sps
+upd  540/762  steps  70,778,880  SPAWN eps  2594 return 10.32 coins  5.7 goal 0.94 max_x  59.1 len   319 | ALL return  9.18 goal 0.95 | ent 0.46 v_loss 0.066   582,221 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.39  coins  5.7  goal 0.95  max_x  59.5  len  318
+        tier 1    100 levels   return 10.76  coins  5.9  goal 0.98  max_x  47.8
+        tier 2    100 levels   return 10.23  coins  5.5  goal 0.95  max_x  60.6
+        tier 3    100 levels   return 10.18  coins  5.6  goal 0.93  max_x  69.9
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 47   >=0.9: 250
+        worst: t2_0073.txt 0.25 (x 28),  t3_0068.txt 0.25 (x 42),  t3_0101.txt 0.25 (x 50),  t2_0175.txt 0.50 (x 47),  t3_0014.txt 0.50 (x 52)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.36  coins  5.7  goal 0.95  max_x  59.3  len  320
+        tier 1    100 levels   return 10.78  coins  5.9  goal 0.98  max_x  47.9
+        tier 2    100 levels   return 10.33  coins  5.6  goal 0.95  max_x  61.0
+        tier 3    100 levels   return  9.98  coins  5.6  goal 0.90  max_x  68.9
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 50   >=0.9: 249
+        worst: t3_0041.txt 0.25 (x 33),  t2_0220.txt 0.50 (x 39),  t3_0068.txt 0.50 (x 42),  t3_0185.txt 0.50 (x 44),  t3_0272.txt 0.50 (x 45)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.66  coins  5.3  goal 0.89  max_x  57.7  len  310
+        tier 1     20 levels   return  9.85  coins  5.3  goal 0.93  max_x  46.6
+        tier 2     20 levels   return 10.58  coins  5.8  goal 0.96  max_x  61.7
+        tier 3     20 levels   return  8.56  coins  4.8  goal 0.80  max_x  64.9
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 26   >=0.9: 33
+        worst: t3_0041.txt 0.44 (x 54),  t3_0047.txt 0.56 (x 46),  t3_0050.txt 0.56 (x 48),  t3_0017.txt 0.56 (x 49),  t1_0030.txt 0.67 (x 42)
+upd  541/762  steps  70,909,952  SPAWN eps  2587 return 10.35 coins  5.7 goal 0.94 max_x  59.0 len   318 | ALL return  9.20 goal 0.95 | ent 0.46 v_loss 0.065   582,384 sps
+upd  542/762  steps  71,041,024  SPAWN eps  2576 return 10.38 coins  5.7 goal 0.94 max_x  59.1 len   318 | ALL return  9.22 goal 0.95 | ent 0.46 v_loss 0.056   582,929 sps
+upd  543/762  steps  71,172,096  SPAWN eps  2583 return 10.39 coins  5.7 goal 0.94 max_x  59.0 len   317 | ALL return  9.22 goal 0.95 | ent 0.46 v_loss 0.067   583,296 sps
+upd  544/762  steps  71,303,168  SPAWN eps  2588 return 10.37 coins  5.7 goal 0.94 max_x  59.2 len   319 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.074   583,197 sps
+upd  545/762  steps  71,434,240  SPAWN eps  2550 return 10.36 coins  5.7 goal 0.94 max_x  59.2 len   319 | ALL return  9.18 goal 0.95 | ent 0.46 v_loss 0.071   582,747 sps
+upd  546/762  steps  71,565,312  SPAWN eps  2576 return 10.40 coins  5.7 goal 0.94 max_x  59.4 len   320 | ALL return  9.20 goal 0.95 | ent 0.46 v_loss 0.070   581,639 sps
+upd  547/762  steps  71,696,384  SPAWN eps  2566 return 10.39 coins  5.7 goal 0.94 max_x  59.5 len   321 | ALL return  9.19 goal 0.95 | ent 0.46 v_loss 0.074   582,730 sps
+upd  548/762  steps  71,827,456  SPAWN eps  2577 return 10.37 coins  5.7 goal 0.94 max_x  59.4 len   320 | ALL return  9.19 goal 0.95 | ent 0.46 v_loss 0.065   582,455 sps
+upd  549/762  steps  71,958,528  SPAWN eps  2577 return 10.34 coins  5.7 goal 0.94 max_x  59.3 len   320 | ALL return  9.18 goal 0.95 | ent 0.45 v_loss 0.076   582,189 sps
+upd  550/762  steps  72,089,600  SPAWN eps  2563 return 10.29 coins  5.6 goal 0.94 max_x  59.2 len   320 | ALL return  9.15 goal 0.95 | ent 0.46 v_loss 0.062   581,926 sps
+upd  551/762  steps  72,220,672  SPAWN eps  2557 return 10.24 coins  5.6 goal 0.94 max_x  59.1 len   319 | ALL return  9.13 goal 0.95 | ent 0.47 v_loss 0.078   583,254 sps
+upd  552/762  steps  72,351,744  SPAWN eps  2563 return 10.20 coins  5.6 goal 0.93 max_x  58.9 len   318 | ALL return  9.10 goal 0.94 | ent 0.47 v_loss 0.067   583,004 sps
+upd  553/762  steps  72,482,816  SPAWN eps  2556 return 10.23 coins  5.6 goal 0.94 max_x  59.1 len   319 | ALL return  9.11 goal 0.94 | ent 0.46 v_loss 0.065   581,558 sps
+upd  554/762  steps  72,613,888  SPAWN eps  2554 return 10.24 coins  5.6 goal 0.94 max_x  59.0 len   318 | ALL return  9.10 goal 0.94 | ent 0.46 v_loss 0.072   581,407 sps
+upd  555/762  steps  72,744,960  SPAWN eps  2565 return 10.27 coins  5.6 goal 0.94 max_x  59.2 len   319 | ALL return  9.12 goal 0.94 | ent 0.47 v_loss 0.069   583,773 sps
+upd  556/762  steps  72,876,032  SPAWN eps  2576 return 10.26 coins  5.6 goal 0.94 max_x  59.1 len   318 | ALL return  9.12 goal 0.95 | ent 0.46 v_loss 0.070   582,616 sps
+upd  557/762  steps  73,007,104  SPAWN eps  2589 return 10.29 coins  5.7 goal 0.94 max_x  59.0 len   318 | ALL return  9.15 goal 0.95 | ent 0.47 v_loss 0.072   583,971 sps
+upd  558/762  steps  73,138,176  SPAWN eps  2612 return 10.27 coins  5.7 goal 0.94 max_x  59.0 len   318 | ALL return  9.14 goal 0.94 | ent 0.47 v_loss 0.078   583,500 sps
+upd  559/762  steps  73,269,248  SPAWN eps  2603 return 10.28 coins  5.7 goal 0.94 max_x  58.9 len   317 | ALL return  9.14 goal 0.94 | ent 0.47 v_loss 0.067   583,241 sps
+upd  560/762  steps  73,400,320  SPAWN eps  2606 return 10.29 coins  5.7 goal 0.93 max_x  59.0 len   317 | ALL return  9.14 goal 0.94 | ent 0.46 v_loss 0.070   582,395 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.41  coins  5.7  goal 0.95  max_x  59.4  len  316
+        tier 1    100 levels   return 10.82  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return 10.27  coins  5.6  goal 0.95  max_x  60.6
+        tier 3    100 levels   return 10.14  coins  5.6  goal 0.92  max_x  69.7
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 46   >=0.9: 253
+        worst: t3_0206.txt 0.25 (x 44),  t1_0165.txt 0.50 (x 30),  t2_0142.txt 0.50 (x 38),  t2_0073.txt 0.50 (x 41),  t3_0224.txt 0.50 (x 42)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.41  coins  5.7  goal 0.96  max_x  59.4  len  319
+        tier 1    100 levels   return 10.64  coins  5.8  goal 0.97  max_x  47.4
+        tier 2    100 levels   return 10.40  coins  5.6  goal 0.96  max_x  61.1
+        tier 3    100 levels   return 10.18  coins  5.6  goal 0.93  max_x  69.5
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 47   >=0.9: 253
+        worst: t1_0147.txt 0.50 (x 34),  t3_0068.txt 0.50 (x 43),  t3_0119.txt 0.50 (x 46),  t3_0041.txt 0.50 (x 48),  t3_0080.txt 0.50 (x 49)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.70  coins  5.3  goal 0.90  max_x  57.9  len  309
+        tier 1     20 levels   return  9.58  coins  5.2  goal 0.90  max_x  45.6
+        tier 2     20 levels   return 10.76  coins  5.9  goal 0.98  max_x  62.5
+        tier 3     20 levels   return  8.75  coins  4.8  goal 0.83  max_x  65.6
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 26   >=0.9: 32
+        worst: t3_0047.txt 0.33 (x 34),  t3_0026.txt 0.44 (x 63),  t3_0017.txt 0.56 (x 52),  t1_0024.txt 0.67 (x 39),  t1_0030.txt 0.67 (x 40)
+upd  561/762  steps  73,531,392  SPAWN eps  2592 return 10.34 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.17 goal 0.95 | ent 0.47 v_loss 0.059   582,159 sps
+upd  562/762  steps  73,662,464  SPAWN eps  2612 return 10.36 coins  5.7 goal 0.94 max_x  59.4 len   319 | ALL return  9.19 goal 0.95 | ent 0.47 v_loss 0.062   581,269 sps
+upd  563/762  steps  73,793,536  SPAWN eps  2611 return 10.32 coins  5.7 goal 0.94 max_x  59.3 len   319 | ALL return  9.16 goal 0.95 | ent 0.46 v_loss 0.071   582,656 sps
+upd  564/762  steps  73,924,608  SPAWN eps  2587 return 10.30 coins  5.7 goal 0.94 max_x  59.1 len   317 | ALL return  9.16 goal 0.95 | ent 0.46 v_loss 0.075   583,570 sps
+upd  565/762  steps  74,055,680  SPAWN eps  2607 return 10.28 coins  5.7 goal 0.93 max_x  59.1 len   317 | ALL return  9.15 goal 0.95 | ent 0.47 v_loss 0.074   583,860 sps
+upd  566/762  steps  74,186,752  SPAWN eps  2578 return 10.27 coins  5.7 goal 0.93 max_x  59.0 len   317 | ALL return  9.15 goal 0.94 | ent 0.46 v_loss 0.070   583,788 sps
+upd  567/762  steps  74,317,824  SPAWN eps  2602 return 10.29 coins  5.7 goal 0.93 max_x  59.2 len   318 | ALL return  9.18 goal 0.95 | ent 0.46 v_loss 0.062   583,273 sps
+upd  568/762  steps  74,448,896  SPAWN eps  2605 return 10.29 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.068   582,680 sps
+upd  569/762  steps  74,579,968  SPAWN eps  2609 return 10.33 coins  5.7 goal 0.94 max_x  59.4 len   319 | ALL return  9.22 goal 0.95 | ent 0.47 v_loss 0.063   582,966 sps
+upd  570/762  steps  74,711,040  SPAWN eps  2621 return 10.34 coins  5.7 goal 0.94 max_x  59.4 len   319 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.064   581,515 sps
+upd  571/762  steps  74,842,112  SPAWN eps  2666 return 10.32 coins  5.7 goal 0.94 max_x  59.5 len   319 | ALL return  9.19 goal 0.95 | ent 0.47 v_loss 0.075   582,047 sps
+upd  572/762  steps  74,973,184  SPAWN eps  2652 return 10.31 coins  5.7 goal 0.93 max_x  59.3 len   318 | ALL return  9.18 goal 0.94 | ent 0.47 v_loss 0.070   581,379 sps
+upd  573/762  steps  75,104,256  SPAWN eps  2644 return 10.29 coins  5.7 goal 0.93 max_x  59.2 len   317 | ALL return  9.16 goal 0.94 | ent 0.46 v_loss 0.084   583,583 sps
+upd  574/762  steps  75,235,328  SPAWN eps  2663 return 10.32 coins  5.7 goal 0.94 max_x  59.4 len   318 | ALL return  9.17 goal 0.94 | ent 0.46 v_loss 0.064   582,686 sps
+upd  575/762  steps  75,366,400  SPAWN eps  2683 return 10.32 coins  5.7 goal 0.94 max_x  59.3 len   317 | ALL return  9.17 goal 0.94 | ent 0.46 v_loss 0.075   584,015 sps
+upd  576/762  steps  75,497,472  SPAWN eps  2682 return 10.33 coins  5.7 goal 0.94 max_x  59.3 len   317 | ALL return  9.17 goal 0.95 | ent 0.47 v_loss 0.073   580,279 sps
+upd  577/762  steps  75,628,544  SPAWN eps  2662 return 10.30 coins  5.7 goal 0.94 max_x  59.4 len   318 | ALL return  9.13 goal 0.95 | ent 0.47 v_loss 0.061   581,748 sps
+upd  578/762  steps  75,759,616  SPAWN eps  2647 return 10.29 coins  5.6 goal 0.94 max_x  59.2 len   317 | ALL return  9.13 goal 0.95 | ent 0.47 v_loss 0.068   583,857 sps
+upd  579/762  steps  75,890,688  SPAWN eps  2662 return 10.29 coins  5.6 goal 0.94 max_x  59.2 len   317 | ALL return  9.14 goal 0.95 | ent 0.47 v_loss 0.061   583,770 sps
+upd  580/762  steps  76,021,760  SPAWN eps  2667 return 10.28 coins  5.6 goal 0.94 max_x  59.0 len   316 | ALL return  9.13 goal 0.94 | ent 0.47 v_loss 0.076   583,307 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.36  coins  5.7  goal 0.95  max_x  59.3  len  315
+        tier 1    100 levels   return 10.84  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return 10.25  coins  5.6  goal 0.95  max_x  60.4
+        tier 3    100 levels   return 10.00  coins  5.6  goal 0.90  max_x  69.3
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 53   >=0.9: 246
+        worst: t3_0071.txt 0.25 (x 63),  t2_0073.txt 0.50 (x 41),  t3_0068.txt 0.50 (x 48),  t3_0080.txt 0.50 (x 49),  t2_0172.txt 0.50 (x 58)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.43  coins  5.7  goal 0.96  max_x  59.4  len  320
+        tier 1    100 levels   return 10.69  coins  5.8  goal 0.98  max_x  47.5
+        tier 2    100 levels   return 10.44  coins  5.6  goal 0.97  max_x  61.3
+        tier 3    100 levels   return 10.17  coins  5.6  goal 0.93  max_x  69.5
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 49   >=0.9: 251
+        worst: t3_0185.txt 0.50 (x 44),  t3_0215.txt 0.50 (x 53),  t1_0174.txt 0.75 (x 35),  t1_0192.txt 0.75 (x 38),  t1_0147.txt 0.75 (x 40)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.74  coins  5.3  goal 0.90  max_x  58.0  len  310
+        tier 1     20 levels   return  9.99  coins  5.4  goal 0.94  max_x  47.0
+        tier 2     20 levels   return 10.54  coins  5.8  goal 0.96  max_x  61.7
+        tier 3     20 levels   return  8.69  coins  4.8  goal 0.82  max_x  65.4
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 25   >=0.9: 33
+        worst: t3_0047.txt 0.44 (x 40),  t3_0026.txt 0.44 (x 63),  t3_0050.txt 0.56 (x 48),  t3_0017.txt 0.56 (x 52),  t3_0005.txt 0.67 (x 59)
+upd  581/762  steps  76,152,832  SPAWN eps  2637 return 10.28 coins  5.6 goal 0.94 max_x  58.9 len   316 | ALL return  9.11 goal 0.94 | ent 0.48 v_loss 0.074   582,431 sps
+upd  582/762  steps  76,283,904  SPAWN eps  2654 return 10.24 coins  5.6 goal 0.94 max_x  58.9 len   317 | ALL return  9.10 goal 0.94 | ent 0.47 v_loss 0.083   582,200 sps
+upd  583/762  steps  76,414,976  SPAWN eps  2655 return 10.29 coins  5.6 goal 0.94 max_x  58.9 len   316 | ALL return  9.15 goal 0.95 | ent 0.48 v_loss 0.058   580,733 sps
+upd  584/762  steps  76,546,048  SPAWN eps  2649 return 10.30 coins  5.6 goal 0.94 max_x  58.8 len   317 | ALL return  9.16 goal 0.95 | ent 0.47 v_loss 0.055   580,968 sps
+upd  585/762  steps  76,677,120  SPAWN eps  2631 return 10.31 coins  5.6 goal 0.94 max_x  58.9 len   317 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.063   583,969 sps
+upd  586/762  steps  76,808,192  SPAWN eps  2629 return 10.29 coins  5.6 goal 0.94 max_x  59.0 len   318 | ALL return  9.17 goal 0.95 | ent 0.47 v_loss 0.070   583,227 sps
+upd  587/762  steps  76,939,264  SPAWN eps  2623 return 10.28 coins  5.7 goal 0.94 max_x  58.8 len   316 | ALL return  9.16 goal 0.95 | ent 0.47 v_loss 0.075   583,366 sps
+upd  588/762  steps  77,070,336  SPAWN eps  2624 return 10.28 coins  5.6 goal 0.94 max_x  59.0 len   317 | ALL return  9.15 goal 0.95 | ent 0.47 v_loss 0.071   582,847 sps
+upd  589/762  steps  77,201,408  SPAWN eps  2600 return 10.24 coins  5.6 goal 0.94 max_x  58.8 len   317 | ALL return  9.14 goal 0.95 | ent 0.46 v_loss 0.066   582,743 sps
+upd  590/762  steps  77,332,480  SPAWN eps  2585 return 10.27 coins  5.7 goal 0.94 max_x  58.9 len   317 | ALL return  9.17 goal 0.95 | ent 0.47 v_loss 0.073   582,162 sps
+upd  591/762  steps  77,463,552  SPAWN eps  2609 return 10.30 coins  5.7 goal 0.94 max_x  58.9 len   317 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.060   581,762 sps
+upd  592/762  steps  77,594,624  SPAWN eps  2615 return 10.31 coins  5.7 goal 0.94 max_x  58.9 len   317 | ALL return  9.22 goal 0.95 | ent 0.47 v_loss 0.085   584,480 sps
+upd  593/762  steps  77,725,696  SPAWN eps  2627 return 10.29 coins  5.7 goal 0.94 max_x  58.9 len   317 | ALL return  9.21 goal 0.94 | ent 0.47 v_loss 0.082   581,462 sps
+upd  594/762  steps  77,856,768  SPAWN eps  2646 return 10.30 coins  5.7 goal 0.93 max_x  59.1 len   318 | ALL return  9.23 goal 0.95 | ent 0.47 v_loss 0.060   582,029 sps
+upd  595/762  steps  77,987,840  SPAWN eps  2612 return 10.28 coins  5.7 goal 0.93 max_x  59.0 len   317 | ALL return  9.21 goal 0.95 | ent 0.48 v_loss 0.062   582,378 sps
+upd  596/762  steps  78,118,912  SPAWN eps  2634 return 10.30 coins  5.7 goal 0.94 max_x  59.0 len   317 | ALL return  9.22 goal 0.94 | ent 0.47 v_loss 0.079   583,873 sps
+upd  597/762  steps  78,249,984  SPAWN eps  2633 return 10.34 coins  5.7 goal 0.94 max_x  59.2 len   318 | ALL return  9.25 goal 0.95 | ent 0.47 v_loss 0.063   583,267 sps
+upd  598/762  steps  78,381,056  SPAWN eps  2620 return 10.34 coins  5.7 goal 0.94 max_x  59.0 len   317 | ALL return  9.24 goal 0.94 | ent 0.45 v_loss 0.072   582,227 sps
+upd  599/762  steps  78,512,128  SPAWN eps  2624 return 10.34 coins  5.7 goal 0.94 max_x  58.9 len   316 | ALL return  9.21 goal 0.94 | ent 0.45 v_loss 0.069   582,275 sps
+upd  600/762  steps  78,643,200  SPAWN eps  2631 return 10.34 coins  5.7 goal 0.94 max_x  59.1 len   318 | ALL return  9.21 goal 0.95 | ent 0.45 v_loss 0.062   582,940 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.35  coins  5.7  goal 0.95  max_x  59.3  len  314
+        tier 1    100 levels   return 10.67  coins  5.8  goal 0.97  max_x  47.5
+        tier 2    100 levels   return 10.23  coins  5.6  goal 0.94  max_x  60.5
+        tier 3    100 levels   return 10.15  coins  5.6  goal 0.92  max_x  69.7
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 56   >=0.9: 243
+        worst: t3_0116.txt 0.25 (x 40),  t1_0060.txt 0.50 (x 33),  t2_0073.txt 0.50 (x 40),  t3_0131.txt 0.50 (x 44),  t2_0112.txt 0.50 (x 54)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.30  coins  5.6  goal 0.94  max_x  59.0  len  316
+        tier 1    100 levels   return 10.50  coins  5.8  goal 0.95  max_x  47.0
+        tier 2    100 levels   return 10.35  coins  5.6  goal 0.96  max_x  61.0
+        tier 3    100 levels   return 10.05  coins  5.6  goal 0.91  max_x  69.1
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 59   >=0.9: 241
+        worst: t1_0288.txt 0.50 (x 30),  t1_0135.txt 0.50 (x 37),  t2_0220.txt 0.50 (x 42),  t3_0224.txt 0.50 (x 43),  t3_0068.txt 0.50 (x 47)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.66  coins  5.3  goal 0.89  max_x  57.9  len  309
+        tier 1     20 levels   return  9.77  coins  5.3  goal 0.91  max_x  46.3
+        tier 2     20 levels   return 10.52  coins  5.8  goal 0.94  max_x  61.7
+        tier 3     20 levels   return  8.69  coins  4.9  goal 0.81  max_x  65.8
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 29   >=0.9: 29
+        worst: t3_0017.txt 0.33 (x 43),  t3_0047.txt 0.44 (x 52),  t3_0050.txt 0.56 (x 48),  t3_0026.txt 0.56 (x 64),  t1_0024.txt 0.67 (x 39)
+upd  601/762  steps  78,774,272  SPAWN eps  2612 return 10.33 coins  5.7 goal 0.94 max_x  59.2 len   318 | ALL return  9.20 goal 0.95 | ent 0.46 v_loss 0.065   583,100 sps
+upd  602/762  steps  78,905,344  SPAWN eps  2596 return 10.33 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.22 goal 0.95 | ent 0.46 v_loss 0.078   582,594 sps
+upd  603/762  steps  79,036,416  SPAWN eps  2600 return 10.34 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.20 goal 0.95 | ent 0.46 v_loss 0.074   581,989 sps
+upd  604/762  steps  79,167,488  SPAWN eps  2579 return 10.30 coins  5.7 goal 0.94 max_x  59.1 len   316 | ALL return  9.17 goal 0.95 | ent 0.48 v_loss 0.066   580,836 sps
+upd  605/762  steps  79,298,560  SPAWN eps  2591 return 10.32 coins  5.7 goal 0.94 max_x  59.1 len   317 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.057   581,795 sps
+upd  606/762  steps  79,429,632  SPAWN eps  2602 return 10.32 coins  5.7 goal 0.94 max_x  59.2 len   317 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.070   583,363 sps
+upd  607/762  steps  79,560,704  SPAWN eps  2607 return 10.29 coins  5.6 goal 0.94 max_x  59.0 len   315 | ALL return  9.20 goal 0.95 | ent 0.48 v_loss 0.056   583,415 sps
+upd  608/762  steps  79,691,776  SPAWN eps  2598 return 10.30 coins  5.6 goal 0.94 max_x  59.1 len   316 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.069   583,431 sps
+upd  609/762  steps  79,822,848  SPAWN eps  2606 return 10.33 coins  5.7 goal 0.94 max_x  59.5 len   318 | ALL return  9.22 goal 0.95 | ent 0.47 v_loss 0.065   582,904 sps
+upd  610/762  steps  79,953,920  SPAWN eps  2587 return 10.31 coins  5.7 goal 0.94 max_x  59.3 len   316 | ALL return  9.19 goal 0.95 | ent 0.46 v_loss 0.084   582,851 sps
+upd  611/762  steps  80,084,992  SPAWN eps  2608 return 10.25 coins  5.6 goal 0.94 max_x  59.1 len   315 | ALL return  9.16 goal 0.94 | ent 0.46 v_loss 0.077   582,624 sps
+upd  612/762  steps  80,216,064  SPAWN eps  2610 return 10.32 coins  5.7 goal 0.94 max_x  59.2 len   316 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.056   582,456 sps
+upd  613/762  steps  80,347,136  SPAWN eps  2599 return 10.33 coins  5.7 goal 0.94 max_x  59.2 len   316 | ALL return  9.22 goal 0.95 | ent 0.47 v_loss 0.063   581,270 sps
+upd  614/762  steps  80,478,208  SPAWN eps  2587 return 10.30 coins  5.7 goal 0.94 max_x  59.4 len   317 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.066   582,267 sps
+upd  615/762  steps  80,609,280  SPAWN eps  2601 return 10.30 coins  5.7 goal 0.94 max_x  59.4 len   317 | ALL return  9.15 goal 0.95 | ent 0.47 v_loss 0.071   582,616 sps
+upd  616/762  steps  80,740,352  SPAWN eps  2578 return 10.32 coins  5.7 goal 0.94 max_x  59.5 len   318 | ALL return  9.13 goal 0.95 | ent 0.47 v_loss 0.078   583,562 sps
+upd  617/762  steps  80,871,424  SPAWN eps  2592 return 10.28 coins  5.7 goal 0.94 max_x  59.4 len   317 | ALL return  9.13 goal 0.94 | ent 0.47 v_loss 0.067   583,664 sps
+upd  618/762  steps  81,002,496  SPAWN eps  2605 return 10.30 coins  5.7 goal 0.94 max_x  59.4 len   317 | ALL return  9.14 goal 0.95 | ent 0.45 v_loss 0.060   582,555 sps
+upd  619/762  steps  81,133,568  SPAWN eps  2611 return 10.32 coins  5.7 goal 0.94 max_x  59.2 len   317 | ALL return  9.17 goal 0.95 | ent 0.45 v_loss 0.058   581,883 sps
+upd  620/762  steps  81,264,640  SPAWN eps  2643 return 10.30 coins  5.7 goal 0.94 max_x  59.2 len   317 | ALL return  9.17 goal 0.95 | ent 0.45 v_loss 0.065   582,124 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.51  coins  5.7  goal 0.96  max_x  59.8  len  318
+        tier 1    100 levels   return 10.81  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return 10.41  coins  5.6  goal 0.97  max_x  61.1
+        tier 3    100 levels   return 10.30  coins  5.7  goal 0.94  max_x  70.4
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 42   >=0.9: 258
+        worst: t2_0073.txt 0.50 (x 40),  t3_0131.txt 0.50 (x 45),  t3_0005.txt 0.50 (x 61),  t1_0222.txt 0.75 (x 40),  t1_0270.txt 0.75 (x 41)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.47  coins  5.7  goal 0.96  max_x  59.6  len  321
+        tier 1    100 levels   return 10.66  coins  5.9  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.49  coins  5.6  goal 0.98  max_x  61.6
+        tier 3    100 levels   return 10.25  coins  5.6  goal 0.94  max_x  69.7
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 46   >=0.9: 254
+        worst: t1_0222.txt 0.50 (x 32),  t1_0135.txt 0.50 (x 36),  t3_0068.txt 0.50 (x 47),  t1_0174.txt 0.75 (x 35),  t1_0009.txt 0.75 (x 38)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.94  coins  5.4  goal 0.92  max_x  59.0  len  316
+        tier 1     20 levels   return  9.98  coins  5.4  goal 0.93  max_x  47.0
+        tier 2     20 levels   return 10.54  coins  5.8  goal 0.96  max_x  61.7
+        tier 3     20 levels   return  9.31  coins  5.0  goal 0.88  max_x  68.3
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 28   >=0.9: 32
+        worst: t3_0050.txt 0.67 (x 54),  t3_0017.txt 0.67 (x 57),  t3_0047.txt 0.67 (x 61),  t3_0026.txt 0.67 (x 67),  t1_0024.txt 0.78 (x 44)
+upd  621/762  steps  81,395,712  SPAWN eps  2606 return 10.37 coins  5.7 goal 0.94 max_x  59.4 len   317 | ALL return  9.18 goal 0.95 | ent 0.46 v_loss 0.065   566,166 sps
+upd  622/762  steps  81,526,784  SPAWN eps  2604 return 10.31 coins  5.7 goal 0.94 max_x  59.3 len   317 | ALL return  9.14 goal 0.95 | ent 0.47 v_loss 0.068   581,446 sps
+upd  623/762  steps  81,657,856  SPAWN eps  2589 return 10.32 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.13 goal 0.95 | ent 0.46 v_loss 0.053   582,184 sps
+upd  624/762  steps  81,788,928  SPAWN eps  2603 return 10.32 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.16 goal 0.95 | ent 0.46 v_loss 0.072   582,159 sps
+upd  625/762  steps  81,920,000  SPAWN eps  2582 return 10.33 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.19 goal 0.95 | ent 0.47 v_loss 0.056   582,984 sps
+upd  626/762  steps  82,051,072  SPAWN eps  2584 return 10.31 coins  5.7 goal 0.94 max_x  59.3 len   318 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.063   582,331 sps
+upd  627/762  steps  82,182,144  SPAWN eps  2575 return 10.33 coins  5.7 goal 0.95 max_x  59.5 len   320 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.069   581,935 sps
+upd  628/762  steps  82,313,216  SPAWN eps  2575 return 10.32 coins  5.7 goal 0.94 max_x  59.5 len   320 | ALL return  9.19 goal 0.95 | ent 0.46 v_loss 0.069   581,488 sps
+upd  629/762  steps  82,444,288  SPAWN eps  2558 return 10.28 coins  5.6 goal 0.94 max_x  59.5 len   320 | ALL return  9.17 goal 0.95 | ent 0.46 v_loss 0.059   582,281 sps
+upd  630/762  steps  82,575,360  SPAWN eps  2546 return 10.31 coins  5.6 goal 0.95 max_x  59.6 len   320 | ALL return  9.19 goal 0.95 | ent 0.47 v_loss 0.066   583,481 sps
+upd  631/762  steps  82,706,432  SPAWN eps  2568 return 10.32 coins  5.6 goal 0.95 max_x  59.6 len   321 | ALL return  9.21 goal 0.95 | ent 0.46 v_loss 0.056   583,573 sps
+upd  632/762  steps  82,837,504  SPAWN eps  2540 return 10.32 coins  5.6 goal 0.95 max_x  59.7 len   321 | ALL return  9.21 goal 0.95 | ent 0.46 v_loss 0.057   583,527 sps
+upd  633/762  steps  82,968,576  SPAWN eps  2524 return 10.32 coins  5.6 goal 0.95 max_x  59.7 len   321 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.065   582,898 sps
+upd  634/762  steps  83,099,648  SPAWN eps  2539 return 10.36 coins  5.7 goal 0.95 max_x  59.7 len   321 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.066   582,804 sps
+upd  635/762  steps  83,230,720  SPAWN eps  2571 return 10.34 coins  5.7 goal 0.95 max_x  59.7 len   321 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.071   581,544 sps
+upd  636/762  steps  83,361,792  SPAWN eps  2548 return 10.36 coins  5.7 goal 0.95 max_x  59.6 len   321 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.066   581,981 sps
+upd  637/762  steps  83,492,864  SPAWN eps  2543 return 10.39 coins  5.7 goal 0.94 max_x  59.5 len   319 | ALL return  9.19 goal 0.95 | ent 0.47 v_loss 0.054   580,918 sps
+upd  638/762  steps  83,623,936  SPAWN eps  2562 return 10.38 coins  5.7 goal 0.94 max_x  59.6 len   320 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.062   582,238 sps
+upd  639/762  steps  83,755,008  SPAWN eps  2575 return 10.40 coins  5.7 goal 0.94 max_x  59.6 len   320 | ALL return  9.22 goal 0.96 | ent 0.47 v_loss 0.057   583,641 sps
+upd  640/762  steps  83,886,080  SPAWN eps  2576 return 10.44 coins  5.8 goal 0.95 max_x  59.7 len   321 | ALL return  9.24 goal 0.96 | ent 0.46 v_loss 0.055   583,723 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.37  coins  5.7  goal 0.95  max_x  59.4  len  314
+        tier 1    100 levels   return 10.71  coins  5.8  goal 0.98  max_x  47.6
+        tier 2    100 levels   return 10.28  coins  5.6  goal 0.95  max_x  60.7
+        tier 3    100 levels   return 10.12  coins  5.6  goal 0.92  max_x  69.8
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 55   >=0.9: 245
+        worst: t1_0132.txt 0.50 (x 30),  t2_0073.txt 0.50 (x 41),  t3_0131.txt 0.50 (x 45),  t2_0106.txt 0.50 (x 52),  t3_0257.txt 0.50 (x 57)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.30  coins  5.6  goal 0.94  max_x  59.0  len  316
+        tier 1    100 levels   return 10.60  coins  5.8  goal 0.96  max_x  47.3
+        tier 2    100 levels   return 10.40  coins  5.6  goal 0.96  max_x  61.2
+        tier 3    100 levels   return  9.90  coins  5.5  goal 0.90  max_x  68.5
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 52   >=0.9: 245
+        worst: t3_0068.txt 0.25 (x 25),  t1_0222.txt 0.25 (x 29),  t3_0101.txt 0.25 (x 52),  t1_0288.txt 0.50 (x 30),  t1_0030.txt 0.50 (x 34)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.50  coins  5.2  goal 0.88  max_x  56.9  len  300
+        tier 1     20 levels   return  9.52  coins  5.2  goal 0.89  max_x  45.3
+        tier 2     20 levels   return 10.40  coins  5.8  goal 0.94  max_x  61.1
+        tier 3     20 levels   return  8.58  coins  4.7  goal 0.81  max_x  64.2
+        levels by goal rate:  0: 0   <0.5: 4   0.5-0.9: 27   >=0.9: 29
+        worst: t3_0017.txt 0.33 (x 41),  t1_0024.txt 0.44 (x 29),  t3_0047.txt 0.44 (x 41),  t3_0005.txt 0.44 (x 44),  t1_0030.txt 0.56 (x 37)
+upd  641/762  steps  84,017,152  SPAWN eps  2579 return 10.41 coins  5.7 goal 0.94 max_x  59.6 len   320 | ALL return  9.22 goal 0.96 | ent 0.46 v_loss 0.060   582,822 sps
+upd  642/762  steps  84,148,224  SPAWN eps  2597 return 10.44 coins  5.8 goal 0.95 max_x  59.6 len   319 | ALL return  9.24 goal 0.96 | ent 0.47 v_loss 0.062   582,356 sps
+upd  643/762  steps  84,279,296  SPAWN eps  2619 return 10.46 coins  5.8 goal 0.95 max_x  59.5 len   319 | ALL return  9.28 goal 0.96 | ent 0.47 v_loss 0.056   582,473 sps
+upd  644/762  steps  84,410,368  SPAWN eps  2603 return 10.47 coins  5.8 goal 0.95 max_x  59.5 len   318 | ALL return  9.28 goal 0.96 | ent 0.47 v_loss 0.059   582,848 sps
+upd  645/762  steps  84,541,440  SPAWN eps  2593 return 10.51 coins  5.8 goal 0.95 max_x  59.6 len   319 | ALL return  9.30 goal 0.96 | ent 0.47 v_loss 0.064   581,716 sps
+upd  646/762  steps  84,672,512  SPAWN eps  2618 return 10.47 coins  5.7 goal 0.95 max_x  59.7 len   319 | ALL return  9.28 goal 0.96 | ent 0.47 v_loss 0.062   582,588 sps
+upd  647/762  steps  84,803,584  SPAWN eps  2621 return 10.48 coins  5.7 goal 0.95 max_x  59.8 len   320 | ALL return  9.27 goal 0.96 | ent 0.47 v_loss 0.068   583,506 sps
+upd  648/762  steps  84,934,656  SPAWN eps  2601 return 10.50 coins  5.8 goal 0.96 max_x  59.8 len   320 | ALL return  9.25 goal 0.96 | ent 0.47 v_loss 0.060   583,806 sps
+upd  649/762  steps  85,065,728  SPAWN eps  2580 return 10.48 coins  5.8 goal 0.95 max_x  59.7 len   320 | ALL return  9.23 goal 0.96 | ent 0.47 v_loss 0.066   582,977 sps
+upd  650/762  steps  85,196,800  SPAWN eps  2590 return 10.45 coins  5.7 goal 0.95 max_x  59.5 len   319 | ALL return  9.23 goal 0.96 | ent 0.46 v_loss 0.060   582,680 sps
+upd  651/762  steps  85,327,872  SPAWN eps  2592 return 10.44 coins  5.7 goal 0.95 max_x  59.5 len   318 | ALL return  9.21 goal 0.96 | ent 0.47 v_loss 0.065   582,291 sps
+upd  652/762  steps  85,458,944  SPAWN eps  2591 return 10.44 coins  5.7 goal 0.95 max_x  59.5 len   319 | ALL return  9.19 goal 0.96 | ent 0.47 v_loss 0.060   582,336 sps
+upd  653/762  steps  85,590,016  SPAWN eps  2586 return 10.40 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.17 goal 0.95 | ent 0.46 v_loss 0.067   582,992 sps
+upd  654/762  steps  85,721,088  SPAWN eps  2604 return 10.35 coins  5.7 goal 0.95 max_x  59.3 len   318 | ALL return  9.18 goal 0.95 | ent 0.46 v_loss 0.070   581,520 sps
+upd  655/762  steps  85,852,160  SPAWN eps  2583 return 10.30 coins  5.6 goal 0.94 max_x  59.2 len   317 | ALL return  9.14 goal 0.95 | ent 0.46 v_loss 0.076   581,389 sps
+upd  656/762  steps  85,983,232  SPAWN eps  2581 return 10.33 coins  5.7 goal 0.94 max_x  59.0 len   316 | ALL return  9.17 goal 0.95 | ent 0.46 v_loss 0.062   581,889 sps
+upd  657/762  steps  86,114,304  SPAWN eps  2589 return 10.33 coins  5.7 goal 0.94 max_x  59.1 len   317 | ALL return  9.19 goal 0.95 | ent 0.47 v_loss 0.064   583,803 sps
+upd  658/762  steps  86,245,376  SPAWN eps  2599 return 10.33 coins  5.7 goal 0.94 max_x  58.9 len   316 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.059   583,902 sps
+upd  659/762  steps  86,376,448  SPAWN eps  2615 return 10.38 coins  5.7 goal 0.95 max_x  59.0 len   316 | ALL return  9.25 goal 0.95 | ent 0.47 v_loss 0.052   582,616 sps
+upd  660/762  steps  86,507,520  SPAWN eps  2612 return 10.37 coins  5.7 goal 0.95 max_x  59.2 len   317 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.061   583,243 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.48  coins  5.7  goal 0.96  max_x  59.8  len  317
+        tier 1    100 levels   return 10.69  coins  5.8  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.36  coins  5.6  goal 0.96  max_x  61.0
+        tier 3    100 levels   return 10.40  coins  5.7  goal 0.95  max_x  70.7
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 41   >=0.9: 258
+        worst: t2_0073.txt 0.25 (x 27),  t1_0276.txt 0.50 (x 37),  t3_0131.txt 0.50 (x 45),  t1_0144.txt 0.50 (x 49),  t1_0132.txt 0.75 (x 40)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.47  coins  5.7  goal 0.96  max_x  59.7  len  321
+        tier 1    100 levels   return 10.65  coins  5.8  goal 0.97  max_x  47.5
+        tier 2    100 levels   return 10.48  coins  5.6  goal 0.97  max_x  61.6
+        tier 3    100 levels   return 10.27  coins  5.7  goal 0.94  max_x  70.1
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 43   >=0.9: 256
+        worst: t3_0068.txt 0.25 (x 31),  t1_0135.txt 0.50 (x 37),  t3_0080.txt 0.50 (x 42),  t3_0065.txt 0.50 (x 59),  t3_0101.txt 0.50 (x 59)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.68  coins  5.3  goal 0.90  max_x  57.7  len  307
+        tier 1     20 levels   return  9.88  coins  5.3  goal 0.93  max_x  46.6
+        tier 2     20 levels   return 10.44  coins  5.8  goal 0.94  max_x  61.3
+        tier 3     20 levels   return  8.71  coins  4.8  goal 0.82  max_x  65.2
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 29   >=0.9: 29
+        worst: t3_0017.txt 0.33 (x 41),  t3_0026.txt 0.44 (x 65),  t3_0050.txt 0.56 (x 48),  t1_0024.txt 0.67 (x 39),  t3_0047.txt 0.67 (x 53)
+upd  661/762  steps  86,638,592  SPAWN eps  2595 return 10.37 coins  5.7 goal 0.95 max_x  59.3 len   318 | ALL return  9.24 goal 0.95 | ent 0.48 v_loss 0.066   582,242 sps
+upd  662/762  steps  86,769,664  SPAWN eps  2593 return 10.38 coins  5.7 goal 0.95 max_x  59.3 len   318 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.065   581,825 sps
+upd  663/762  steps  86,900,736  SPAWN eps  2602 return 10.37 coins  5.7 goal 0.95 max_x  59.1 len   317 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.061   582,400 sps
+upd  664/762  steps  87,031,808  SPAWN eps  2591 return 10.40 coins  5.7 goal 0.95 max_x  59.4 len   319 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.069   583,055 sps
+upd  665/762  steps  87,162,880  SPAWN eps  2621 return 10.41 coins  5.7 goal 0.95 max_x  59.4 len   318 | ALL return  9.27 goal 0.95 | ent 0.48 v_loss 0.063   583,214 sps
+upd  666/762  steps  87,293,952  SPAWN eps  2619 return 10.41 coins  5.7 goal 0.95 max_x  59.4 len   318 | ALL return  9.26 goal 0.95 | ent 0.48 v_loss 0.065   583,649 sps
+upd  667/762  steps  87,425,024  SPAWN eps  2611 return 10.40 coins  5.7 goal 0.96 max_x  59.3 len   318 | ALL return  9.28 goal 0.96 | ent 0.48 v_loss 0.050   581,178 sps
+upd  668/762  steps  87,556,096  SPAWN eps  2598 return 10.40 coins  5.7 goal 0.95 max_x  59.4 len   319 | ALL return  9.28 goal 0.96 | ent 0.47 v_loss 0.058   582,635 sps
+upd  669/762  steps  87,687,168  SPAWN eps  2595 return 10.38 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.27 goal 0.96 | ent 0.47 v_loss 0.054   582,346 sps
+upd  670/762  steps  87,818,240  SPAWN eps  2581 return 10.39 coins  5.7 goal 0.95 max_x  59.3 len   318 | ALL return  9.25 goal 0.96 | ent 0.47 v_loss 0.065   582,285 sps
+upd  671/762  steps  87,949,312  SPAWN eps  2612 return 10.38 coins  5.7 goal 0.95 max_x  59.3 len   318 | ALL return  9.26 goal 0.95 | ent 0.47 v_loss 0.071   580,927 sps
+upd  672/762  steps  88,080,384  SPAWN eps  2596 return 10.37 coins  5.7 goal 0.95 max_x  59.1 len   317 | ALL return  9.26 goal 0.96 | ent 0.48 v_loss 0.066   583,397 sps
+upd  673/762  steps  88,211,456  SPAWN eps  2617 return 10.37 coins  5.7 goal 0.95 max_x  59.1 len   317 | ALL return  9.26 goal 0.95 | ent 0.48 v_loss 0.068   582,699 sps
+upd  674/762  steps  88,342,528  SPAWN eps  2625 return 10.35 coins  5.7 goal 0.95 max_x  59.1 len   317 | ALL return  9.26 goal 0.95 | ent 0.47 v_loss 0.067   583,650 sps
+upd  675/762  steps  88,473,600  SPAWN eps  2605 return 10.36 coins  5.7 goal 0.95 max_x  59.2 len   318 | ALL return  9.24 goal 0.95 | ent 0.48 v_loss 0.067   582,954 sps
+upd  676/762  steps  88,604,672  SPAWN eps  2620 return 10.38 coins  5.7 goal 0.95 max_x  59.3 len   319 | ALL return  9.23 goal 0.95 | ent 0.48 v_loss 0.067   583,420 sps
+upd  677/762  steps  88,735,744  SPAWN eps  2614 return 10.36 coins  5.7 goal 0.95 max_x  59.2 len   319 | ALL return  9.19 goal 0.95 | ent 0.48 v_loss 0.070   582,967 sps
+upd  678/762  steps  88,866,816  SPAWN eps  2636 return 10.39 coins  5.7 goal 0.95 max_x  59.3 len   319 | ALL return  9.19 goal 0.95 | ent 0.47 v_loss 0.056   582,259 sps
+upd  679/762  steps  88,997,888  SPAWN eps  2633 return 10.35 coins  5.7 goal 0.95 max_x  59.0 len   317 | ALL return  9.17 goal 0.95 | ent 0.48 v_loss 0.072   582,143 sps
+upd  680/762  steps  89,128,960  SPAWN eps  2635 return 10.38 coins  5.7 goal 0.95 max_x  59.2 len   319 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.064   583,402 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.48  coins  5.7  goal 0.96  max_x  59.8  len  317
+        tier 1    100 levels   return 10.84  coins  5.9  goal 0.99  max_x  48.1
+        tier 2    100 levels   return 10.37  coins  5.6  goal 0.96  max_x  61.0
+        tier 3    100 levels   return 10.24  coins  5.7  goal 0.93  max_x  70.2
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 44   >=0.9: 256
+        worst: t2_0073.txt 0.50 (x 41),  t3_0131.txt 0.50 (x 45),  t3_0053.txt 0.50 (x 53),  t3_0080.txt 0.50 (x 56),  t1_0222.txt 0.75 (x 40)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.44  coins  5.7  goal 0.96  max_x  59.6  len  321
+        tier 1    100 levels   return 10.69  coins  5.8  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.42  coins  5.6  goal 0.96  max_x  61.4
+        tier 3    100 levels   return 10.22  coins  5.6  goal 0.93  max_x  69.9
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 46   >=0.9: 253
+        worst: t3_0023.txt 0.25 (x 39),  t1_0222.txt 0.50 (x 36),  t3_0080.txt 0.50 (x 42),  t3_0005.txt 0.50 (x 60),  t3_0149.txt 0.50 (x 69)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.80  coins  5.4  goal 0.91  max_x  58.2  len  310
+        tier 1     20 levels   return 10.07  coins  5.4  goal 0.94  max_x  47.3
+        tier 2     20 levels   return 10.43  coins  5.8  goal 0.94  max_x  61.2
+        tier 3     20 levels   return  8.90  coins  4.9  goal 0.83  max_x  66.1
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 26   >=0.9: 31
+        worst: t3_0047.txt 0.44 (x 40),  t3_0017.txt 0.44 (x 46),  t3_0026.txt 0.44 (x 65),  t2_0013.txt 0.67 (x 51),  t3_0050.txt 0.67 (x 54)
+upd  681/762  steps  89,260,032  SPAWN eps  2609 return 10.40 coins  5.7 goal 0.95 max_x  59.4 len   319 | ALL return  9.18 goal 0.95 | ent 0.48 v_loss 0.062   582,669 sps
+upd  682/762  steps  89,391,104  SPAWN eps  2647 return 10.40 coins  5.7 goal 0.95 max_x  59.5 len   320 | ALL return  9.19 goal 0.95 | ent 0.48 v_loss 0.069   582,410 sps
+upd  683/762  steps  89,522,176  SPAWN eps  2603 return 10.40 coins  5.7 goal 0.95 max_x  59.6 len   321 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.062   581,493 sps
+upd  684/762  steps  89,653,248  SPAWN eps  2592 return 10.45 coins  5.7 goal 0.95 max_x  59.6 len   321 | ALL return  9.20 goal 0.95 | ent 0.48 v_loss 0.063   580,566 sps
+upd  685/762  steps  89,784,320  SPAWN eps  2604 return 10.48 coins  5.8 goal 0.95 max_x  59.7 len   321 | ALL return  9.22 goal 0.95 | ent 0.47 v_loss 0.060   580,521 sps
+upd  686/762  steps  89,915,392  SPAWN eps  2599 return 10.45 coins  5.7 goal 0.95 max_x  59.6 len   321 | ALL return  9.22 goal 0.95 | ent 0.47 v_loss 0.069   580,708 sps
+upd  687/762  steps  90,046,464  SPAWN eps  2602 return 10.45 coins  5.8 goal 0.95 max_x  59.5 len   320 | ALL return  9.26 goal 0.95 | ent 0.48 v_loss 0.062   581,494 sps
+upd  688/762  steps  90,177,536  SPAWN eps  2610 return 10.42 coins  5.7 goal 0.95 max_x  59.5 len   320 | ALL return  9.25 goal 0.95 | ent 0.48 v_loss 0.068   581,830 sps
+upd  689/762  steps  90,308,608  SPAWN eps  2602 return 10.45 coins  5.8 goal 0.95 max_x  59.7 len   321 | ALL return  9.24 goal 0.95 | ent 0.48 v_loss 0.058   581,033 sps
+upd  690/762  steps  90,439,680  SPAWN eps  2600 return 10.42 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.23 goal 0.95 | ent 0.48 v_loss 0.061   581,483 sps
+upd  691/762  steps  90,570,752  SPAWN eps  2610 return 10.42 coins  5.7 goal 0.95 max_x  59.5 len   319 | ALL return  9.24 goal 0.95 | ent 0.48 v_loss 0.067   581,580 sps
+upd  692/762  steps  90,701,824  SPAWN eps  2623 return 10.43 coins  5.7 goal 0.95 max_x  59.5 len   319 | ALL return  9.24 goal 0.96 | ent 0.47 v_loss 0.054   578,481 sps
+upd  693/762  steps  90,832,896  SPAWN eps  2634 return 10.44 coins  5.7 goal 0.95 max_x  59.6 len   319 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.062   581,272 sps
+upd  694/762  steps  90,963,968  SPAWN eps  2640 return 10.43 coins  5.7 goal 0.95 max_x  59.6 len   319 | ALL return  9.24 goal 0.95 | ent 0.48 v_loss 0.066   582,245 sps
+upd  695/762  steps  91,095,040  SPAWN eps  2621 return 10.42 coins  5.7 goal 0.95 max_x  59.6 len   319 | ALL return  9.26 goal 0.95 | ent 0.48 v_loss 0.059   581,094 sps
+upd  696/762  steps  91,226,112  SPAWN eps  2607 return 10.43 coins  5.7 goal 0.95 max_x  59.7 len   319 | ALL return  9.24 goal 0.96 | ent 0.47 v_loss 0.067   580,969 sps
+upd  697/762  steps  91,357,184  SPAWN eps  2612 return 10.44 coins  5.7 goal 0.95 max_x  59.9 len   321 | ALL return  9.23 goal 0.96 | ent 0.48 v_loss 0.052   581,019 sps
+upd  698/762  steps  91,488,256  SPAWN eps  2588 return 10.42 coins  5.7 goal 0.95 max_x  59.7 len   320 | ALL return  9.23 goal 0.96 | ent 0.48 v_loss 0.067   580,217 sps
+upd  699/762  steps  91,619,328  SPAWN eps  2607 return 10.38 coins  5.7 goal 0.95 max_x  59.5 len   319 | ALL return  9.23 goal 0.95 | ent 0.47 v_loss 0.072   581,462 sps
+upd  700/762  steps  91,750,400  SPAWN eps  2590 return 10.39 coins  5.7 goal 0.95 max_x  59.5 len   320 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.060   581,575 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.50  coins  5.7  goal 0.96  max_x  59.8  len  317
+        tier 1    100 levels   return 10.84  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return 10.31  coins  5.6  goal 0.95  max_x  60.8
+        tier 3    100 levels   return 10.35  coins  5.7  goal 0.94  max_x  70.6
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 43   >=0.9: 257
+        worst: t2_0073.txt 0.50 (x 41),  t3_0131.txt 0.50 (x 45),  t3_0080.txt 0.50 (x 57),  t3_0071.txt 0.50 (x 68),  t1_0222.txt 0.75 (x 40)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.47  coins  5.7  goal 0.96  max_x  59.7  len  319
+        tier 1    100 levels   return 10.83  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return 10.42  coins  5.6  goal 0.97  max_x  61.3
+        tier 3    100 levels   return 10.16  coins  5.6  goal 0.93  max_x  69.7
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 44   >=0.9: 256
+        worst: t3_0080.txt 0.50 (x 42),  t3_0011.txt 0.50 (x 49),  t3_0173.txt 0.50 (x 51),  t3_0065.txt 0.50 (x 56),  t1_0174.txt 0.75 (x 34)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.72  coins  5.3  goal 0.90  max_x  58.0  len  308
+        tier 1     20 levels   return  9.98  coins  5.3  goal 0.94  max_x  46.8
+        tier 2     20 levels   return 10.49  coins  5.8  goal 0.95  max_x  61.6
+        tier 3     20 levels   return  8.68  coins  4.8  goal 0.81  max_x  65.6
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 26   >=0.9: 33
+        worst: t3_0047.txt 0.44 (x 40),  t1_0024.txt 0.56 (x 34),  t3_0017.txt 0.56 (x 52),  t3_0041.txt 0.56 (x 63),  t3_0026.txt 0.56 (x 66)
+upd  701/762  steps  91,881,472  SPAWN eps  2588 return 10.42 coins  5.7 goal 0.95 max_x  59.7 len   321 | ALL return  9.27 goal 0.96 | ent 0.47 v_loss 0.054   581,050 sps
+upd  702/762  steps  92,012,544  SPAWN eps  2536 return 10.41 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.30 goal 0.95 | ent 0.47 v_loss 0.063   579,185 sps
+upd  703/762  steps  92,143,616  SPAWN eps  2557 return 10.40 coins  5.7 goal 0.95 max_x  59.4 len   320 | ALL return  9.31 goal 0.95 | ent 0.47 v_loss 0.068   582,217 sps
+upd  704/762  steps  92,274,688  SPAWN eps  2535 return 10.37 coins  5.7 goal 0.95 max_x  59.3 len   319 | ALL return  9.26 goal 0.95 | ent 0.47 v_loss 0.066   582,372 sps
+upd  705/762  steps  92,405,760  SPAWN eps  2536 return 10.36 coins  5.7 goal 0.95 max_x  59.2 len   318 | ALL return  9.23 goal 0.95 | ent 0.47 v_loss 0.055   581,679 sps
+upd  706/762  steps  92,536,832  SPAWN eps  2581 return 10.37 coins  5.7 goal 0.95 max_x  59.1 len   318 | ALL return  9.26 goal 0.95 | ent 0.47 v_loss 0.065   581,255 sps
+upd  707/762  steps  92,667,904  SPAWN eps  2578 return 10.33 coins  5.7 goal 0.94 max_x  58.8 len   316 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.074   581,441 sps
+upd  708/762  steps  92,798,976  SPAWN eps  2602 return 10.35 coins  5.7 goal 0.94 max_x  58.8 len   316 | ALL return  9.25 goal 0.95 | ent 0.48 v_loss 0.070   579,456 sps
+upd  709/762  steps  92,930,048  SPAWN eps  2582 return 10.37 coins  5.7 goal 0.95 max_x  58.9 len   316 | ALL return  9.26 goal 0.95 | ent 0.48 v_loss 0.060   581,171 sps
+upd  710/762  steps  93,061,120  SPAWN eps  2616 return 10.38 coins  5.7 goal 0.95 max_x  58.9 len   315 | ALL return  9.28 goal 0.95 | ent 0.47 v_loss 0.062   582,037 sps
+upd  711/762  steps  93,192,192  SPAWN eps  2604 return 10.36 coins  5.7 goal 0.95 max_x  58.8 len   315 | ALL return  9.25 goal 0.95 | ent 0.47 v_loss 0.070   581,326 sps
+upd  712/762  steps  93,323,264  SPAWN eps  2627 return 10.34 coins  5.7 goal 0.95 max_x  58.9 len   315 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.068   580,966 sps
+upd  713/762  steps  93,454,336  SPAWN eps  2605 return 10.34 coins  5.7 goal 0.95 max_x  59.0 len   316 | ALL return  9.20 goal 0.95 | ent 0.47 v_loss 0.065   581,417 sps
+upd  714/762  steps  93,585,408  SPAWN eps  2611 return 10.37 coins  5.7 goal 0.95 max_x  58.9 len   316 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.061   581,001 sps
+upd  715/762  steps  93,716,480  SPAWN eps  2618 return 10.37 coins  5.7 goal 0.95 max_x  58.9 len   315 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.058   580,413 sps
+upd  716/762  steps  93,847,552  SPAWN eps  2589 return 10.39 coins  5.7 goal 0.95 max_x  59.0 len   316 | ALL return  9.25 goal 0.95 | ent 0.47 v_loss 0.055   581,816 sps
+upd  717/762  steps  93,978,624  SPAWN eps  2601 return 10.36 coins  5.7 goal 0.95 max_x  59.1 len   316 | ALL return  9.23 goal 0.96 | ent 0.47 v_loss 0.068   581,682 sps
+upd  718/762  steps  94,109,696  SPAWN eps  2578 return 10.36 coins  5.7 goal 0.95 max_x  59.1 len   316 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.069   580,620 sps
+upd  719/762  steps  94,240,768  SPAWN eps  2587 return 10.35 coins  5.7 goal 0.95 max_x  59.1 len   317 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.056   580,298 sps
+upd  720/762  steps  94,371,840  SPAWN eps  2570 return 10.36 coins  5.7 goal 0.95 max_x  59.2 len   318 | ALL return  9.19 goal 0.96 | ent 0.48 v_loss 0.052   581,676 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.46  coins  5.7  goal 0.96  max_x  59.7  len  316
+        tier 1    100 levels   return 10.83  coins  5.9  goal 0.99  max_x  48.1
+        tier 2    100 levels   return 10.42  coins  5.6  goal 0.97  max_x  61.2
+        tier 3    100 levels   return 10.14  coins  5.6  goal 0.92  max_x  69.9
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 42   >=0.9: 257
+        worst: t3_0077.txt 0.25 (x 56),  t2_0073.txt 0.50 (x 41),  t1_0144.txt 0.50 (x 50),  t3_0068.txt 0.50 (x 54),  t3_0101.txt 0.50 (x 58)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.44  coins  5.7  goal 0.96  max_x  59.6  len  318
+        tier 1    100 levels   return 10.82  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return 10.45  coins  5.6  goal 0.97  max_x  61.5
+        tier 3    100 levels   return 10.05  coins  5.6  goal 0.91  max_x  69.4
+        levels by goal rate:  0: 0   <0.5: 1   0.5-0.9: 45   >=0.9: 254
+        worst: t3_0137.txt 0.25 (x 61),  t2_0220.txt 0.50 (x 40),  t3_0080.txt 0.50 (x 42),  t3_0065.txt 0.50 (x 52),  t3_0119.txt 0.50 (x 54)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.83  coins  5.4  goal 0.91  max_x  58.4  len  311
+        tier 1     20 levels   return 10.17  coins  5.4  goal 0.96  max_x  47.5
+        tier 2     20 levels   return 10.48  coins  5.8  goal 0.94  max_x  61.7
+        tier 3     20 levels   return  8.83  coins  4.9  goal 0.82  max_x  66.1
+        levels by goal rate:  0: 0   <0.5: 2   0.5-0.9: 27   >=0.9: 31
+        worst: t3_0047.txt 0.44 (x 44),  t3_0026.txt 0.44 (x 63),  t3_0017.txt 0.56 (x 51),  t3_0050.txt 0.67 (x 54),  t3_0041.txt 0.67 (x 66)
+upd  721/762  steps  94,502,912  SPAWN eps  2614 return 10.36 coins  5.7 goal 0.95 max_x  59.2 len   317 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.074   581,753 sps
+upd  722/762  steps  94,633,984  SPAWN eps  2605 return 10.39 coins  5.7 goal 0.95 max_x  59.1 len   317 | ALL return  9.23 goal 0.96 | ent 0.47 v_loss 0.064   579,826 sps
+upd  723/762  steps  94,765,056  SPAWN eps  2637 return 10.39 coins  5.7 goal 0.95 max_x  59.2 len   317 | ALL return  9.24 goal 0.96 | ent 0.47 v_loss 0.061   580,928 sps
+upd  724/762  steps  94,896,128  SPAWN eps  2646 return 10.35 coins  5.7 goal 0.94 max_x  59.1 len   317 | ALL return  9.20 goal 0.95 | ent 0.48 v_loss 0.068   581,574 sps
+upd  725/762  steps  95,027,200  SPAWN eps  2647 return 10.32 coins  5.7 goal 0.94 max_x  59.1 len   317 | ALL return  9.18 goal 0.95 | ent 0.47 v_loss 0.068   581,003 sps
+upd  726/762  steps  95,158,272  SPAWN eps  2611 return 10.33 coins  5.7 goal 0.94 max_x  59.1 len   316 | ALL return  9.17 goal 0.95 | ent 0.47 v_loss 0.057   579,496 sps
+upd  727/762  steps  95,289,344  SPAWN eps  2615 return 10.41 coins  5.8 goal 0.94 max_x  59.2 len   317 | ALL return  9.22 goal 0.95 | ent 0.48 v_loss 0.071   581,186 sps
+upd  728/762  steps  95,420,416  SPAWN eps  2599 return 10.41 coins  5.7 goal 0.94 max_x  59.2 len   317 | ALL return  9.23 goal 0.95 | ent 0.47 v_loss 0.064   580,515 sps
+upd  729/762  steps  95,551,488  SPAWN eps  2593 return 10.42 coins  5.7 goal 0.95 max_x  59.2 len   317 | ALL return  9.22 goal 0.95 | ent 0.47 v_loss 0.059   582,712 sps
+upd  730/762  steps  95,682,560  SPAWN eps  2613 return 10.41 coins  5.7 goal 0.94 max_x  59.2 len   316 | ALL return  9.23 goal 0.95 | ent 0.47 v_loss 0.063   581,391 sps
+upd  731/762  steps  95,813,632  SPAWN eps  2575 return 10.45 coins  5.8 goal 0.95 max_x  59.4 len   318 | ALL return  9.25 goal 0.96 | ent 0.47 v_loss 0.056   581,017 sps
+upd  732/762  steps  95,944,704  SPAWN eps  2607 return 10.46 coins  5.8 goal 0.95 max_x  59.4 len   318 | ALL return  9.26 goal 0.96 | ent 0.47 v_loss 0.056   580,831 sps
+upd  733/762  steps  96,075,776  SPAWN eps  2572 return 10.47 coins  5.8 goal 0.95 max_x  59.5 len   318 | ALL return  9.25 goal 0.96 | ent 0.46 v_loss 0.056   581,087 sps
+upd  734/762  steps  96,206,848  SPAWN eps  2554 return 10.49 coins  5.8 goal 0.95 max_x  59.5 len   318 | ALL return  9.28 goal 0.96 | ent 0.47 v_loss 0.061   579,287 sps
+upd  735/762  steps  96,337,920  SPAWN eps  2582 return 10.53 coins  5.8 goal 0.95 max_x  59.6 len   318 | ALL return  9.30 goal 0.96 | ent 0.47 v_loss 0.067   582,592 sps
+upd  736/762  steps  96,468,992  SPAWN eps  2600 return 10.50 coins  5.8 goal 0.95 max_x  59.7 len   319 | ALL return  9.30 goal 0.96 | ent 0.47 v_loss 0.057   581,212 sps
+upd  737/762  steps  96,600,064  SPAWN eps  2609 return 10.46 coins  5.7 goal 0.95 max_x  59.4 len   317 | ALL return  9.30 goal 0.96 | ent 0.47 v_loss 0.069   580,423 sps
+upd  738/762  steps  96,731,136  SPAWN eps  2603 return 10.45 coins  5.7 goal 0.95 max_x  59.5 len   318 | ALL return  9.29 goal 0.96 | ent 0.47 v_loss 0.057   580,828 sps
+upd  739/762  steps  96,862,208  SPAWN eps  2625 return 10.46 coins  5.7 goal 0.95 max_x  59.6 len   319 | ALL return  9.31 goal 0.96 | ent 0.47 v_loss 0.057   581,662 sps
+upd  740/762  steps  96,993,280  SPAWN eps  2615 return 10.47 coins  5.7 goal 0.95 max_x  59.7 len   319 | ALL return  9.31 goal 0.96 | ent 0.47 v_loss 0.067   580,584 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.49  coins  5.7  goal 0.96  max_x  59.8  len  317
+        tier 1    100 levels   return 10.85  coins  5.9  goal 0.99  max_x  48.1
+        tier 2    100 levels   return 10.32  coins  5.6  goal 0.96  max_x  60.8
+        tier 3    100 levels   return 10.29  coins  5.7  goal 0.93  max_x  70.5
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 47   >=0.9: 253
+        worst: t2_0088.txt 0.50 (x 38),  t2_0073.txt 0.50 (x 41),  t3_0020.txt 0.50 (x 42),  t1_0144.txt 0.50 (x 50),  t1_0222.txt 0.75 (x 40)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.45  coins  5.7  goal 0.96  max_x  59.6  len  320
+        tier 1    100 levels   return 10.69  coins  5.9  goal 0.97  max_x  47.6
+        tier 2    100 levels   return 10.46  coins  5.6  goal 0.97  max_x  61.4
+        tier 3    100 levels   return 10.21  coins  5.6  goal 0.93  max_x  69.9
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 47   >=0.9: 253
+        worst: t2_0220.txt 0.50 (x 39),  t3_0080.txt 0.50 (x 42),  t3_0068.txt 0.50 (x 44),  t3_0257.txt 0.50 (x 56),  t1_0174.txt 0.75 (x 35)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.78  coins  5.4  goal 0.90  max_x  58.3  len  310
+        tier 1     20 levels   return  9.99  coins  5.4  goal 0.94  max_x  47.1
+        tier 2     20 levels   return 10.64  coins  5.9  goal 0.96  max_x  62.2
+        tier 3     20 levels   return  8.71  coins  4.8  goal 0.81  max_x  65.6
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 23   >=0.9: 34
+        worst: t3_0017.txt 0.33 (x 43),  t3_0047.txt 0.44 (x 40),  t3_0026.txt 0.44 (x 63),  t1_0030.txt 0.67 (x 41),  t3_0050.txt 0.67 (x 54)
+upd  741/762  steps  97,124,352  SPAWN eps  2626 return 10.41 coins  5.7 goal 0.95 max_x  59.4 len   318 | ALL return  9.27 goal 0.96 | ent 0.47 v_loss 0.067   580,855 sps
+upd  742/762  steps  97,255,424  SPAWN eps  2611 return 10.42 coins  5.7 goal 0.95 max_x  59.4 len   318 | ALL return  9.27 goal 0.95 | ent 0.46 v_loss 0.068   581,487 sps
+upd  743/762  steps  97,386,496  SPAWN eps  2617 return 10.44 coins  5.7 goal 0.95 max_x  59.2 len   317 | ALL return  9.27 goal 0.95 | ent 0.47 v_loss 0.064   579,923 sps
+upd  744/762  steps  97,517,568  SPAWN eps  2640 return 10.44 coins  5.7 goal 0.95 max_x  59.3 len   317 | ALL return  9.27 goal 0.95 | ent 0.47 v_loss 0.060   581,186 sps
+upd  745/762  steps  97,648,640  SPAWN eps  2602 return 10.44 coins  5.7 goal 0.95 max_x  59.3 len   317 | ALL return  9.28 goal 0.96 | ent 0.47 v_loss 0.054   582,655 sps
+upd  746/762  steps  97,779,712  SPAWN eps  2644 return 10.44 coins  5.7 goal 0.96 max_x  59.2 len   317 | ALL return  9.28 goal 0.96 | ent 0.47 v_loss 0.061   581,437 sps
+upd  747/762  steps  97,910,784  SPAWN eps  2608 return 10.43 coins  5.7 goal 0.96 max_x  59.3 len   318 | ALL return  9.25 goal 0.96 | ent 0.47 v_loss 0.066   580,264 sps
+upd  748/762  steps  98,041,856  SPAWN eps  2656 return 10.45 coins  5.7 goal 0.95 max_x  59.4 len   318 | ALL return  9.27 goal 0.96 | ent 0.47 v_loss 0.056   579,975 sps
+upd  749/762  steps  98,172,928  SPAWN eps  2640 return 10.45 coins  5.7 goal 0.95 max_x  59.4 len   318 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.068   579,489 sps
+upd  750/762  steps  98,304,000  SPAWN eps  2639 return 10.47 coins  5.7 goal 0.95 max_x  59.3 len   317 | ALL return  9.25 goal 0.95 | ent 0.47 v_loss 0.064   582,262 sps
+upd  751/762  steps  98,435,072  SPAWN eps  2600 return 10.48 coins  5.8 goal 0.95 max_x  59.5 len   318 | ALL return  9.27 goal 0.96 | ent 0.47 v_loss 0.055   579,583 sps
+upd  752/762  steps  98,566,144  SPAWN eps  2567 return 10.46 coins  5.7 goal 0.95 max_x  59.5 len   318 | ALL return  9.27 goal 0.96 | ent 0.46 v_loss 0.061   580,073 sps
+upd  753/762  steps  98,697,216  SPAWN eps  2580 return 10.43 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.26 goal 0.96 | ent 0.47 v_loss 0.061   582,559 sps
+upd  754/762  steps  98,828,288  SPAWN eps  2573 return 10.39 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.24 goal 0.96 | ent 0.47 v_loss 0.067   582,105 sps
+upd  755/762  steps  98,959,360  SPAWN eps  2599 return 10.38 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.061   581,640 sps
+upd  756/762  steps  99,090,432  SPAWN eps  2576 return 10.38 coins  5.7 goal 0.95 max_x  59.7 len   321 | ALL return  9.21 goal 0.95 | ent 0.47 v_loss 0.074   581,375 sps
+upd  757/762  steps  99,221,504  SPAWN eps  2570 return 10.41 coins  5.7 goal 0.95 max_x  59.8 len   321 | ALL return  9.25 goal 0.96 | ent 0.47 v_loss 0.050   580,972 sps
+upd  758/762  steps  99,352,576  SPAWN eps  2566 return 10.40 coins  5.7 goal 0.95 max_x  59.9 len   321 | ALL return  9.24 goal 0.95 | ent 0.48 v_loss 0.068   581,140 sps
+upd  759/762  steps  99,483,648  SPAWN eps  2549 return 10.39 coins  5.7 goal 0.95 max_x  59.7 len   321 | ALL return  9.23 goal 0.95 | ent 0.47 v_loss 0.071   580,605 sps
+upd  760/762  steps  99,614,720  SPAWN eps  2541 return 10.36 coins  5.7 goal 0.95 max_x  59.7 len   321 | ALL return  9.23 goal 0.96 | ent 0.47 v_loss 0.065   581,764 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.48  coins  5.7  goal 0.96  max_x  59.7  len  316
+        tier 1    100 levels   return 10.78  coins  5.9  goal 0.98  max_x  47.9
+        tier 2    100 levels   return 10.32  coins  5.6  goal 0.96  max_x  60.8
+        tier 3    100 levels   return 10.33  coins  5.7  goal 0.94  max_x  70.4
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 45   >=0.9: 255
+        worst: t2_0088.txt 0.50 (x 38),  t2_0073.txt 0.50 (x 41),  t1_0144.txt 0.50 (x 50),  t3_0224.txt 0.50 (x 58),  t1_0222.txt 0.75 (x 40)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.45  coins  5.7  goal 0.96  max_x  59.7  len  319
+        tier 1    100 levels   return 10.74  coins  5.9  goal 0.98  max_x  47.8
+        tier 2    100 levels   return 10.40  coins  5.6  goal 0.96  max_x  61.4
+        tier 3    100 levels   return 10.19  coins  5.6  goal 0.93  max_x  69.8
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 48   >=0.9: 252
+        worst: t1_0135.txt 0.50 (x 37),  t2_0220.txt 0.50 (x 39),  t3_0068.txt 0.50 (x 43),  t3_0185.txt 0.50 (x 44),  t3_0119.txt 0.50 (x 54)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.79  coins  5.4  goal 0.91  max_x  58.3  len  310
+        tier 1     20 levels   return 10.11  coins  5.4  goal 0.95  max_x  47.4
+        tier 2     20 levels   return 10.55  coins  5.8  goal 0.96  max_x  61.8
+        tier 3     20 levels   return  8.71  coins  4.8  goal 0.81  max_x  65.7
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 24   >=0.9: 33
+        worst: t3_0047.txt 0.33 (x 37),  t3_0017.txt 0.33 (x 43),  t3_0026.txt 0.44 (x 63),  t3_0050.txt 0.67 (x 54),  t3_0041.txt 0.67 (x 69)
+upd  761/762  steps  99,745,792  SPAWN eps  2601 return 10.36 coins  5.7 goal 0.95 max_x  59.6 len   320 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.067   580,389 sps
+upd  762/762  steps  99,876,864  SPAWN eps  2618 return 10.39 coins  5.7 goal 0.95 max_x  59.7 len   320 | ALL return  9.24 goal 0.95 | ent 0.47 v_loss 0.061   581,437 sps
+    EVAL greedy   1200 fresh episodes, random phases:  return 10.49  coins  5.7  goal 0.96  max_x  59.8  len  317
+        tier 1    100 levels   return 10.81  coins  5.9  goal 0.99  max_x  48.0
+        tier 2    100 levels   return 10.32  coins  5.6  goal 0.96  max_x  60.8
+        tier 3    100 levels   return 10.35  coins  5.7  goal 0.94  max_x  70.6
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 44   >=0.9: 256
+        worst: t2_0088.txt 0.50 (x 38),  t2_0073.txt 0.50 (x 41),  t1_0144.txt 0.50 (x 50),  t3_0224.txt 0.50 (x 58),  t1_0222.txt 0.75 (x 40)
+    EVAL sampled  1200 fresh episodes, random phases:  return 10.47  coins  5.7  goal 0.96  max_x  59.7  len  320
+        tier 1    100 levels   return 10.76  coins  5.9  goal 0.98  max_x  47.8
+        tier 2    100 levels   return 10.42  coins  5.6  goal 0.96  max_x  61.4
+        tier 3    100 levels   return 10.23  coins  5.7  goal 0.93  max_x  70.0
+        levels by goal rate:  0: 0   <0.5: 0   0.5-0.9: 46   >=0.9: 254
+        worst: t1_0135.txt 0.50 (x 37),  t2_0220.txt 0.50 (x 39),  t3_0185.txt 0.50 (x 44),  t3_0119.txt 0.50 (x 54),  t3_0257.txt 0.50 (x 56)
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  9.79  coins  5.4  goal 0.91  max_x  58.3  len  310
+        tier 1     20 levels   return 10.11  coins  5.4  goal 0.95  max_x  47.4
+        tier 2     20 levels   return 10.55  coins  5.8  goal 0.96  max_x  61.8
+        tier 3     20 levels   return  8.71  coins  4.8  goal 0.81  max_x  65.7
+        levels by goal rate:  0: 0   <0.5: 3   0.5-0.9: 24   >=0.9: 33
+        worst: t3_0047.txt 0.33 (x 37),  t3_0017.txt 0.33 (x 43),  t3_0026.txt 0.44 (x 63),  t3_0050.txt 0.67 (x 54),  t3_0041.txt 0.67 (x 69)
+done in 204s, saved runs/2026-10-15_113450_generated/params.msgpack

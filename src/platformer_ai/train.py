@@ -16,19 +16,19 @@ import dataclasses
 import datetime
 import os
 import shutil
+import sys
 import time
 from collections import deque
 from dataclasses import replace
 from pathlib import Path
 
-import sys
-
 import jax
+import numpy as np
 from flax import serialization
 
 from platformer_ai import env as E
 from platformer_ai import level as L
-from platformer_ai import runs
+from platformer_ai import levelgen, runs
 from platformer_ai.evaluate import greedy, make_eval, sampled
 from platformer_ai.levelcheck import LevelError
 from platformer_ai.ppo import Config, make_train
@@ -43,16 +43,54 @@ def load_levels(paths, what: str):
     return [a.name for a in arrays], E.make_levels(arrays)
 
 
+PER_LEVEL_LINES = 12      # up to this many levels the evaluation prints one line per level, above it a summary
+WORST = 5                 # ... with the worst levels named
+
+
 def eval_lines(name: str, e: dict, names: list[str], n_envs: int) -> list[str]:
-    """The evaluation printout: one line over all levels, plus one per level when there are several."""
+    """The evaluation printout: one line over all levels, plus one per level when there are a few, or a summary (per
+    tier for generated levels, the spread of the per-level goal rates and the worst levels) when there are many."""
     out = [f"    EVAL {name}  {n_envs} fresh episodes, random phases:  return {e['ret']:5.2f}  "
            f"coins {e['coins']:4.1f}  goal {e['goal']:4.2f}  max_x {e['max_x']:5.1f}  len {e['length']:4.0f}"]
-    if len(names) > 1:
-        p = e["per_level"]
+    if len(names) <= 1:
+        return out
+    p = {k: np.asarray(v) for k, v in e["per_level"].items()}
+    if len(names) <= PER_LEVEL_LINES:
         for i, n in enumerate(names):
             out.append(f"        {Path(n).name[-28:]:<28} return {p['ret'][i]:5.2f}  coins {p['coins'][i]:4.1f}  "
                        f"goal {p['goal'][i]:4.2f}  max_x {p['max_x'][i]:5.1f}")
+        return out
+    tiers = np.array([levelgen.tier_of(n) or 0 for n in names])
+    for t in sorted(set(tiers.tolist())):
+        sel = tiers == t
+        label = f"tier {t}" if t else "other"
+        out.append(f"        {label:<8} {int(sel.sum()):4d} levels   return {p['ret'][sel].mean():5.2f}  "
+                   f"coins {p['coins'][sel].mean():4.1f}  goal {p['goal'][sel].mean():4.2f}  "
+                   f"max_x {p['max_x'][sel].mean():5.1f}")
+    g = p["goal"]
+    out.append(f"        levels by goal rate:  0: {int((g == 0).sum())}   <0.5: {int(((g > 0) & (g < 0.5)).sum())}   "
+               f"0.5-0.9: {int(((g >= 0.5) & (g < 0.9)).sum())}   >=0.9: {int((g >= 0.9).sum())}")
+    worst = np.lexsort((p["max_x"], g))[:WORST]
+    out.append("        worst: " + ",  ".join(f"{Path(names[i]).name} {g[i]:.2f} (x {p['max_x'][i]:.0f})" for i in worst))
     return out
+
+
+def level_summary(names: list[str], args) -> str:
+    """'3 levels: a.txt, b.txt, c.txt', or for many: '300 levels from gen/train/ (tier 1: 100, tier 2: 100, ...)'."""
+    n = len(names)
+    if n <= PER_LEVEL_LINES:
+        return f"{n} level{'s' if n > 1 else ''}: {', '.join(names)}"
+    tiers = [levelgen.tier_of(x) for x in names]
+    counts = ", ".join(f"tier {t}: {tiers.count(t)}" for t in sorted({t for t in tiers if t}))
+    other = tiers.count(None)
+    detail = counts + (f", other: {other}" if other and counts else "")
+    return f"{n} levels from {' '.join(args or [])}" + (f" ({detail})" if detail else "")
+
+
+def eval_envs(n_levels: int, per_level: int) -> int:
+    """Episodes per evaluation: at least 512, at least per_level for every level, a multiple of the level count."""
+    n = max(512, per_level * n_levels)
+    return -(-n // n_levels) * n_levels
 
 
 def main() -> None:
@@ -74,6 +112,8 @@ def main() -> None:
                     help="with random starts: share of episodes that start at the spawn")
     ap.add_argument("--eval-every", type=int, default=20,
                     help="run the fixed evaluation every N updates (0 = never)")
+    ap.add_argument("--eval-per-level", type=int, default=4,
+                    help="evaluation episodes per level (at least 512 in total; default 4)")
     ap.add_argument("--levels", nargs="+", metavar="PATH",
                     help="level files or folders (all *.txt inside) to train on together "
                          "(default: the level of level.py / PLATFORMER_LEVEL)")
@@ -133,8 +173,8 @@ def main() -> None:
     runs.write_info(out, info)
     print(f"run folder: {out}" + (f"   (resuming after update {resumed['update']})" if resumed else ""))
     print(f"devices: {jax.devices()}")
-    print(f"training on {len(names)} level{'s' if len(names) > 1 else ''}: {', '.join(names)}"
-          + (f";  testing on {len(tests[0])} unseen: {', '.join(tests[0])}" if tests else ""))
+    print(f"training on {level_summary(names, level_args)}"
+          + (f";  testing on {level_summary(tests[0], test_args)} unseen" if tests else ""))
     print(f"{cfg.n_updates} updates x {cfg.batch_size} steps = {cfg.n_updates * cfg.batch_size:,} steps")
 
     init, update, network = make_train(cfg, levels)
@@ -163,11 +203,12 @@ def main() -> None:
         # they stopped; the environments simply start fresh episodes
         runner = (saved["train_state"], runner[1], runner[2], saved["rng"])
         first = resumed["update"] + 1
-    n_eval = 512
-    evals = [("greedy ", names, make_eval(greedy(network), n_eval, levels)),
-             ("sampled", names, make_eval(sampled(network), n_eval, levels))]
+    n_eval = eval_envs(len(names), args.eval_per_level)
+    evals = [("greedy ", names, n_eval, make_eval(greedy(network), n_eval, levels)),
+             ("sampled", names, n_eval, make_eval(sampled(network), n_eval, levels))]
     if tests:
-        evals.append(("UNSEEN greedy", tests[0], make_eval(greedy(network), n_eval, tests[1])))
+        n_test = eval_envs(len(tests[0]), args.eval_per_level)
+        evals.append(("UNSEEN greedy", tests[0], n_test, make_eval(greedy(network), n_test, tests[1])))
     eval_key = jax.random.PRNGKey(12345)       # same start conditions at every evaluation
 
     def save(i: int, finished: bool = False):
@@ -202,9 +243,8 @@ def main() -> None:
                   f"ALL return {a['all_return'] / n_all:5.2f} goal {a['all_goal'] / n_all:4.2f} | "
                   f"ent {m['entropy']:.2f} v_loss {m['v_loss']:.3f} {cfg.batch_size / dt:>9,.0f} sps{tag}")
             if args.eval_every and (i % args.eval_every == 0 or i == cfg.n_updates):
-                for name, lv_names, fn in evals:
+                for name, lv_names, n_envs, fn in evals:
                     e = jax.device_get(fn(runner[0].params, eval_key))
-                    n_envs = -(-n_eval // len(lv_names)) * len(lv_names)
                     print("\n".join(eval_lines(name, e, lv_names, n_envs)))
                     info["last_eval"][name.strip()] = {k: round(float(e[k]), 4)
                                                        for k in ("ret", "coins", "goal", "max_x", "length")}

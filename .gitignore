@@ -9,3 +9,6 @@ runs/*
 !runs/pretrained/
 runs/pretrained/*
 !runs/pretrained/params.msgpack
+
+# generated levels (python -m platformer_ai.levelgen)
+gen/

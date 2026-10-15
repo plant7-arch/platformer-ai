@@ -44,6 +44,8 @@ much lower power state on battery and training can be several times slower.
 src/platformer_ai/
   level.py      the level as ASCII (edit it! also holds the S start points)
   levelcheck.py checks the level when it loads: errors with row/col, warnings in the log
+  levelgen.py   random levels in 3 difficulty tiers (valid and beatable), writes gen/train/ and gen/test/
+  levelplan.py  beam search over the real env: can a level be finished? (used by levelgen)
   env.py        reset / step / observe: pure functions on a small pytree; vmap for many envs; the level is an input
   cli.py        the --level FILE option of viewer / play
   runs.py       run folders, finding the latest run, `python -m platformer_ai.runs` lists them
@@ -365,6 +367,53 @@ Leaving `levels` out means the level of `level.py`, so a single-level run behave
 The one visible difference inside a padded set: when the player falls out of a level that is shorter than the
 tallest one, the observation window keeps showing the empty rows below it instead of stopping at the map's edge.
 
+## Generated levels: many levels it has never seen
+
+`levelgen` writes random levels: spawn on the left, flag on the right, 40 to 80 tiles wide, 10 to 12 rows, built from
+segments (flat ground, steps, gaps, ledges, ferries over pits, patrolling enemies, stepping stones, upper platforms with
+coins, riders on platforms and ledges), with a start point `S` in front of every hard part.
+
+```bash
+uv run python -m platformer_ai.levelgen                    # gen/train/ (300 levels) and gen/test/ (60), seed 0, ~4 min on CPU
+uv run python -m platformer_ai.levelgen --show 2 --tier 3  # just print a few, write nothing
+uv run python -m platformer_ai.train --levels gen/train/ --test-levels gen/test/ --name generated
+uv run python -m platformer_ai.viewer --level gen/test/t3_0002.txt
+```
+
+* **Valid**: every level passes `levelcheck` with no errors *and no warnings* (the generator retries until it does).
+* **Beatable**: every segment stays inside what the physics allow (the feet rise at most about 2.2 tiles and a jump
+  covers about 4 tiles, so: steps up of at most 2, gaps of at most 3, ledges 2 above the ground), and `levelplan`
+  then plays every level with a beam search over the real `env.step`: from the spawn with fixed phases and twice with
+  random phases. A level it cannot finish within the 900 steps is thrown away and replaced. The hand-made levels
+  and the built-in level all pass the search; a 5-tile gap or a 3-tile wall does not.
+  `uv run python -m platformer_ai.levelplan FILES_OR_FOLDERS` checks any level files the same way.
+* **Tiers** (in the file name, `t2_0013.txt`, and in a comment line of the file), in equal shares:
+
+  | tier | width | what is in it |
+  | --- | --- | --- |
+  | 1 | 40-55 | gaps of 1-2, steps of 1, ledges, at most one enemy and one ferry |
+  | 2 | 50-70 | gaps up to 3, steps of 2, more enemies and ferries, stepping stones, upper platforms with coins |
+  | 3 | 60-80 | gaps of 2-3, two enemies on one stretch, enemies on ledges, riders on ferries and upper platforms |
+
+  The tiers are only labels for now (training picks levels uniformly); a curriculum can weight the level choice in
+  `reset` by them later. `levelgen.tier_of(name)` reads the tier of a file.
+* `--seed` gives another set; the test set uses its own seed (`seed + 1000003`), so it never shares a level with the
+  training set. The same seed gives the same levels. `gen/` is not in git: regenerate it with the command above.
+
+**Evaluation with many levels.** Up to 12 levels the `EVAL` lines name every level, as before. With more, they print
+one line per tier, how many levels are at goal rate 0 / below 0.5 / 0.5-0.9 / 0.9 and up, and the 5 worst levels:
+
+```
+    EVAL UNSEEN greedy  540 fresh episodes, random phases:  return  4.10  coins  2.9  goal 0.71  max_x  52.3  len  301
+        tier 1     20 levels   return  6.40  coins  3.4  goal 0.95  max_x  47.1
+        ...
+        levels by goal rate:  0: 3   <0.5: 6   0.5-0.9: 14   >=0.9: 37
+        worst: t3_0017.txt 0.00 (x 21),  ...
+```
+
+Every evaluation runs at least 4 episodes per level (`--eval-per-level`, at least 512 in total), so 300 levels take
+1200 episodes.
+
 ## Where to add features later
 
 * **More level / different layout**: edit `LEVEL` in `level.py` (see "Editing the level"; all sizes are derived from
@@ -372,9 +421,9 @@ tallest one, the observation window keeps showing the empty rows below it instea
 * **Different enemy kinds** (flying, jumping) or **platform paths**: `enemy_x` / `plat_x` are already arrays with
   one entry per enemy / platform; give them more fields or another update rule inside `step`. Paths come from `level.py`
   (`PLAT_START_X` / `PLAT_STOP_X`, `ENEMY_MIN` / `ENEMY_MAX`).
-* **Random / generated levels**: the env already takes levels as data (`make_levels`); a generator only has to
-  write level text (and pass `levelcheck`), then train with `--levels`. A curriculum would weight the random level
-  choice in `reset` instead of picking uniformly.
+* **A curriculum**: generated levels carry their tier (`levelgen.tier_of`); weight the random level choice in
+  `reset` by it instead of picking uniformly. **More segment kinds**: a new `seg_*` method in `levelgen.Builder` and an
+  entry in `WEIGHTS`; `levelplan` checks the result.
 
 ## Credits and license
 
