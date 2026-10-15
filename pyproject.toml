@@ -6,7 +6,7 @@ readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 authors = [
-    { name = "plant7-arch" }
+    { name = "plant7-arch" , email = "230461642+plant7-arch@users.noreply.github.com" }
 ]
 requires-python = ">=3.12"
 dependencies = [
