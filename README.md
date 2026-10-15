@@ -8,8 +8,9 @@ the trained agent, or take over and play the same level yourself.
 ![The viewer](docs/preview.png)
 
 On an RTX 3050 laptop GPU (plugged in), 25M environment steps take about a minute (~600k steps/s). The
-included policy reaches the flag in 99% of fixed evaluation episodes with random platform/enemy phases
-(return 13.9 of a possible 14).
+included policy (`runs/pretrained/`) plays levels it has never seen: it reaches the flag in 97% of episodes on 120
+freshly generated levels (95% on the hardest tier), and in 99% on the built-in level, with random platform / enemy
+phases (see "The included policy" below).
 
 ## Quick start
 
@@ -337,10 +338,10 @@ A level that is not valid stops the program with a short message (which file, ev
 and the command to check it) instead of a traceback; warnings are logged with the file name too.
 
 The check cannot tell whether a level is *beatable*: it finds things that are walled in completely, but not ones that
-are just too high or too far for the jump (about 2.7 tiles). Train an agent on it to find out, and retrain after any
-change. The included policy (`runs/pretrained/`) was trained on the three small levels in `docs/levels/` only; it
-loads for any level (the observation size is fixed) but has never seen the others, the built-in level included. To
-get a policy that plays many levels, train on many levels (next section).
+are just too high or too far for the jump (the feet rise about 2.2 tiles). Train an agent on it to find out (or run
+`python -m platformer_ai.levelplan` on it, see "Generated levels"), and retrain after any change. The included policy
+(`runs/pretrained/`) loads for any level (the observation size is fixed) and plays most new levels; see "The included
+policy" for what it was trained on.
 
 ## Several levels: the level is an input
 
@@ -518,6 +519,39 @@ episodes run at once (lower it if the GPU runs out of memory), `--csv` writes ev
 The same starts can come out differently on the GPU and the CPU: when two actions score almost the same, the tiny
 rounding differences between them can tip the choice. Over many episodes this evens out; for one level over a few
 episodes it does not, which is one more reason to use many episodes per level.
+
+## The included policy
+
+`runs/pretrained/params.msgpack` is what `viewer` and `play` use when you have no runs of your own. Scores with
+`python -m platformer_ai.evaluate` (greedy, random phases):
+
+| levels | goal |
+| --- | --- |
+| the built-in level (`docs/builtin.txt`, the same map as `level.py`) | 0.99 (296/300) |
+| `docs/levels/` and `docs/example_many.txt` | 0.92 - 1.00 per level |
+| the 60 held-out levels of `gen_t3/test/` (= `gen/test/`), 50 episodes each | 0.97 (tier 3: 0.95) |
+| 120 levels it has never seen (`levelgen --seed 777 --train 0 --test 120 --test-seed 4242`), 30 each | 0.97 (tier 3: 0.95) |
+
+How it was trained (three runs, each starting from the previous one's weights; about 4 minutes in all on the GPU):
+
+```bash
+uv run python -m platformer_ai.levelgen                                        # gen/: 300 + 60 levels
+uv run python -m platformer_ai.train --levels gen/train/ --test-levels gen/test/ --total-steps 100000000 --name generated
+uv run python -m platformer_ai.levelgen --config docs/levelgen/tier3_drill.toml # gen_t3/: 600 + 60, mostly tier 3
+uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3/test/ --init-from <generated run> \
+    --total-steps 100000000 --name t3_drill
+# then 25M steps on gen_t3/train/ plus 40 copies of each hand-made level (docs/levels/*, docs/example_many.txt,
+# docs/builtin.txt), so those are about a quarter of the practice; with only one copy each (0.6% of the levels) they
+# did not improve
+uv run python -m platformer_ai.train --levels gen_t3/train/ hand_x40/ --test-levels gen_t3/test/ --init-from <t3_drill run> \
+    --total-steps 25000000 --name pretrained
+```
+
+(`hand_x40/` is a folder with the copies: `for f in docs/levels/*.txt docs/example_many.txt docs/builtin.txt; do for i in
+$(seq -w 1 40); do cp $f hand_x40/$(basename $f .txt)_$i.txt; done; done`.)
+
+To ship a better one: train, check it with `evaluate` on levels it has not seen, then copy the run's `params.msgpack`
+into `runs/pretrained/` and commit it (it is the one run file that is not git-ignored).
 
 ## Where to add features later
 
