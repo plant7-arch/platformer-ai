@@ -127,7 +127,10 @@ def main() -> None:
     ap.add_argument("--eval-every", type=int, default=20,
                     help="run the fixed evaluation every N updates (0 = never)")
     ap.add_argument("--eval-per-level", type=int, default=4,
-                    help="evaluation episodes per level (at least 512 in total; default 4)")
+                    help="evaluation episodes per training level (at least 512 in total; default 4)")
+    ap.add_argument("--test-eval-per-level", type=int, metavar="N",
+                    help="evaluation episodes per --test-levels level (default: as --eval-per-level). The held-out "
+                         "set is usually small, so e.g. 50 gives firm per-level numbers at little cost")
     ap.add_argument("-v", "--verbosity", type=int, default=1, choices=range(4), metavar="0-3",
                     help="how much to print: 0 = only the final evaluation; 1 = a progress line every ~1/40 of the run "
                          "and one line per evaluation (default); 2 = every update and every evaluation in full; "
@@ -227,7 +230,7 @@ def main() -> None:
     evals = [("greedy ", names, n_eval, make_eval(greedy(network), n_eval, levels)),
              ("sampled", names, n_eval, make_eval(sampled(network), n_eval, levels))]
     if tests:
-        n_test = eval_envs(len(tests[0]), args.eval_per_level)
+        n_test = eval_envs(len(tests[0]), args.test_eval_per_level or args.eval_per_level)
         evals.append(("UNSEEN greedy", tests[0], n_test, make_eval(greedy(network), n_test, tests[1])))
     eval_key = jax.random.PRNGKey(12345)       # same start conditions at every evaluation
 

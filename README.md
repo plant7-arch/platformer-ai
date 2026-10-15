@@ -51,7 +51,7 @@ src/platformer_ai/
   cli.py        the --level FILE option of viewer / play
   runs.py       run folders, finding the latest run, `python -m platformer_ai.runs` lists them
   ppo.py        PureJaxRL-style PPO (MLP actor-critic)
-  evaluate.py   fixed GPU evaluation: 512 full episodes from the spawn with random phases
+  evaluate.py   fixed GPU evaluation (also during training); `python -m platformer_ai.evaluate` scores a policy on levels
   train.py      training loop, prints metrics + periodic evaluation, saves params
   play.py       watch a trained policy in the terminal (ASCII)
   render.py     ASCII rendering
@@ -472,7 +472,27 @@ one line per tier, how many levels are at goal rate 0 / below 0.5 / 0.5-0.9 / 0.
 ```
 
 Every evaluation runs at least 4 episodes per level (`--eval-per-level`, at least 512 in total), so 300 levels take
-1200 episodes.
+1200 episodes. The held-out levels get as many unless you set `--test-eval-per-level N`: 60 levels x 50 episodes is
+3000 episodes, a second or two on the GPU, and makes the per-level `UNSEEN` numbers much firmer (with 9 episodes a
+level's goal rate can easily be 20 points off; the tier and overall lines are already reliable).
+
+### Scoring a policy without training
+
+```bash
+uv run python -m platformer_ai.evaluate --params t3_drill --levels gen_t3/test/                  # 100 episodes per level
+uv run python -m platformer_ai.evaluate --params t3_drill --levels gen_t3/test/t3_0047.txt --episodes 500
+uv run python -m platformer_ai.evaluate --levels docs/levels/ --all --csv scores.csv             # latest run, every level
+```
+
+It prints the goal rate overall and per tier as `goal 0.857 (257/300)`, the spread of the levels' goal rates, and the
+worst levels with a 95% range (`goal 0.567 (17/30, 95%: 0.39-0.73)`), so you can see how sure each number is. Starts are
+random phases with a jittered spawn, like the training evaluation; `--fixed-phases` uses the level's own start (then
+every greedy episode is the same), `--sample` samples actions, `--seed` picks other starts, `--batch` limits how many
+episodes run at once (lower it if the GPU runs out of memory), `--csv` writes every level's numbers.
+
+The same starts can come out differently on the GPU and the CPU: when two actions score almost the same, the tiny
+rounding differences between them can tip the choice. Over many episodes this evens out; for one level over a few
+episodes it does not, which is one more reason to use many episodes per level.
 
 ## Where to add features later
 
