@@ -13,6 +13,14 @@ STEP = jax.jit(E.step)
 NOOP, LEFT, RIGHT, JUMP, JUMP_LEFT, JUMP_RIGHT = range(6)
 HEIGHT_GAP = E.JUMP_SPEED ** 2 / (2 * E.GRAVITY)
 
+# The observation from inside the jitted step vs. a separate E.observe call: on the GPU they agree to float32 precision
+# (numpy's default rtol 1e-7); XLA on the CPU fuses the arithmetic differently, so the last bit can differ (~3e-8).
+OBS_TOL = dict(rtol=1e-6, atol=1e-6) if jax.default_backend() == "cpu" else {}
+
+
+def assert_obs_close(a, b):
+    np.testing.assert_allclose(np.asarray(a), np.asarray(b), **OBS_TOL)
+
 
 def put(x, y, vx=0.0, vy=0.0, **kw):
     """Initial state with the player somewhere else (other fields can be overridden)."""
@@ -295,7 +303,7 @@ def test_auto_reset_randomizes_phases_when_enabled():
             if bool(d):
                 break
         assert bool(d) and bool(s.from_spawn)
-        np.testing.assert_allclose(np.asarray(obs), np.asarray(E.observe(s)))
+        assert_obs_close(obs, E.observe(s))
         plats.add(round(float(s.plat_x[0]), 2)); enemies.add(round(float(s.enemy_x[0]), 2))
     assert len(plats) > 20 and len(enemies) > 20
 
@@ -315,7 +323,7 @@ def test_auto_reset_picks_random_starts_when_enabled():
             if bool(d):
                 break
         assert bool(d) and int(s.t) == 0
-        np.testing.assert_allclose(np.asarray(obs), np.asarray(E.observe(s)))   # obs of the NEW state
+        assert_obs_close(obs, E.observe(s))   # obs of the NEW state
         xs.add(round(float(s.x), 2))
     assert len(xs) >= 5
 

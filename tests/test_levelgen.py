@@ -110,3 +110,17 @@ def test_eval_envs_and_level_summary():
     names = [f"gen/train/t{1 + i % 3}_{i:04d}.txt" for i in range(30)]
     assert train.level_summary(names, ["gen/train/"]) == "30 levels from gen/train/ (tier 1: 10, tier 2: 10, tier 3: 10)"
     assert train.level_summary(["a.txt"], None) == "1 level: a.txt"
+
+
+def test_log_interval_by_verbosity():
+    assert train.log_interval(762, 1, None) == 19          # ~40 progress lines per run
+    assert train.log_interval(12, 1, None) == 1
+    assert train.log_interval(762, 2, None) == 1           # every update
+    assert train.log_interval(762, 0, 50) == 50 and train.log_interval(762, 2, 5) == 5     # --log-every wins
+
+
+def test_eval_compact_and_every_level():
+    line = train.eval_compact(40, [("greedy ", fake_eval(3)), ("UNSEEN greedy", fake_eval(3))])
+    assert line.startswith("    EVAL upd   40  greedy goal 0.50") and "UNSEEN greedy goal" in line and "\n" not in line
+    names = [f"gen/train/t1_{i:04d}.txt" for i in range(30)]
+    assert len(train.eval_lines("greedy", fake_eval(30), names, 600, every_level=True)) == 31

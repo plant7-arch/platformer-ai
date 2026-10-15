@@ -47,15 +47,16 @@ PER_LEVEL_LINES = 12      # up to this many levels the evaluation prints one lin
 WORST = 5                 # ... with the worst levels named
 
 
-def eval_lines(name: str, e: dict, names: list[str], n_envs: int) -> list[str]:
-    """The evaluation printout: one line over all levels, plus one per level when there are a few, or a summary (per
-    tier for generated levels, the spread of the per-level goal rates and the worst levels) when there are many."""
+def eval_lines(name: str, e: dict, names: list[str], n_envs: int, every_level: bool = False) -> list[str]:
+    """The evaluation printout: one line over all levels, plus one per level when there are a few (or every_level), or
+    a summary (per tier for generated levels, the spread of the per-level goal rates and the worst levels) when there
+    are many."""
     out = [f"    EVAL {name}  {n_envs} fresh episodes, random phases:  return {e['ret']:5.2f}  "
            f"coins {e['coins']:4.1f}  goal {e['goal']:4.2f}  max_x {e['max_x']:5.1f}  len {e['length']:4.0f}"]
     if len(names) <= 1:
         return out
     p = {k: np.asarray(v) for k, v in e["per_level"].items()}
-    if len(names) <= PER_LEVEL_LINES:
+    if len(names) <= PER_LEVEL_LINES or every_level:
         for i, n in enumerate(names):
             out.append(f"        {Path(n).name[-28:]:<28} return {p['ret'][i]:5.2f}  coins {p['coins'][i]:4.1f}  "
                        f"goal {p['goal'][i]:4.2f}  max_x {p['max_x'][i]:5.1f}")
@@ -73,6 +74,19 @@ def eval_lines(name: str, e: dict, names: list[str], n_envs: int) -> list[str]:
     worst = np.lexsort((p["max_x"], g))[:WORST]
     out.append("        worst: " + ",  ".join(f"{Path(names[i]).name} {g[i]:.2f} (x {p['max_x'][i]:.0f})" for i in worst))
     return out
+
+
+def eval_compact(update: int, results) -> str:
+    """All evaluations of one point in a single line (verbosity 1): [(name, metrics)] -> 'EVAL upd 40  greedy goal ...'."""
+    parts = [f"{name.strip()} goal {e['goal']:4.2f} return {e['ret']:5.2f} coins {e['coins']:4.1f}" for name, e in results]
+    return f"    EVAL upd {update:4d}  " + "  |  ".join(parts)
+
+
+def log_interval(n_updates: int, verbosity: int, log_every: int | None) -> int:
+    """Updates between progress lines: --log-every, else every update at verbosity >= 2, else ~40 lines per run."""
+    if log_every:
+        return log_every
+    return 1 if verbosity >= 2 else max(1, round(n_updates / 40))
 
 
 def level_summary(names: list[str], args) -> str:
@@ -114,6 +128,12 @@ def main() -> None:
                     help="run the fixed evaluation every N updates (0 = never)")
     ap.add_argument("--eval-per-level", type=int, default=4,
                     help="evaluation episodes per level (at least 512 in total; default 4)")
+    ap.add_argument("-v", "--verbosity", type=int, default=1, choices=range(4), metavar="0-3",
+                    help="how much to print: 0 = only the final evaluation; 1 = a progress line every ~1/40 of the run "
+                         "and one line per evaluation (default); 2 = every update and every evaluation in full; "
+                         "3 = like 2, with every level named in the evaluations")
+    ap.add_argument("--log-every", type=int, metavar="N",
+                    help="print a progress line every N updates (default: see --verbosity)")
     ap.add_argument("--levels", nargs="+", metavar="PATH",
                     help="level files or folders (all *.txt inside) to train on together "
                          "(default: the level of level.py / PLATFORMER_LEVEL)")
@@ -222,7 +242,8 @@ def main() -> None:
 
     keys = ("n_all", "all_return", "all_goal", "n_spawn", "sp_return", "sp_coins", "sp_goal",
             "sp_maxx", "sp_len")
-    window = deque(maxlen=10)          # average over the last 10 updates so rare episode ends show up
+    every = log_interval(cfg.n_updates, args.verbosity, args.log_every)
+    window = deque(maxlen=max(10, every))   # average over the last updates (at least 10) so rare episode ends show up
     t_start = time.time()
     done = first - 1                                   # last update that finished
     try:
@@ -236,18 +257,25 @@ def main() -> None:
             a = {k: float(sum(w[k] for w in window)) for k in keys}
             n_sp, n_all = max(a["n_spawn"], 1.0), max(a["n_all"], 1.0)
             tag = " (includes compile)" if i == first else ""
-            print(f"upd {i:4d}/{cfg.n_updates}  steps {i * cfg.batch_size:>11,}  "
-                  f"SPAWN eps {int(a['n_spawn']):5d} return {a['sp_return'] / n_sp:5.2f} "
-                  f"coins {a['sp_coins'] / n_sp:4.1f} goal {a['sp_goal'] / n_sp:4.2f} "
-                  f"max_x {a['sp_maxx'] / n_sp:5.1f} len {a['sp_len'] / n_sp:5.0f} | "
-                  f"ALL return {a['all_return'] / n_all:5.2f} goal {a['all_goal'] / n_all:4.2f} | "
-                  f"ent {m['entropy']:.2f} v_loss {m['v_loss']:.3f} {cfg.batch_size / dt:>9,.0f} sps{tag}")
-            if args.eval_every and (i % args.eval_every == 0 or i == cfg.n_updates):
+            if args.verbosity >= 1 and (i == first or i % every == 0 or i == cfg.n_updates):
+                print(f"upd {i:4d}/{cfg.n_updates}  steps {i * cfg.batch_size:>11,}  "
+                      f"SPAWN eps {int(a['n_spawn']):5d} return {a['sp_return'] / n_sp:5.2f} "
+                      f"coins {a['sp_coins'] / n_sp:4.1f} goal {a['sp_goal'] / n_sp:4.2f} "
+                      f"max_x {a['sp_maxx'] / n_sp:5.1f} len {a['sp_len'] / n_sp:5.0f} | "
+                      f"ALL return {a['all_return'] / n_all:5.2f} goal {a['all_goal'] / n_all:4.2f} | "
+                      f"ent {m['entropy']:.2f} v_loss {m['v_loss']:.3f} {cfg.batch_size / dt:>9,.0f} sps{tag}")
+            last = i == cfg.n_updates
+            if args.eval_every and (i % args.eval_every == 0 or last):
+                results = []
                 for name, lv_names, n_envs, fn in evals:
                     e = jax.device_get(fn(runner[0].params, eval_key))
-                    print("\n".join(eval_lines(name, e, lv_names, n_envs)))
+                    results.append((name, e))
+                    if args.verbosity >= 2 or last:          # in full (the final evaluation always)
+                        print("\n".join(eval_lines(name, e, lv_names, n_envs, every_level=args.verbosity >= 3)))
                     info["last_eval"][name.strip()] = {k: round(float(e[k]), 4)
                                                        for k in ("ret", "coins", "goal", "max_x", "length")}
+                if args.verbosity == 1 and not last:
+                    print(eval_compact(i, results))
             if i % 25 == 0:
                 save(i)
     except KeyboardInterrupt:                          # Ctrl-C: keep everything up to the last finished update

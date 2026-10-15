@@ -85,6 +85,18 @@ upd   60/190  steps ...  SPAWN eps  310 return  6.20 coins  5.1 goal 0.30 max_x 
     EVAL sampled  512 fresh episodes, random phases:  return 13.10  coins  8.7  goal 0.93  max_x  67.9  len  300
 ```
 
+**How much it prints**: `--verbosity` (`-v`) 0 to 3.
+
+| `-v` | progress lines | evaluations |
+| --- | --- | --- |
+| 0 | none | only the final one, in full |
+| 1 (default) | about 40 per run (the first update, then every ~1/40 of the run) | one line each (`EVAL upd 40  greedy goal ... \| sampled ... \| UNSEEN ...`), the final one in full |
+| 2 | every update | every one in full |
+| 3 | every update | every one in full, naming every level even when there are hundreds |
+
+`--log-every N` sets the progress interval yourself. A progress line averages the updates since the previous line
+(at least the last 10).
+
 * **`EVAL` lines are the number to trust** (every 20 updates, `--eval-every`). 512 fresh episodes from the
   real spawn with random phases, always the same 512 start conditions, each run to its very end
   (900 steps). `greedy` = most likely action, `sampled` = like the training policy. Max return is 14;
