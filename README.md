@@ -14,22 +14,24 @@ phases (see "The included policy" below).
 
 ## Quick start
 
-Needs [uv](https://docs.astral.sh/uv/), which installs the Python version pinned in `.python-version`. The lockfile targets an NVIDIA GPU with CUDA 13
-(`jax[cuda13]`); for CUDA 12 use `jax[cuda12]`, for CPU-only plain `jax` (it works, just slower).
+Needs [uv](https://docs.astral.sh/uv/), which installs the Python version pinned in `.python-version`. The lockfile
+targets an NVIDIA GPU with CUDA 13 (`jax[cuda13]`); for CUDA 12 change the dependency in `pyproject.toml` to
+`jax[cuda12]`, for CPU only to plain `jax` (it works, just slower), and run `uv sync` again.
 
 ```bash
 git clone https://github.com/plant7-arch/platformer-ai.git
 cd platformer-ai
 uv sync
 
-uv run python -m platformer_ai.viewer                 # watch the latest trained agent (Tab: play yourself)
-uv run python -m platformer_ai.train                  # train your own: 25M steps, into a new runs/<date>_<time>/
-uv run python -m platformer_ai.runs                   # list the runs; the latest one is what viewer / play use
-uv run pytest                                         # tests
+uv run python -m platformer_ai.viewer                 # watch the agent (the included one until you train your own; Tab: play yourself)
+uv run python -m platformer_ai.train                  # train your own on the built-in level: 25M steps, into a new runs/<date>_<time>/
+uv run python -m platformer_ai.runs                   # list the runs; the latest one is what viewer / play / evaluate use
+uv run pytest                                         # tests (about 5 minutes on the GPU, longer on the CPU)
 ```
 
 Optional JAX settings: put these in a `.env` file (it is git-ignored) and run `uv run --env-file .env ...`,
-or `export` them in your shell:
+or `export` them in your shell. (If you set `UV_ENV_FILE=.env` in your shell profile instead, every `uv run` needs a
+`.env` in the current folder, also in a fresh clone; otherwise uv stops with `No environment file found`.)
 
 ```
 XLA_PYTHON_CLIENT_PREALLOCATE=false      # do not grab all GPU memory up front
@@ -62,30 +64,36 @@ src/platformer_ai/
   scene.py      numpy renderer for one 480x270 frame (tilemaps + sprites)
   terrain.py    draws terrain, backdrop, decorations and the goal flag from the ASCII level (so level edits show up)
 assets/         sprites/ and fonts/ from the Brackeys platformer bundle (CC0)
+docs/           example levels (levels/, example_many.txt, builtin.txt = the level of level.py), generator settings
+                (levelgen/), the README pictures
 runs/           one folder per training run (params.msgpack, run.json, levels.txt); runs/pretrained/ = the included policy
-tests/          env behaviour tests, viewer-logic tests, a PPO smoke test
+gen/, gen_*/    generated level sets (not in git; levelgen makes them again, identically)
+tests/          environment, levels and level checks, generator, PPO, curriculum, evaluation, runs and viewer logic
 ```
 
 ## Training: what the options do and how to read the log
 
-The level has two hard parts (the ferry and the enemy) that a random policy practically never gets
-through, so plain PPO from the spawn stalls after the first coins. The switches below fix that:
+The built-in level has two hard parts (the ferry and the enemy) that a random policy practically never gets
+through, so plain PPO from the spawn stalls after the first coins. The switches below fix that (they are on by
+default):
 
 * **Random phases** (`--no-random-phases` turns them off). Every episode starts with the platform and the
   enemy at random phases, and the spawn position is jittered. With fixed phases the agent can learn one
   timed route by heart and never look at the platform or the enemy; with random phases it has to react.
 * **Random starts** (`--no-random-starts` turns them off). With probability `1 - spawn-prob` (default
-  0.5) an episode begins at one of the `S` points in `level.py` or riding the ferry, so the hard parts are
-  practised directly. `play` always starts at the spawn.
+  0.5) an episode begins at one of the level's `S` points or riding a moving platform, so the hard parts are
+  practised directly. `play`, `viewer`, `evaluate` and the `EVAL` lines always start at the spawn.
 * **Progress bonus** (`--progress-coef 0.1`, `0` = off): +0.1 per tile of *new* furthest-right progress.
   Walking back and forth pays nothing, waiting costs nothing (the ferry needs waiting).
 * Longer horizon: `gamma` 0.995 and 128-step rollouts.
 
 ```
-upd   60/190  steps ...  SPAWN eps  310 return  6.20 coins  5.1 goal 0.30 max_x  52.3 len  612 | ALL return ... 
-    EVAL greedy   512 fresh episodes, random phases:  return 13.80  coins  8.9  goal 0.98  max_x  68.5  len  291
-    EVAL sampled  512 fresh episodes, random phases:  return 13.10  coins  8.7  goal 0.93  max_x  67.9  len  300
+upd   60/190  steps   7,864,320  SPAWN eps   310 return  6.20 coins  5.1 goal 0.30 max_x  52.3 len   612 | ALL return  7.10 goal 0.45 | ent 0.92 v_loss 0.051   590,000 sps
+    EVAL upd   60  greedy goal 0.98 return 13.80 coins  8.9  |  sampled goal 0.93 return 13.10 coins  8.7
 ```
+
+(at `-v 2`, and for the last evaluation of every run, each `EVAL` is printed in full, e.g.
+`EVAL greedy   512 fresh episodes, random phases:  return 13.80  coins  8.9  goal 0.98  max_x  68.5  len  291`)
 
 **How much it prints**: `--verbosity` (`-v`) 0 to 3.
 
@@ -99,15 +107,17 @@ upd   60/190  steps ...  SPAWN eps  310 return  6.20 coins  5.1 goal 0.30 max_x 
 `--log-every N` sets the progress interval yourself. A progress line averages the updates since the previous line
 (at least the last 10).
 
-* **`EVAL` lines are the number to trust** (every 20 updates, `--eval-every`). 512 fresh episodes from the
-  real spawn with random phases, always the same 512 start conditions, each run to its very end
-  (900 steps). `greedy` = most likely action, `sampled` = like the training policy. Max return is 14;
-  `goal` is the share that reaches the flag. If `goal` is high here, the agent really reacts to the
-  platform and enemy.
-* `SPAWN ...` (every update) only averages episodes that have *finished*, so while many episodes are still
+* **`EVAL` lines are the number to trust** (every 20 updates, `--eval-every`). At least 512 fresh episodes from the
+  real spawn with random phases (at least 4 per level), always the same start conditions, each run to its very end
+  (900 steps). `greedy` = most likely action, `sampled` = like the training policy. On the built-in level the max
+  return is 14 (9 coins + 5 for the flag); `goal` is the share that reaches the flag. If `goal` is high here, the
+  agent really reacts to the platform and enemy.
+* `SPAWN ...` only averages episodes that have *finished*, so while many episodes are still
   running it looks better than reality (stuck episodes only count when they time out after 900 steps).
   Use it for trends, not for absolute values.
-* `ALL ...` includes the random starts (easier on average). Everything is averaged over 10 updates.
+* `ALL ...` includes the random starts (easier on average). A progress line averages the updates since the previous
+  line (at least the last 10). `ent` is the policy's entropy (1.79 = fully random), `sps` the speed in steps per
+  second.
 * Logged returns are the task return (coins + goal + death); the progress bonus is only used for training.
 
 If the spawn is learned too slowly, raise `--spawn-prob` (e.g. 0.75, or 1.0 with `--no-random-starts`);
@@ -133,7 +143,7 @@ runs/2026-10-14_211502_three_levels/     uv run python -m platformer_ai.train --
 ```
 
 `--out DIR` picks the folder yourself. **The latest run** is your run whose `params.msgpack` was saved most recently
-(a run that is still training counts, so you can watch it learn); `viewer` and `play` use it unless you pass
+(a run that is still training counts, so you can watch it learn); `viewer`, `play` and `evaluate` use it unless you pass
 `--params` (a run name, a run folder or a `.msgpack` file). `runs/pretrained/` (the policy that comes with the
 repository) is only used when you have no runs of your own, or with `--params pretrained`. See them all:
 
@@ -153,7 +163,8 @@ uv run python -m platformer_ai.train --resume 2026-10-14_205407       # a given 
 uv run python -m platformer_ai.train --resume --total-steps 50000000  # a finished run: train it longer
 ```
 
-The settings and levels come from the run's `run.json` (only `--total-steps` and `--eval-every` can be given), the
+The settings and levels come from the run's `run.json`; only what changes the length, the evaluation or the printing
+can be given (`--total-steps`, `--eval-every`, `--eval-per-level`, `--test-eval-per-level`, `-v`, `--log-every`). The
 network, the Adam state, the learning-rate schedule and the random stream continue exactly; the environments start
 fresh episodes. With a bigger `--total-steps` the learning-rate schedule is stretched to the new end, so the rate
 picks up again from `lr x (1 - done / new total)` and decays to 0.
@@ -167,8 +178,10 @@ uv run python -m platformer_ai.train --init-from pretrained --levels docs/levels
 uv run python -m platformer_ai.train --init-from 2026-10-14_212223 --levels my_levels/
 ```
 
-To ship a new policy, copy a run's `params.msgpack` into `runs/pretrained/`. The `.gitignore` keeps every run out of
-git except that file:
+**Using a policy.** Your own policies do not need to go anywhere: `viewer`, `play` and `evaluate` use your latest run,
+and `--params` picks any other run (name or folder) or any `.msgpack` file, for example one someone sent you:
+`uv run python -m platformer_ai.viewer --params ~/Downloads/params.msgpack`. Only `runs/pretrained/` comes with the
+repository; the `.gitignore` keeps every other run out of git:
 
 ```
 runs/*
@@ -177,14 +190,17 @@ runs/pretrained/*
 !runs/pretrained/params.msgpack
 ```
 
-(Also un-ignore `runs/pretrained/checkpoint.msgpack` and `runs/pretrained/run.json`, and copy them along, if the
-shipped policy should be resumable with `--resume pretrained`; the checkpoint is about three times the policy's size.)
+So in your own fork, committing a run's `params.msgpack` as `runs/pretrained/params.msgpack` makes it the policy your
+fork ships. (To make it resumable with `--resume pretrained`, also un-ignore and copy `checkpoint.msgpack` and
+`run.json`; the checkpoint is about three times the policy's size.) To suggest a better policy for this repository, see
+"The included policy" below.
 
 ## The viewer (pygame)
 
 ```bash
 uv run python -m platformer_ai.viewer                                     # the latest run
-uv run python -m platformer_ai.viewer --params 2026-10-14_205407_three     # a run by name (or a folder / .msgpack)
+uv run python -m platformer_ai.viewer --params 2026-10-14_211502_three_levels   # a run by its folder name (or a folder path / .msgpack)
+uv run python -m platformer_ai.viewer --level docs/example_many.txt              # another level
 ```
 
 A 480x270 picture scaled up in whole-number steps (the window is resizable), camera following the knight,
@@ -199,14 +215,16 @@ finds `assets/` (or pass `--assets DIR`).
 | `R` | restart the episode |
 | `Esc` / `Q` | quit |
 
-Options: `--human` (start with the keyboard), `--sample`, `--random-phases`, `--scale N` (initial window size),
-`--theme grass|sand|ice`, `--no-decor`, `--assets DIR`, `--seed`. Without a params file it starts in keyboard mode.
+Options: `--level FILE`, `--human` (start with the keyboard), `--sample`, `--random-phases` (random platform / enemy
+start and a jittered spawn at every restart, like the evaluation; without it every greedy episode is the same),
+`--scale N` (initial window size), `--theme grass|sand|ice`, `--no-decor`, `--assets DIR`, `--seed`. Without a params
+file it starts in keyboard mode.
 
 The viewer runs one env on the **CPU** (`JAX_PLATFORMS=cpu` is set unless you set it yourself), so it never
 touches the GPU, even while a training run is going. The art is only pictures: the physics are `env.py`, and
 the sprites are placed from the env state (feet position, one tile = 16 px).
 
-**The picture follows the level.** The terrain is generated from the ASCII in `level.py` (`terrain.py`): a solid
+**The picture follows the level.** The terrain is generated from the level's ASCII (`terrain.py`): a solid
 cell with air above it gets a grass top tile, any other solid cell a dirt tile (a position hash varies them, the same
 every run), small bushes and mushrooms are sprinkled on free ground, the sky/water backdrop is generated for any
 width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABELS` in `level.py`) are optional.
@@ -215,10 +233,11 @@ width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABE
 
 * **Level**: the 70 x 10 tile collision map of the Godot project, as ASCII in `level.py`
   (the 3 nearly flat slope tiles became flat solid tiles).
-* **Player**: a 0.6 x 0.8 box. Run left/right, jump about 2.7 tiles high (only from the ground or a platform).
+* **Player**: a 0.6 x 0.8 box. Run left/right at 6 tiles/s, jump with the feet rising about 2.2 tiles and covering
+  about 4 tiles of run (only from the ground or a platform).
   Units are tiles; one env step = 1/30 s.
 * **Actions (6)**: horizontal `[none, left, right][a % 3]`, jump when `a >= 3`.
-* **One-way platforms**: a static one (spawn drops onto it; it is out of reach from the ground) and a
+* **One-way platforms** (in the built-in level): a static one (spawn drops onto it; it is out of reach from the ground) and a
   moving one that ferries the player across the 8-tile pit while carrying whoever stands on it. A level may
   have any number of moving platforms (also none).
 * **Enemies**: each patrols between its own two x limits (given in the level; a wall inside the path is reported as an error), touch = death.
@@ -235,7 +254,7 @@ width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABE
   moving platform, coin, goal, enemy) plus 13 scalars: velocity, on-floor, sub-tile position, progress,
   time used, and relative position + direction of the *nearest* enemy and of the *nearest* moving platform
   (the window shows all of them; with none in the level these scalars read "far away, standing still").
-  The size is the same for every level, so a policy file fits any enemy / platform count (but see below).
+  The size is the same for every level, so a policy file fits any level and any enemy / platform count.
 
 ## Editing the level
 
@@ -308,13 +327,13 @@ enemy 7 49 from 44.5625 to 52.4375
 
 Several enemies and platforms: `E` and `M` can appear as often as you like. Neighbouring `M` tiles in a row are one
 platform of that width, so `MM.MM` is two 2-wide platforms (a stray gap splits a platform!). Enemies and platforms are
-numbered row by row, left to right,. With no `E` or no `M` at all the level
+numbered row by row, left to right. With no `E` or no `M` at all the level
 still loads and trains; the observation keeps its size.
 
 ![a level with three enemies and two moving platforms](docs/preview_multi.png)
 
-Try it: `PLATFORMER_LEVEL=docs/example_many.txt uv run python -m platformer_ai.viewer` (the level in the picture,
-with its path lines).
+Try it: `uv run python -m platformer_ai.viewer --level docs/example_many.txt` (the level in the picture, with its path
+lines).
 
 To check a level while you edit it, without starting anything else (a text file with the map rows and optional path lines also works):
 
@@ -363,7 +382,7 @@ uv run python -m platformer_ai.play --level unseen/hard.txt
 A folder stands for all `*.txt` files in it (`docs/levels/` has three small ones to start with:
 `--levels docs/levels/`). Without `--levels`, training uses the level of `level.py` (or
 `PLATFORMER_LEVEL`), exactly as before. With several levels the evaluation prints one line over all of them and one
-line per level; `--test-levels` adds an `UNSEEN` evaluation on levels that are never trained on, which is the honest
+line per level (a summary per tier when there are more than 12, see "Generated levels"); `--test-levels` adds an `UNSEEN` evaluation on levels that are never trained on, which is the honest
 test of whether the agent learned to *play* rather than to memorise. The level names of a run are saved in
 `runs/.../levels.txt`.
 
@@ -409,8 +428,8 @@ uv run python -m platformer_ai.viewer --level gen/test/t3_0002.txt
   | 2 | 50-70 | gaps up to 3, steps of 2, more enemies and ferries, stepping stones, upper platforms with coins |
   | 3 | 60-80 | gaps of 2-3, two enemies on one stretch, enemies on ledges, riders on ferries and upper platforms |
 
-  The tiers are only labels for now (training picks levels uniformly); a curriculum can weight the level choice in
-  `reset` by them later. `levelgen.tier_of(name)` reads the tier of a file.
+  Training picks the levels uniformly whatever their tier, unless you use `--curriculum` (below), which picks them by
+  how often the agent fails them. `levelgen.tier_of(name)` reads the tier of a file.
 * `--seed` gives another set; the test set uses its own seed (`seed + 1000003`), so it never shares a level with the
   training set. The same seed gives the same levels. `gen/` is not in git: regenerate it with the command above.
 
@@ -484,7 +503,7 @@ much practice as one it finishes half the time. `--curriculum` changes that:
 
 ```bash
 uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3/test/ --curriculum \
-    --init-from 2026-10-15_125821_t3_drill --name t3_curriculum
+    --init-from pretrained --name t3_curriculum
 ```
 
 * **What it measures**: for every level, the episodes of the training rollouts that started at the real spawn and
@@ -505,9 +524,9 @@ uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3
 ### Scoring a policy without training
 
 ```bash
-uv run python -m platformer_ai.evaluate --params t3_drill --levels gen_t3/test/                  # 100 episodes per level
-uv run python -m platformer_ai.evaluate --params t3_drill --levels gen_t3/test/t3_0047.txt --episodes 500
-uv run python -m platformer_ai.evaluate --levels docs/levels/ --all --csv scores.csv             # latest run, every level
+uv run python -m platformer_ai.evaluate --params pretrained --levels gen_t3/test/                  # 100 episodes per level
+uv run python -m platformer_ai.evaluate --params pretrained --levels gen_t3/test/t3_0047.txt --episodes 500
+uv run python -m platformer_ai.evaluate --levels docs/levels/ --all --csv scores.csv                # latest run, every level
 ```
 
 It prints the goal rate overall and per tier as `goal 0.857 (257/300)`, the spread of the levels' goal rates, and the
@@ -522,7 +541,7 @@ episodes it does not, which is one more reason to use many episodes per level.
 
 ## The included policy
 
-`runs/pretrained/params.msgpack` is what `viewer` and `play` use when you have no runs of your own. Scores with
+`runs/pretrained/params.msgpack` is what `viewer`, `play` and `evaluate` use when you have no runs of your own. Scores with
 `python -m platformer_ai.evaluate` (greedy, random phases):
 
 | levels | goal |
@@ -532,7 +551,9 @@ episodes it does not, which is one more reason to use many episodes per level.
 | the 60 held-out levels of `gen_t3/test/` (= `gen/test/`), 50 episodes each | 0.97 (tier 3: 0.95) |
 | 120 levels it has never seen (`levelgen --seed 777 --train 0 --test 120 --test-seed 4242`), 30 each | 0.97 (tier 3: 0.95) |
 
-How it was trained (three runs, each starting from the previous one's weights; about 4 minutes in all on the GPU):
+How it was trained (three runs, each starting from the previous one's weights; about 8 minutes of training in all on
+an RTX 3050). `<generated run>` and `<t3_drill run>` are the run folders the earlier commands made (see
+`python -m platformer_ai.runs`):
 
 ```bash
 uv run python -m platformer_ai.levelgen                                        # gen/: 300 + 60 levels
@@ -540,18 +561,20 @@ uv run python -m platformer_ai.train --levels gen/train/ --test-levels gen/test/
 uv run python -m platformer_ai.levelgen --config docs/levelgen/tier3_drill.toml # gen_t3/: 600 + 60, mostly tier 3
 uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3/test/ --init-from <generated run> \
     --total-steps 100000000 --name t3_drill
-# then 25M steps on gen_t3/train/ plus 40 copies of each hand-made level (docs/levels/*, docs/example_many.txt,
-# docs/builtin.txt), so those are about a quarter of the practice; with only one copy each (0.6% of the levels) they
-# did not improve
+# 40 copies of each hand-made level, so they are about a quarter of the practice next to the 600 generated ones
+# (with one copy each, 0.6% of the levels, they did not improve)
+mkdir -p hand_x40
+for f in docs/levels/*.txt docs/example_many.txt docs/builtin.txt; do
+    for i in $(seq -w 1 40); do cp "$f" "hand_x40/$(basename "$f" .txt)_$i.txt"; done
+done
 uv run python -m platformer_ai.train --levels gen_t3/train/ hand_x40/ --test-levels gen_t3/test/ --init-from <t3_drill run> \
     --total-steps 25000000 --name pretrained
 ```
 
-(`hand_x40/` is a folder with the copies: `for f in docs/levels/*.txt docs/example_many.txt docs/builtin.txt; do for i in
-$(seq -w 1 40); do cp $f hand_x40/$(basename $f .txt)_$i.txt; done; done`.)
-
-To ship a better one: train, check it with `evaluate` on levels it has not seen, then copy the run's `params.msgpack`
-into `runs/pretrained/` and commit it (it is the one run file that is not git-ignored).
+**Trained a better one?** Check it with `evaluate` on levels it has never seen (for example the 120-level set in the
+table) and compare with the numbers above. To use it yourself nothing more is needed: it is your latest run, or pass
+`--params`. To propose it as the included policy, open a pull request that replaces `runs/pretrained/params.msgpack`,
+with the `evaluate` output for the levels in the table and the commands you trained it with.
 
 ## Where to add features later
 
@@ -562,8 +585,9 @@ into `runs/pretrained/` and commit it (it is the one run file that is not git-ig
   (`PLAT_START_X` / `PLAT_STOP_X`, `ENEMY_MIN` / `ENEMY_MAX`).
 * **Another curriculum**: `ppo.curriculum_update` turns per-level results into the chance of each level being picked
   (`env.reset(level_logits=...)`); a different rule (by tier, by learning progress, by value error) only changes that
-  function. **More segment kinds**: a new `seg_*` method in `levelgen.Builder` and an
-  entry in `WEIGHTS`; `levelplan` checks the result.
+  function.
+* **More segment kinds**: a new `seg_*` method in `levelgen.Builder`, its name in `levelsettings.KINDS` and a weight
+  per tier in `levelsettings.TIER_DEFAULTS`; `levelplan` checks that the levels stay beatable.
 
 ## Credits and license
 

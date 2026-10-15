@@ -40,7 +40,7 @@ from platformer_ai import level as L
 # ---- physics (tiles, seconds) -------------------------------------------------------------
 DT = 1.0 / 30.0          # one env step = 1/30 s
 GRAVITY = 40.0
-JUMP_SPEED = 14.0        # apex ~2.7 tiles: the static one-way platform (3 tiles up) is out of reach
+JUMP_SPEED = 14.0        # the feet rise ~2.2 tiles (head ~3.0): the static one-way platform (3 tiles up) is out of reach
 RUN_SPEED = 6.0
 MAX_FALL = 18.0          # must stay < 1 tile per step (18 * DT = 0.6) so nothing tunnels
 HW = 0.3                 # player half width   (AABB: width 0.6)
@@ -60,7 +60,7 @@ N_CHANNELS = 5           # solid, one-way (static + moving platform), coin, goal
 N_SCALARS = 13
 OBS_DIM = N_CHANNELS * PATCH[0] * PATCH[1] + N_SCALARS      # the same for every level
 PLAT_THICK = 0.5         # only used to draw the moving platform into the observation
-ABOVE = 4                # extra empty rows above the padded grids: a jump (apex 2.7 tiles) above the map's top row
+ABOVE = 4                # extra empty rows above the padded grids: a jump (head up to ~3 tiles) above the map's top row
                          # still sees sky there (a negative slice start would wrap round to the bottom in JAX)
 FAR = -1.0e4             # where unused (padding) enemies, platforms and coins sit: far above every map
 
