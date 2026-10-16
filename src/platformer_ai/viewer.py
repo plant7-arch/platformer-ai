@@ -20,7 +20,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import pygame
-from flax import serialization
 
 from platformer_ai import cli
 
@@ -33,7 +32,7 @@ from platformer_ai import runs
 from platformer_ai import scene
 from platformer_ai import terrain
 from platformer_ai import viewlogic as V
-from platformer_ai.ppo import ActorCritic
+from platformer_ai.ppo import ActorCritic, restore_params
 
 BANNER_SECONDS = 0.9
 WHITE, SHADOW, YELLOW = (255, 255, 255), (0, 0, 0), (255, 220, 80)
@@ -47,7 +46,10 @@ def load_agent(path: str, hidden: int):
     if not p.is_file():
         print(f"no params at {p}: starting in keyboard mode (train first to watch the agent)")
         return net, None
-    return net, serialization.from_bytes(template, p.read_bytes())
+    try:
+        return net, restore_params(template, p.read_bytes())
+    except ValueError as e:
+        raise SystemExit(f"{p} does not fit a network of width {hidden} ({e}; try --hidden)") from None
 
 
 class Snap:

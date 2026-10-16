@@ -33,3 +33,30 @@ def test_training_on_two_levels_of_different_sizes():
     for _ in range(2):
         runner, metrics = update(runner)
     assert all(np.isfinite(v) for v in jax.device_get(metrics).values())
+
+
+def test_config_problems_are_found_before_training():
+    from platformer_ai.ppo import Config
+    assert Config().problems() == []
+    assert "does not split into 8" in Config(num_envs=10, num_steps=3).problems()[0]
+    assert "less than one update" in Config(total_timesteps=1000).problems()[0]
+    assert "at least 1" in Config(num_envs=0).problems()[0]
+    with pytest.raises(ValueError, match="does not split"):
+        make_train(Config(num_envs=10, num_steps=3))
+
+
+def test_restore_params_refuses_another_network():
+    import jax.numpy as jnp
+    from flax import serialization
+
+    from platformer_ai import env as E
+    from platformer_ai.ppo import ActorCritic, restore_params
+    x = jnp.zeros((E.OBS_DIM,), jnp.float32)
+    small, big = (ActorCritic(E.N_ACTIONS, h).init(jax.random.PRNGKey(0), x) for h in (16, 32))
+    data = serialization.to_bytes(small)
+    back = restore_params(small, data)
+    assert all(np.array_equal(a, b) for a, b in zip(jax.tree_util.tree_leaves(back), jax.tree_util.tree_leaves(small), strict=True))
+    with pytest.raises(ValueError, match="shape"):
+        restore_params(big, data)
+    with pytest.raises(ValueError):
+        restore_params(small, b"not a policy")

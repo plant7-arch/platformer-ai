@@ -8,7 +8,6 @@ import time
 
 import jax
 import jax.numpy as jnp
-from flax import serialization
 
 from platformer_ai import cli
 
@@ -19,7 +18,7 @@ from platformer_ai import env as E
 from platformer_ai import render
 from platformer_ai import runs
 from platformer_ai.terminal import Screen
-from platformer_ai.ppo import ActorCritic
+from platformer_ai.ppo import ActorCritic, restore_params
 
 
 def main() -> None:
@@ -41,7 +40,10 @@ def main() -> None:
     if not path.is_file():
         raise SystemExit(f"no policy at {path} (train one first, or pick a run: uv run python -m platformer_ai.runs)")
     print(f"policy: {path}")
-    params = serialization.from_bytes(template, path.read_bytes())
+    try:
+        params = restore_params(template, path.read_bytes())
+    except ValueError as e:
+        raise SystemExit(f"{path} does not fit a network of width {args.hidden} ({e}; try --hidden)") from None
 
     @jax.jit
     def act(params, obs, key):

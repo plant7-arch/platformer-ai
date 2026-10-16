@@ -116,11 +116,10 @@ def main(argv=None) -> int:
     from pathlib import Path
 
     import numpy as np
-    from flax import serialization
 
     from platformer_ai import level as L
     from platformer_ai import levelcheck, levelgen, runs
-    from platformer_ai.ppo import ActorCritic, Config
+    from platformer_ai.ppo import ActorCritic, Config, restore_params
 
     ap = argparse.ArgumentParser(
         prog="python -m platformer_ai.evaluate",
@@ -143,6 +142,11 @@ def main(argv=None) -> int:
     ap.add_argument("--csv", metavar="FILE", help="also write every level's numbers to a CSV file")
     ap.add_argument("--hidden", type=int, default=Config.hidden, help="network width (default %(default)s)")
     a = ap.parse_args(argv)
+    for flag, value in (("--episodes", a.episodes), ("--batch", a.batch), ("--hidden", a.hidden)):
+        if value < 1:
+            ap.error(f"{flag} must be at least 1 (got {value})")
+    if a.show < 0:
+        ap.error(f"--show must be 0 or more (got {a.show})")
 
     path = runs.resolve_params(a.params)
     if not path.is_file():
@@ -156,9 +160,9 @@ def main(argv=None) -> int:
     net = ActorCritic(E.N_ACTIONS, a.hidden)
     template = net.init(jax.random.PRNGKey(0), jnp.zeros((E.OBS_DIM,), jnp.float32))
     try:
-        params = serialization.from_bytes(template, path.read_bytes())
-    except (ValueError, KeyError, TypeError):
-        print(f"{path} does not fit a network of width {a.hidden} (try --hidden)", file=sys.stderr)
+        params = restore_params(template, path.read_bytes())
+    except ValueError as e:
+        print(f"{path} does not fit a network of width {a.hidden} ({e}; try --hidden)", file=sys.stderr)
         return 2
     mode = "sampled" if a.sample else "greedy"
     phases = "fixed phases" if a.fixed_phases else "random phases"

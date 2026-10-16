@@ -48,3 +48,17 @@ def test_command_line(tmp_path, capsys):
     rows = csv.read_text().splitlines()
     assert rows[0] == "level,tier,episodes,goal,return,coins,max_x,length" and len(rows) == 4
     assert EV.main(["--params", str(tmp_path / "missing.msgpack"), "--levels", *LEVELS]) == 2
+
+
+def test_command_line_refuses_bad_input(tmp_path, capsys):
+    import pytest
+    net = ActorCritic(E.N_ACTIONS, 128)
+    p = tmp_path / "params.msgpack"
+    p.write_bytes(serialization.to_bytes(net.init(jax.random.PRNGKey(0), jnp.zeros((E.OBS_DIM,), jnp.float32))))
+    assert EV.main(["--params", str(p), "--levels", *LEVELS, "--hidden", "64"]) == 2     # no traceback
+    assert "does not fit a network of width 64" in capsys.readouterr().err
+    for bad in (["--episodes", "0"], ["--batch", "0"]):
+        with pytest.raises(SystemExit) as e:
+            EV.main(["--params", str(p), "--levels", *LEVELS, *bad])
+        assert e.value.code == 2
+    assert "--batch must be at least 1" in capsys.readouterr().err

@@ -31,7 +31,7 @@ from platformer_ai import level as L
 from platformer_ai import levelgen, runs
 from platformer_ai.evaluate import greedy, make_eval, sampled
 from platformer_ai.levelcheck import LevelError
-from platformer_ai.ppo import Config, make_train
+from platformer_ai.ppo import Config, make_train, restore_params
 
 
 def load_levels(paths, what: str):
@@ -137,8 +137,13 @@ def eval_envs(n_levels: int, per_level: int) -> int:
     return -(-n // n_levels) * n_levels
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser()
+# with --resume the settings come from the run's run.json; only these options may be given as well
+RESUME_OPTIONS = {"resume", "total_steps", "eval_every", "eval_per_level", "test_eval_per_level", "verbosity",
+                  "log_every"}
+
+
+def build_parser() -> argparse.ArgumentParser:
+    ap = argparse.ArgumentParser(prog="python -m platformer_ai.train")
     ap.add_argument("--total-steps", type=int, default=None,
                     help=f"steps in total (default {Config.total_timesteps:,}); with --resume: a bigger number "
                          "trains on past the original end")
@@ -184,11 +189,28 @@ def main() -> None:
     ap.add_argument("--out", help="run folder (default: a new runs/<date>_<time>[_NAME])")
     ap.add_argument("--resume", metavar="RUN", nargs="?", const="latest",
                     help="continue a run where it stopped: 'latest' (also: just --resume), a run name or folder. "
-                         "Settings and levels come from its run.json; only --total-steps / --eval-every apply")
+                         "Settings and levels come from its run.json; only --total-steps, --eval-every, "
+                         "--eval-per-level, --test-eval-per-level, -v and --log-every can be given with it")
     ap.add_argument("--init-from", metavar="RUN",
                     help="start the network from this policy ('pretrained', a run name or folder, or a .msgpack "
                          "file) instead of random weights; a new run with fresh optimiser and learning-rate schedule")
-    args = ap.parse_args()
+    return ap
+
+
+def given_options(ap: argparse.ArgumentParser, argv) -> dict[str, str]:
+    """The options actually typed on the command line: {dest: flag}.  (args alone cannot tell `--lr 3e-4` from no
+    --lr at all, so the arguments are parsed once more with every default removed.)"""
+    probe = build_parser()
+    for action in probe._actions:
+        action.default = argparse.SUPPRESS
+    seen = vars(probe.parse_args(argv))
+    flags = {a.dest: max(a.option_strings, key=len) for a in ap._actions if a.option_strings}
+    return {dest: flags[dest] for dest in seen}
+
+
+def main(argv=None) -> None:
+    ap = build_parser()
+    args = ap.parse_args(argv)
     if args.resume and args.init_from:
         raise SystemExit("--resume continues a run, --init-from starts a new one: use one of them")
     start_params = None
@@ -199,7 +221,7 @@ def main() -> None:
 
     resumed = None
     if args.resume:
-        out, info, cfg, resumed = resume_point(args)
+        out, info, cfg, resumed = resume_point(args, given_options(ap, argv))
         level_args, test_args = info["level_args"], info["test_level_args"]
         if info.get("platformer_level") != os.environ.get("PLATFORMER_LEVEL") and not level_args:
             raise SystemExit(f"this run trained on PLATFORMER_LEVEL={info.get('platformer_level')}; "
@@ -213,6 +235,8 @@ def main() -> None:
                       curriculum_decay=args.curriculum_decay)
         if not 0.0 <= cfg.curriculum_mix <= 1.0 or not 0.0 <= cfg.curriculum_decay < 1.0:
             raise SystemExit("--curriculum-mix must be 0..1 and --curriculum-decay 0..1 (below 1)")
+        if cfg.problems():                             # checked before a run folder is made
+            raise SystemExit("\n".join(cfg.problems()))
         level_args, test_args = args.levels, args.test_levels
     if level_args:
         names, levels = load_levels(level_args, "--levels")
@@ -250,19 +274,13 @@ def main() -> None:
     init, update, network = make_train(cfg, levels)
     runner = init(jax.random.PRNGKey(cfg.seed))
     if start_params:
-        template = runner[0].params
         try:
-            params = serialization.from_bytes(template, start_params.read_bytes())
-            leaves, want = jax.tree_util.tree_leaves(params), jax.tree_util.tree_leaves(template)
-            fits = (jax.tree_util.tree_structure(params) == jax.tree_util.tree_structure(template)
-                    and all(a.shape == b.shape for a, b in zip(leaves, want)))
-        except (ValueError, KeyError, TypeError):
-            fits = False
-        if not fits:
+            params = restore_params(runner[0].params, start_params.read_bytes())
+        except ValueError as e:
             if not args.out:
                 shutil.rmtree(out, ignore_errors=True)       # the new, still empty run folder
             raise SystemExit(f"--init-from: {start_params} does not fit this network (another network size or "
-                             "observation size)")
+                             f"observation size: {e})") from None
         runner = (runner[0].replace(params=params),) + tuple(runner[1:])
         print(f"network starts from {start_params}")
     first = 1
@@ -349,11 +367,18 @@ def main() -> None:
     print(f"done in {time.time() - t_start:.0f}s, saved {out / runs.PARAMS}")
 
 
-def resume_point(args):
-    """--resume: -> (run folder, its run.json, Config, dict(update=last saved update, bytes=checkpoint))."""
+def resume_point(args, given: dict[str, str] | None = None):
+    """--resume: -> (run folder, its run.json, Config, dict(update=last saved update, bytes=checkpoint)).
+    given: the options typed on the command line ({dest: flag}); settings among them are refused, not ignored."""
     if args.levels or args.test_levels or args.out or args.name:
         raise SystemExit("--resume continues a run with its own levels and folder: leave out --levels / "
                          "--test-levels / --out / --name")
+    settings = [flag for dest, flag in (given or {}).items() if dest not in RESUME_OPTIONS | {"init_from"}]
+    if settings:
+        raise SystemExit(f"--resume continues a run with the settings in its run.json: leave out {', '.join(settings)}.  "
+                         "Only --total-steps, --eval-every, --eval-per-level, --test-eval-per-level, -v and "
+                         "--log-every can be given with --resume (to change the settings, start a new run with "
+                         "--init-from RUN)")
     run = runs.resolve_run(args.resume)
     if run is None:
         raise SystemExit(f"no run '{args.resume}' to resume (see: uv run python -m platformer_ai.runs)")

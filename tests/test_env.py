@@ -396,3 +396,17 @@ def test_built_in_level_behaves_exactly_as_with_one_enemy_and_one_platform():
     assert np.asarray(obs[-13:]).tolist() == pytest.approx(
         [1.0, 0.52381, 0.0, 0.0, -0.38889, 0.33571, 0.03333, 2.0, 0.22222, 1.0, 0.9625, 0.22222, 1.0], abs=1e-3)
     assert float(np.asarray(obs[:-13]).sum()) == 27.0
+
+
+def test_the_window_stays_aligned_while_falling_out_of_the_map():
+    """Below the last row (until death at feet > H + 1, plus one more step) the tile channels must still show the rows
+    the enemy / coin / platform channels are drawn for: the padded grids have room below, so the slice is never clamped."""
+    s = E.initial_state()
+    c = 12
+    for y in (E.H - 0.5, E.H + 0.6, E.H + 1.0, E.H + 1.0 + E.MAX_FALL * E.DT):
+        obs = E.observe(s.replace(x=jnp.float32(c + 0.5), y=jnp.float32(y)))
+        solid = np.asarray(obs[:E.PATCH[0] * E.PATCH[1]]).reshape(E.PATCH).astype(bool)
+        r = int(np.floor(y - E.HEIGHT / 2))
+        want = np.array([[not 0 <= cc < E.W or (0 <= rr < E.H and bool(L.SOLID[rr, cc]))
+                          for cc in range(c - E.PC, c + E.PC + 1)] for rr in range(r - E.PR, r + E.PR + 1)])
+        assert (solid == want).all(), y

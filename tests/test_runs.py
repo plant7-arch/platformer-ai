@@ -161,3 +161,25 @@ def test_init_from_starts_a_new_run_from_another_policy(tmp_path):
     assert r.returncode != 0 and "use one of them" in r.stdout + r.stderr
     r = train("--init-from", "nothing_here", *small)
     assert r.returncode != 0 and "no policy at" in r.stdout + r.stderr
+
+
+def test_train_refuses_unusable_settings_without_making_a_run_folder(tmp_path, monkeypatch):
+    """Too few steps for one update, a batch that does not split into minibatches, and settings given with --resume
+    (they used to be ignored without a word) all stop before anything is written."""
+    import pytest
+
+    from platformer_ai import train
+    monkeypatch.chdir(tmp_path)
+    for argv, msg in ((["--total-steps", "1000"], "less than one update"),
+                      (["--num-envs", "10", "--num-steps", "3"], "does not split into 8"),
+                      (["--resume", "--lr", "1", "--seed", "5"], "leave out --lr, --seed"),
+                      (["--resume", "x", "--curriculum", "--no-random-starts"], "leave out --curriculum, --no-random-starts"),
+                      (["--resume", "x", "--num-envs", "1024"], "leave out --num-envs")):    # even the default value
+        with pytest.raises(SystemExit) as e:
+            train.main(argv)
+        assert msg in str(e.value), (argv, str(e.value))
+    with pytest.raises(SystemExit) as e:                  # the allowed options get as far as looking for the run
+        train.main(["--resume", "x", "--total-steps", "5000", "-v", "2", "--log-every", "3", "--eval-every", "0",
+                    "--eval-per-level", "2", "--test-eval-per-level", "9"])
+    assert "no run 'x'" in str(e.value)
+    assert not (tmp_path / "runs").exists()

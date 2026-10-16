@@ -63,7 +63,7 @@ def channel(obs, k):
 def test_make_levels_pads_everything_to_the_largest_level():
     assert E.n_levels(BOTH) == 2
     assert BOTH.solid.shape == (2, 7, 30)
-    assert BOTH.solid_pad.shape == (2, 7 + 2 * E.PR + E.ABOVE, 30 + 2 * E.PC)
+    assert BOTH.solid_pad.shape == (2, 7 + 2 * E.PR + E.ABOVE + E.BELOW, 30 + 2 * E.PC)
     assert BOTH.enemy_on.shape == (2, 2) and BOTH.plat_on.shape == (2, 1) and BOTH.coin_on.shape == (2, 2)
     assert np.asarray(BOTH.h).tolist() == [3, 7] and np.asarray(BOTH.w).tolist() == [12, 30]
     assert np.asarray(BOTH.enemy_on).tolist() == [[False, False], [True, True]]

@@ -62,6 +62,10 @@ OBS_DIM = N_CHANNELS * PATCH[0] * PATCH[1] + N_SCALARS      # the same for every
 PLAT_THICK = 0.5         # only used to draw the moving platform into the observation
 ABOVE = 4                # extra empty rows above the padded grids: a jump (head up to ~3 tiles) above the map's top row
                          # still sees sky there (a negative slice start would wrap round to the bottom in JAX)
+BELOW = 2                # extra empty rows below the padded grids: a falling player is only dead once its feet are more
+                         # than 1 tile below the map (and one more step can add 0.6), so its window centre reaches
+                         # up to 2 rows below the last row; without these rows the slice would be clamped and the
+                         # tile channels would shift up against the enemy / coin / platform channels
 FAR = -1.0e4             # where unused (padding) enemies, platforms and coins sit: far above every map
 
 
@@ -123,7 +127,7 @@ def make_levels(levels) -> Level:
         def grid(g, wall=False):
             out = np.zeros((hm, wm), bool)
             out[:a.H, :a.W] = g
-            p = np.pad(out, ((PR + ABOVE, PR), (PC, PC)))
+            p = np.pad(out, ((PR + ABOVE, PR + BELOW), (PC, PC)))
             if wall:                    # columns outside the map are solid walls, at every height
                 p[:, :PC] = True
                 p[:, PC + a.W:] = True

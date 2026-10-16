@@ -28,6 +28,7 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 import optax
+from flax import serialization
 from flax.linen.initializers import constant, orthogonal
 from flax.training.train_state import TrainState
 
@@ -66,6 +67,37 @@ class Config:
     @property
     def n_updates(self) -> int:
         return self.total_timesteps // self.batch_size
+
+    def problems(self) -> list[str]:
+        """What makes this configuration unusable (empty list = fine)."""
+        out = []
+        if self.num_envs < 1 or self.num_steps < 1:
+            out.append(f"--num-envs and --num-steps must be at least 1 (got {self.num_envs} and {self.num_steps})")
+        elif self.batch_size % self.num_minibatches:
+            out.append(f"one update is --num-envs x --num-steps = {self.num_envs} x {self.num_steps} = "
+                       f"{self.batch_size:,} steps, which does not split into {self.num_minibatches} equal minibatches: "
+                       f"make it a multiple of {self.num_minibatches}")
+        elif self.n_updates < 1:
+            out.append(f"--total-steps {self.total_timesteps:,} is less than one update ({self.num_envs} envs x "
+                       f"{self.num_steps} steps = {self.batch_size:,}): nothing would be trained")
+        return out
+
+
+def restore_params(template, data: bytes):
+    """Policy bytes (a params.msgpack) -> params with the structure of `template`.  Raises ValueError if they do not
+    fit (another network width, another observation size, or not a policy file at all): flax's from_bytes alone
+    accepts arrays of any shape and the mismatch would only show up later as a traceback deep inside the network."""
+    try:
+        params = serialization.from_bytes(template, data)
+    except (ValueError, KeyError, TypeError) as e:
+        raise ValueError(f"not a policy file ({e.__class__.__name__})") from None
+    have, want = jax.tree_util.tree_leaves(params), jax.tree_util.tree_leaves(template)
+    if jax.tree_util.tree_structure(params) != jax.tree_util.tree_structure(template):
+        raise ValueError("the network layout differs")
+    for a, b in zip(have, want, strict=True):
+        if np.shape(a) != np.shape(b):
+            raise ValueError(f"a weight has shape {tuple(np.shape(a))}, this network needs {tuple(np.shape(b))}")
+    return params
 
 
 class ActorCritic(nn.Module):
@@ -122,6 +154,8 @@ def curriculum_update(curr: dict, level, ended, reached, mix: float, decay: floa
 def make_train(cfg: Config, levels=None):
     """levels: env.make_levels(...) to train on (default: the level of level.py).  Every environment plays a random
     one of them and gets a new random one at every reset, so each batch mixes all levels."""
+    if cfg.num_envs < 1 or cfg.num_steps < 1 or cfg.batch_size % cfg.num_minibatches:
+        raise ValueError(cfg.problems()[0])
     network = ActorCritic(E.N_ACTIONS, cfg.hidden)
     n_lv = E.n_levels(E.DEFAULT_LEVELS if levels is None else levels)
     use_curriculum = cfg.curriculum and n_lv > 1
