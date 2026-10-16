@@ -8,6 +8,9 @@
 
     runs/pretrained/                      the policy that comes with the repository (only params.msgpack is in git)
 
+runs/ is the one in the project folder (the folder with this project's pyproject.toml, found from the current folder
+upwards), so the commands find the runs from any subfolder of the repository; outside of it, ./runs is used.
+
 "latest" = your run whose params.msgpack was saved most recently (a run still training counts too), so the viewer and
 play pick up a new run without being told.  runs/pretrained/ is only the fallback when you have no runs of your own
 (a git pull that updates it does not make it "latest"); use it on purpose with --params pretrained.
@@ -20,10 +23,38 @@ from __future__ import annotations
 
 import datetime as _dt
 import json
+import os
 import sys
 from pathlib import Path
 
-ROOT = Path("runs")
+
+def project_root(start: Path | None = None) -> Path | None:
+    """The platformer-ai checkout that contains `start` (default: the current folder): the nearest folder upwards with
+    this project's pyproject.toml.  None outside of it."""
+    here = Path.cwd() if start is None else Path(start)
+    here = here.resolve()
+    for d in (here, *here.parents):
+        try:
+            if 'name = "platformer-ai"' in (d / "pyproject.toml").read_text():
+                return d
+        except (OSError, UnicodeDecodeError):
+            continue
+    return None
+
+
+def project_path(name: str, start: Path | None = None) -> Path:
+    """`name` inside the project folder (runs, assets), as short a path as possible: plain 'runs' when you are in the
+    project folder, '../runs' from a subfolder; outside of any checkout just `name` (the current folder)."""
+    root = project_root(start)
+    if root is None:
+        return Path(name)
+    try:
+        return Path(os.path.relpath(root / name, Path.cwd() if start is None else start))
+    except ValueError:                          # another drive (Windows): no relative path exists
+        return root / name
+
+
+ROOT = project_path("runs")
 PARAMS = "params.msgpack"
 STATE = "checkpoint.msgpack"     # network + optimiser state + random key: what --resume needs
 INFO = "run.json"

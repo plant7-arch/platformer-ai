@@ -15,6 +15,7 @@ import argparse
 import dataclasses
 import datetime
 import os
+import shlex
 import shutil
 import sys
 import time
@@ -209,6 +210,8 @@ def given_options(ap: argparse.ArgumentParser, argv) -> dict[str, str]:
 
 
 def main(argv=None) -> None:
+    argv = sys.argv[1:] if argv is None else list(argv)
+    command = shlex.join(["python", "-m", "platformer_ai.train", *argv])     # as typed, for run.json
     ap = build_parser()
     args = ap.parse_args(argv)
     if args.resume and args.init_from:
@@ -247,7 +250,7 @@ def main(argv=None) -> None:
     if not resumed:
         out = Path(args.out) if args.out else runs.new_run_dir(args.name)
         out.mkdir(parents=True, exist_ok=True)
-        info = dict(created=datetime.datetime.now().isoformat(timespec="seconds"), command=" ".join(sys.argv),
+        info = dict(created=datetime.datetime.now().isoformat(timespec="seconds"), command=command,
                     levels=names, test_levels=tests[0] if tests else [], level_args=level_args,
                     test_level_args=test_args, platformer_level=os.environ.get("PLATFORMER_LEVEL"),
                     config=dataclasses.asdict(cfg), updates=0, steps=0, last_eval={}, finished=False,
@@ -256,7 +259,7 @@ def main(argv=None) -> None:
                                         "".join(f"test {n}\n" for n in (tests[0] if tests else [])))
     else:
         info.setdefault("resumed", []).append(dict(at=datetime.datetime.now().isoformat(timespec="seconds"),
-                                                   from_update=resumed["update"], command=" ".join(sys.argv)))
+                                                   from_update=resumed["update"], command=command))
         info.update(config=dataclasses.asdict(cfg), finished=False)
     runs.write_info(out, info)
     print(f"run folder: {out}" + (f"   (resuming after update {resumed['update']})" if resumed else ""))

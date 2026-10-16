@@ -15,10 +15,9 @@ if __name__ == "__main__":
     cli.level_from_argv()          # --level FILE: has to be set before the level is loaded by the imports below
 
 from platformer_ai import env as E
-from platformer_ai import render
-from platformer_ai import runs
-from platformer_ai.terminal import Screen
+from platformer_ai import render, runs
 from platformer_ai.ppo import ActorCritic, restore_params
+from platformer_ai.terminal import Screen
 
 
 def main() -> None:

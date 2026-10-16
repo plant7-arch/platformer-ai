@@ -86,7 +86,7 @@ def test_spawn_drops_onto_one_way_platform_and_takes_coin():
     s, log = run(E.initial_state(), [NOOP] * 30)
     assert float(s.y) == pytest.approx(5.0) and float(s.vy) == 0.0       # standing on the platform
     assert not bool(s.coins_alive[coin_index(17.5, 4.5)])
-    assert sum(l["reward"] for l in log) == pytest.approx(E.R_COIN)
+    assert sum(e["reward"] for e in log) == pytest.approx(E.R_COIN)
 
 
 def test_gravity_and_terminal_velocity():
@@ -185,7 +185,8 @@ def test_enemy_patrols_between_walls():
     xs, dirs = [], []
     for _ in range(400):
         s, *_ = STEP(s, NOOP)
-        xs.append(float(s.enemy_x[0])); dirs.append(float(s.enemy_dir[0]))
+        xs.append(float(s.enemy_x[0]))
+        dirs.append(float(s.enemy_dir[0]))
     assert 44.4 < min(xs) and max(xs) < 52.6
     assert sum(1 for a, b in zip(dirs, dirs[1:]) if a != b) >= 3        # turned around several times
     assert xs[9] == pytest.approx(48.5 + 10 * L.ENEMY_SPEED * E.DT, abs=1e-3)
@@ -304,7 +305,8 @@ def test_auto_reset_randomizes_phases_when_enabled():
                 break
         assert bool(d) and bool(s.from_spawn)
         assert_obs_close(obs, E.observe(s))
-        plats.add(round(float(s.plat_x[0]), 2)); enemies.add(round(float(s.enemy_x[0]), 2))
+        plats.add(round(float(s.plat_x[0]), 2))
+        enemies.add(round(float(s.enemy_x[0]), 2))
     assert len(plats) > 20 and len(enemies) > 20
 
 
@@ -344,7 +346,7 @@ def test_progress_bonus_pays_only_new_ground():
 
 def test_progress_bonus_is_off_by_default():
     _, log = run(put(12.0, 8.0), [RIGHT] * 5)
-    assert all(l["reward"] == 0.0 for l in log)
+    assert all(e["reward"] == 0.0 for e in log)
 
 
 # ---------------------------------------------------------------- the level can be finished

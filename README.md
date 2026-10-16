@@ -16,7 +16,9 @@ phases (see "The included policy" below).
 
 Needs [uv](https://docs.astral.sh/uv/), which installs the Python version pinned in `.python-version`. The lockfile
 targets an NVIDIA GPU with CUDA 13 (`jax[cuda13]`); for CUDA 12 change the dependency in `pyproject.toml` to
-`jax[cuda12]`, for CPU only to plain `jax` (it works, just slower), and run `uv sync` again.
+`jax[cuda12]`, for CPU only to plain `jax` (it works, just slower), and run `uv sync` again. (Left at `jax[cuda13]` on a
+machine without an NVIDIA GPU, everything still runs on the CPU, but every command first prints a long warning that
+CUDA could not be loaded.)
 
 ```bash
 git clone https://github.com/plant7-arch/platformer-ai.git
@@ -27,7 +29,11 @@ uv run python -m platformer_ai.viewer                 # watch the agent (the inc
 uv run python -m platformer_ai.train                  # train your own on the built-in level: 25M steps, into a new runs/<date>_<time>/
 uv run python -m platformer_ai.runs                   # list the runs; the latest one is what viewer / play / evaluate use
 uv run pytest                                         # tests (about 5 minutes on the GPU, longer on the CPU)
+uv run python check_gpu.py                            # optional: does JAX see the GPU? (prints the devices, runs a matmul)
 ```
+
+The commands can be run from the repository folder or any folder inside it: `runs/` and `assets/` are always the ones
+of the repository. Level files and other paths you type are relative to the folder you are in.
 
 Optional JAX settings: put these in a `.env` file (it is git-ignored) and run `uv run --env-file .env ...`,
 or `export` them in your shell. (If you set `UV_ENV_FILE=.env` in your shell profile instead, every `uv run` needs a
@@ -64,11 +70,12 @@ src/platformer_ai/
   scene.py      numpy renderer for one 480x270 frame (tilemaps + sprites)
   terrain.py    draws terrain, backdrop, decorations and the goal flag from the ASCII level (so level edits show up)
 assets/         sprites/ and fonts/ from the Brackeys platformer bundle (CC0)
-docs/           example levels (levels/, example_many.txt, builtin.txt = the level of level.py), generator settings
+docs/           example levels (levels/, example_many.txt = levels/03_many.txt, builtin.txt = the level of level.py), generator settings
                 (levelgen/), the README pictures
 runs/           one folder per training run (params.msgpack, run.json, levels.txt); runs/pretrained/ = the included policy
 gen/, gen_*/    generated level sets (not in git; levelgen makes them again, identically)
 tests/          environment, levels and level checks, generator, PPO, curriculum, evaluation, runs and viewer logic
+check_gpu.py    prints the JAX devices and runs one matmul: is the GPU used?
 ```
 
 ## Training: what the options do and how to read the log
@@ -115,8 +122,7 @@ upd   60/190  steps   7,864,320  SPAWN eps   310 return  6.20 coins  5.1 goal 0.
 * `SPAWN ...` only averages episodes that have *finished*, so while many episodes are still
   running it looks better than reality (stuck episodes only count when they time out after 900 steps).
   Use it for trends, not for absolute values.
-* `ALL ...` includes the random starts (easier on average). A progress line averages the updates since the previous
-  line (at least the last 10). `ent` is the policy's entropy (1.79 = fully random), `sps` the speed in steps per
+* `ALL ...` includes the random starts (easier on average). `ent` is the policy's entropy (1.79 = fully random), `sps` the speed in steps per
   second.
 * Logged returns are the task return (coins + goal + death); the progress bonus is only used for training.
 
@@ -164,7 +170,8 @@ uv run python -m platformer_ai.train --resume --total-steps 50000000  # a finish
 ```
 
 The settings and levels come from the run's `run.json`; only what changes the length, the evaluation or the printing
-can be given (`--total-steps`, `--eval-every`, `--eval-per-level`, `--test-eval-per-level`, `-v`, `--log-every`). The
+can be given (`--total-steps`, `--eval-every`, `--eval-per-level`, `--test-eval-per-level`, `-v`, `--log-every`); any
+other option is refused with a message, not ignored (to change settings, start a new run with `--init-from`). The
 network, the Adam state, the learning-rate schedule and the random stream continue exactly; the environments start
 fresh episodes. With a bigger `--total-steps` the learning-rate schedule is stretched to the new end, so the rate
 picks up again from `lr x (1 - done / new total)` and decays to 0.
@@ -204,8 +211,8 @@ uv run python -m platformer_ai.viewer --level docs/example_many.txt             
 ```
 
 A 480x270 picture scaled up in whole-number steps (the window is resizable), camera following the knight,
-knight / slime / coin / platform animations, coin counter. Run it from the repository root so it
-finds `assets/` (or pass `--assets DIR`).
+knight / slime / coin / platform animations, coin counter. It uses the repository's `assets/` (or pass
+`--assets DIR`).
 
 | key | action |
 | --- | --- |
@@ -333,7 +340,7 @@ still loads and trains; the observation keeps its size.
 ![a level with three enemies and two moving platforms](docs/preview_multi.png)
 
 Try it: `uv run python -m platformer_ai.viewer --level docs/example_many.txt` (the level in the picture, with its path
-lines).
+lines; the same level is also `docs/levels/03_many.txt`).
 
 To check a level while you edit it, without starting anything else (a text file with the map rows and optional path lines also works):
 
@@ -408,7 +415,7 @@ coins, riders on platforms and ledges), with a start point `S` in front of every
 
 ```bash
 uv run python -m platformer_ai.levelgen                    # gen/train/ (300 levels) and gen/test/ (60), seed 0, ~4 min on CPU
-uv run python -m platformer_ai.levelgen --show 2 --tiers 3 # just print a few, write nothing
+uv run python -m platformer_ai.levelgen --show 2 --tiers 3 # just print a few (each marked beatable or not), write nothing
 uv run python -m platformer_ai.train --levels gen/train/ --test-levels gen/test/ --name generated
 uv run python -m platformer_ai.viewer --level gen/test/t3_0002.txt
 ```
@@ -547,7 +554,7 @@ episodes it does not, which is one more reason to use many episodes per level.
 | levels | goal |
 | --- | --- |
 | the built-in level (`docs/builtin.txt`, the same map as `level.py`) | 0.99 (296/300) |
-| `docs/levels/` and `docs/example_many.txt` | 0.92 - 1.00 per level |
+| `docs/levels/` (`03_many.txt` is the same map as `docs/example_many.txt`) | 0.92 - 1.00 per level |
 | the 60 held-out levels of `gen_t3/test/` (= `gen/test/`), 50 episodes each | 0.97 (tier 3: 0.95) |
 | 120 levels it has never seen (`levelgen --seed 777 --train 0 --test 120 --test-seed 4242`), 30 each | 0.97 (tier 3: 0.95) |
 
@@ -562,7 +569,8 @@ uv run python -m platformer_ai.levelgen --config docs/levelgen/tier3_drill.toml 
 uv run python -m platformer_ai.train --levels gen_t3/train/ --test-levels gen_t3/test/ --init-from <generated run> \
     --total-steps 100000000 --name t3_drill
 # 40 copies of each hand-made level, so they are about a quarter of the practice next to the 600 generated ones
-# (with one copy each, 0.6% of the levels, they did not improve)
+# (with one copy each, 0.6% of the levels, they did not improve).  docs/example_many.txt and docs/levels/03_many.txt
+# are the same map, so that one gets 80 copies: this is the exact recipe of the included policy
 mkdir -p hand_x40
 for f in docs/levels/*.txt docs/example_many.txt docs/builtin.txt; do
     for i in $(seq -w 1 40); do cp "$f" "hand_x40/$(basename "$f" .txt)_$i.txt"; done

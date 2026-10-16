@@ -65,10 +65,11 @@ def _starts(levels, n: int, trials: int, seed: int):
         lambda a, b: jnp.where(first.reshape((-1,) + (1,) * (a.ndim - 1)), a, b), fixed, rand)
 
 
-def _search(texts, trials: int, beam: int, seed: int):
-    """(solved[n] bool, steps[n] = env steps of the slowest start, or -1)."""
+def _search(texts, trials: int, beam: int, seed: int, names=None):
+    """(solved[n] bool, steps[n] = env steps of the slowest start, or -1).  names: for the level messages."""
     n = len(texts)
-    levels = E.make_levels([L.build(t, f"candidate {i}") for i, t in enumerate(texts)])
+    names = names or [f"candidate {i}" for i in range(n)]
+    levels = E.make_levels([L.build(t, nm) for t, nm in zip(texts, names, strict=True)])
     macro = _macro_fn(levels)
     rng = np.random.default_rng(seed)
 
@@ -138,12 +139,15 @@ def _search(texts, trials: int, beam: int, seed: int):
     return solved, np.where(solved, per.max(1), -1)
 
 
-def solvable(texts, trials: int = 3, beam: int = BEAM, seed: int = 0, chunk: int = 48, with_steps: bool = False):
+def solvable(texts, trials: int = 3, beam: int = BEAM, seed: int = 0, chunk: int = 48, with_steps: bool = False,
+             names=None):
     """[bool] per level text: the search reached the goal from every one of `trials` starts (with_steps: also the
-    env steps the slowest start needed, -1 if not solved)."""
+    env steps the slowest start needed, -1 if not solved).  names: file names for the level warnings (default
+    'candidate N')."""
     out, steps = [], []
     for i in range(0, len(texts), chunk):
-        s, st = _search(list(texts[i:i + chunk]), trials, beam, seed)
+        part = None if names is None else list(names[i:i + chunk])
+        s, st = _search(list(texts[i:i + chunk]), trials, beam, seed, part)
         out += s.tolist()
         steps += st.tolist()
     return (out, steps) if with_steps else out
@@ -155,11 +159,24 @@ def main(argv=None) -> int:
         print("usage: python -m platformer_ai.levelplan LEVEL_FILES_OR_FOLDERS...")
         return 2
     files = levelcheck.level_files(argv)
-    texts = []
+    texts, problems = [], []                        # every broken or unreadable file at once, without a traceback
     for f in files:
-        with open(f) as fh:
-            texts.append(fh.read())
-    ok, steps = solvable(texts, with_steps=True)
+        try:
+            with open(f) as fh:
+                texts.append(fh.read())
+        except OSError as e:
+            problems.append(f"cannot read the level file {f}: {e.strerror}")
+            continue
+        limits = (L.DEFAULT_PLATFORM_TRAVEL, L.DEFAULT_ENEMY_REACH, L.ENEMY_HALF_W, L.ENEMY_H)
+        if levelcheck.check(texts[-1], *limits).errors:          # (check() logs nothing: warnings come once, below)
+            try:
+                L.build(texts[-1], f)
+            except levelcheck.LevelError as e:
+                problems.append(str(e))
+    if problems:
+        print("levelplan: " + "\n".join(problems), file=sys.stderr)
+        return 2
+    ok, steps = solvable(texts, with_steps=True, names=files)
     for f, good, st in zip(files, ok, steps):
         print(f"{'ok     ' if good else 'NOT OK '} {f}" + (f"  ({st} steps)" if good else ""))
     print(f"{sum(ok)} of {len(ok)} levels finished by the search")

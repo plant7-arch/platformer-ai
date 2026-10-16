@@ -125,3 +125,26 @@ def test_eval_compact_and_every_level():
     assert line.startswith("    EVAL upd   40  greedy goal 0.50") and "UNSEEN greedy goal" in line and "\n" not in line
     names = [f"gen/train/t1_{i:04d}.txt" for i in range(30)]
     assert len(train.eval_lines("greedy", fake_eval(30), names, 600, every_level=True)) == 31
+
+
+def test_levelplan_command_line_names_files_and_refuses_broken_ones(tmp_path, capsys, caplog):
+    good, bad = tmp_path / "good.txt", tmp_path / "bad.txt"
+    good.write_text("..........\n.P......G.\n##########\n")
+    bad.write_text("..........\n.p.P..P...\n##########\n")
+    assert levelplan.main([str(good)]) == 0
+    assert levelplan.main([str(good), str(bad), str(tmp_path / "missing.txt")]) == 2      # no search, no traceback
+    err = capsys.readouterr().err
+    assert "bad.txt has 2 problems" in err and "cannot read the level file" in err
+    nogoal = tmp_path / "nogoal.txt"
+    nogoal.write_text("..........\n.P........\n##########\n")
+    caplog.clear()
+    assert levelplan.main([str(nogoal)]) == 1
+    warnings = [r.getMessage() for r in caplog.records if "no-goal" in r.getMessage()]
+    assert len(warnings) == 1 and "nogoal.txt" in warnings[0]          # once, naming the file (not 'candidate 0')
+
+
+def test_show_marks_every_level_beatable_or_not(capsys):
+    assert levelgen.main(["--show", "2", "--tiers", "1"]) == 0
+    assert capsys.readouterr().out.count("beatable (levelplan search)") == 2
+    assert levelgen.main(["--show", "1", "--no-verify"]) == 0
+    assert "not checked for beatability (--no-verify)" in capsys.readouterr().out

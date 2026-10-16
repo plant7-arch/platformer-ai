@@ -422,7 +422,9 @@ def build_parser() -> argparse.ArgumentParser:
                     help="any setting by name, e.g. tier.3.gap=2-3 or test_set.weight.enemy=1 (repeatable)")
     ap.add_argument("--print-settings", action="store_true",
                     help="print the settings that would be used (as a settings file) and stop")
-    ap.add_argument("--show", type=int, default=0, metavar="N", help="print N levels of the training set, write nothing")
+    ap.add_argument("--show", type=int, default=0, metavar="N",
+                    help="print N levels of the training set, each marked beatable or not by the search (not with "
+                         "--no-verify), write nothing")
     ap.add_argument("--tier", type=int, choices=TIERS, help=argparse.SUPPRESS)       # old name: --tiers T
     return ap
 
@@ -463,8 +465,17 @@ def main(argv=None) -> int:
         if a.show:
             rng = random.Random(run["seed"])
             cfgs = {c.tier: c for c in resolved}
-            for t in LS.tier_plan(a.show, run["tiers"]):
-                print(generate(cfgs[t], rng))
+            texts = [generate(cfgs[t], rng) for t in LS.tier_plan(a.show, run["tiers"])]
+            if run["verify"]:                           # the same beatability search the written sets go through
+                from platformer_ai import levelplan
+                ok = levelplan.solvable(texts)
+            for i, text in enumerate(texts):
+                if run["verify"]:
+                    print(f"# level {i + 1}: " + ("beatable (levelplan search)" if ok[i] else
+                                                    "NOT beatable: a written set would replace it"))
+                else:
+                    print(f"# level {i + 1}: not checked for beatability (--no-verify)")
+                print(text)
             return 0
         os.makedirs(run["out"], exist_ok=True)
         with open(os.path.join(run["out"], "settings.toml"), "w") as f:

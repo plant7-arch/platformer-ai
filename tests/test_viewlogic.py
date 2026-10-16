@@ -3,8 +3,8 @@ import numpy as np
 import pytest
 
 from platformer_ai import level as L
-from platformer_ai import viewlogic as V
 from platformer_ai import scene as S
+from platformer_ai import viewlogic as V
 
 
 def test_coordinates_match_the_original_scene():

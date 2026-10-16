@@ -31,3 +31,11 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+# ruff's classic defaults (pyflakes + the error-prone pycodestyle checks) and sorted imports.  The code keeps its own
+# column alignment of comments, so `ruff format` is not part of the workflow: run `uv run ruff check`.
+select = ["E4", "E7", "E9", "F", "I"]

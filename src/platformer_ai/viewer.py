@@ -28,9 +28,7 @@ if __name__ == "__main__":
 
 from platformer_ai import env as E
 from platformer_ai import level as L
-from platformer_ai import runs
-from platformer_ai import scene
-from platformer_ai import terrain
+from platformer_ai import runs, scene, terrain
 from platformer_ai import viewlogic as V
 from platformer_ai.ppo import ActorCritic, restore_params
 
@@ -261,7 +259,8 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--params", default="latest",
                     help="'latest' (default), a run folder or run name under runs/, or a params.msgpack file")
-    ap.add_argument("--assets", default="assets", help="folder with sprites/ and fonts/ (Brackeys bundle)")
+    ap.add_argument("--assets", default=str(runs.project_path("assets")),
+                    help="folder with sprites/ and fonts/ (Brackeys bundle; default: assets/ of the project folder)")
     ap.add_argument("--scale", type=int, default=3, help="initial window = 480x270 times this (resizable)")
     ap.add_argument("--human", action="store_true", help="start with keyboard control")
     ap.add_argument("--sample", action="store_true", help="agent samples actions instead of argmax")

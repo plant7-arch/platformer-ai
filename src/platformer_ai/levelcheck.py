@@ -272,8 +272,8 @@ def check(text: str, platform_travel: float = 6.0, enemy_reach: float = 3.0, ene
           enemy_h: float = 0.875) -> Report:
     """Find everything wrong with a level text.  Never raises.  platform_travel / enemy_reach: paths without a path line."""
     rep = Report()
-    err = lambda code, msg, cells=(): rep.errors.append(Problem(code, msg, list(cells)))
-    warn = lambda code, msg, cells=(): rep.warnings.append(Problem(code, msg, list(cells)))
+    err = lambda code, msg, cells=(): rep.errors.append(Problem(code, msg, list(cells)))         # noqa: E731
+    warn = lambda code, msg, cells=(): rep.warnings.append(Problem(code, msg, list(cells)))     # noqa: E731
 
     rows, spec = split_text(text)
     if not rows:
@@ -519,7 +519,7 @@ def main(argv=None) -> int:
                 texts.append((f, None))
                 print(f"ERROR   cannot read {f}: {e.strerror}")
     else:
-        from platformer_ai import level as L      # the level in level.py (importing it already validates it)
+        from platformer_ai import level as L  # the level in level.py (importing it already validates it)
         texts = [(None, L.LEVEL)]
     bad = 0
     for name, text in texts:

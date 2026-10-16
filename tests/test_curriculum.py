@@ -6,8 +6,7 @@ import numpy as np
 
 from platformer_ai import env as E
 from platformer_ai import level as L
-from platformer_ai import ppo
-from platformer_ai import train
+from platformer_ai import ppo, train
 
 LEVELS = E.make_levels(L.load_all(["docs/levels/"]))
 

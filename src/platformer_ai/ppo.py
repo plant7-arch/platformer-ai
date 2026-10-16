@@ -1,7 +1,7 @@
 """PPO written PureJaxRL-style: environment stepping, GAE and the optimiser updates all live
 inside one jitted function, so nothing leaves the GPU during an update.
 
-    init, update = make_train(Config())
+    init, update, network = make_train(Config())
     runner = init(jax.random.PRNGKey(0))
     runner, metrics = update(runner)        # one rollout (num_envs * num_steps) + PPO epochs
 

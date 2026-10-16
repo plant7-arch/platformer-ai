@@ -10,10 +10,9 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
-from platformer_ai import cli
+from platformer_ai import cli, levelcheck
 from platformer_ai import env as E
 from platformer_ai import level as L
-from platformer_ai import levelcheck
 from platformer_ai.evaluate import make_eval
 
 NOOP, LEFT, RIGHT, JUMP, JUMP_LEFT, JUMP_RIGHT = range(6)

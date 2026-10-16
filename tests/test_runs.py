@@ -1,6 +1,7 @@
 """Run folders under runs/ and how --params finds the latest one (plain Python, no jax)."""
 import datetime as dt
 import os
+from pathlib import Path
 
 from platformer_ai import runs
 
@@ -105,6 +106,7 @@ def test_train_stops_and_resumes(tmp_path):
     assert r.returncode == 0, r.stdout + r.stderr
     info = json.loads((run / runs.INFO).read_text())
     assert (info["updates"], info["finished"]) == (4, True)
+    assert info["command"].startswith("python -m platformer_ai.train --total-steps 512 ")       # as typed
     params_before = (run / runs.PARAMS).read_bytes()
 
     r = train("--resume", str(run))                                    # finished: nothing left to do
@@ -183,3 +185,21 @@ def test_train_refuses_unusable_settings_without_making_a_run_folder(tmp_path, m
                     "--eval-per-level", "2", "--test-eval-per-level", "9"])
     assert "no run 'x'" in str(e.value)
     assert not (tmp_path / "runs").exists()
+
+
+def test_runs_and_assets_are_the_ones_of_the_project_folder(tmp_path, monkeypatch):
+    """From any folder inside the checkout the commands use its runs/ (and assets/); outside of one, ./runs."""
+    repo = tmp_path / "repo"
+    (repo / "docs" / "levels").mkdir(parents=True)
+    (repo / "pyproject.toml").write_text('[project]\nname = "platformer-ai"\n')
+    other = tmp_path / "other"
+    (other / "sub").mkdir(parents=True)
+    (other / "pyproject.toml").write_text('[project]\nname = "something-else"\n')
+    assert runs.project_root(repo / "docs" / "levels") == repo.resolve()
+    assert runs.project_root(other / "sub") is None
+    monkeypatch.chdir(repo / "docs" / "levels")
+    assert runs.project_path("runs") == Path("../../runs")
+    monkeypatch.chdir(repo)
+    assert runs.project_path("assets") == Path("assets")
+    monkeypatch.chdir(other / "sub")
+    assert runs.project_path("runs") == Path("runs")
