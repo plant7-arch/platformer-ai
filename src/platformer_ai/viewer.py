@@ -3,7 +3,10 @@
   uv run python -m platformer_ai.viewer [--params RUN]          (default: the latest run, see runs.py)
 
 The window only READS the JAX env (one env, one jitted step per tick, on the CPU) - training is untouched.
-Keys:  Tab agent <-> you | arrows / A D move, Space / Up / W jump | P pause, . single step | R restart | Esc quit
+It follows the policy: a newer params.msgpack (the run still training saved again, or a new latest run) is loaded at
+the start of the next episode (policywatch.py; --no-follow turns that off).
+Keys:  Tab agent <-> you | arrows / A D move, Space / Up / W jump | P pause, . single step | R restart |
+       L load the newest policy now | Esc quit
 """
 from __future__ import annotations
 
@@ -30,24 +33,26 @@ from platformer_ai import env as E
 from platformer_ai import level as L
 from platformer_ai import runs, scene, terrain
 from platformer_ai import viewlogic as V
+from platformer_ai.policywatch import PolicyWatch
 from platformer_ai.ppo import ActorCritic, restore_params
 
 BANNER_SECONDS = 0.9
 WHITE, SHADOW, YELLOW = (255, 255, 255), (0, 0, 0), (255, 220, 80)
 
 
-def load_agent(path: str, hidden: int):
-    """-> (net, params) or (net, None) if the file is missing (then you play yourself)."""
+def load_agent(arg: str, hidden: int, follow: bool = True):
+    """-> (net, PolicyWatch).  watch.params is None if there is no policy file yet (then you play yourself; with
+    follow on, the agent takes over as soon as a run saves one)."""
     net = ActorCritic(E.N_ACTIONS, hidden)
     template = net.init(jax.random.PRNGKey(0), jnp.zeros((E.OBS_DIM,), jnp.float32))
-    p = Path(path)
-    if not p.is_file():
-        print(f"no params at {p}: starting in keyboard mode (train first to watch the agent)")
-        return net, None
     try:
-        return net, restore_params(template, p.read_bytes())
+        watch = PolicyWatch(arg, lambda data: restore_params(template, data), follow=follow)
     except ValueError as e:
-        raise SystemExit(f"{p} does not fit a network of width {hidden} ({e}; try --hidden)") from None
+        raise SystemExit(f"{runs.resolve_params(arg)} does not fit a network of width {hidden} ({e}; try --hidden)") \
+            from None
+    if watch.params is None:
+        print(f"no params at {watch.path}: starting in keyboard mode (train first to watch the agent)")
+    return net, watch
 
 
 class Snap:
@@ -71,7 +76,7 @@ class Viewer:
     def __init__(self, args):
         self.args = args
         self.assets = scene.load_assets(args.assets, args.theme, not args.no_decor)
-        self.net, self.params = load_agent(args.params, args.hidden)
+        self.net, self.watch = load_agent(args.params, args.hidden, follow=not args.no_follow)
         self.human = self.params is None or args.human
         net = self.net
 
@@ -85,7 +90,7 @@ class Viewer:
         self.key = jax.random.PRNGKey(args.seed)
 
         pygame.init()
-        pygame.display.set_caption("platformer-ai   Tab: agent/you   P: pause   R: restart   Esc: quit")
+        pygame.display.set_caption("platformer-ai   Tab: agent/you   P: pause   R: restart   L: newest policy   Esc: quit")
         self.screen = pygame.display.set_mode((V.SCREEN_W * args.scale, V.SCREEN_H * args.scale), pygame.RESIZABLE)
         self.clock = pygame.time.Clock()
         self.font_path = str(Path(args.assets) / "fonts" / "PixelOperator8-Bold.ttf")
@@ -101,8 +106,22 @@ class Viewer:
         self.banner, self.hold_until = "", 0.0
         self.restart()
 
+    @property
+    def params(self):
+        return self.watch.params
+
+    def reload(self, force: bool = False):
+        """A newer policy (between episodes, or now with L)?  The agent takes over if there was none before."""
+        had = self.params is not None
+        msg = self.watch.poll(force=force)
+        if msg:
+            print(msg)
+        if not had and self.params is not None and not self.args.human:
+            self.human = False
+
     # ---- simulation ----------------------------------------------------------------------------
     def restart(self):
+        self.reload()
         self.key, k = jax.random.split(self.key)
         self.state = E.reset(k, random_phases=self.args.random_phases)
         self.obs = E.observe(self.state)
@@ -128,6 +147,7 @@ class Viewer:
         self.state, self.obs, _, done, info = self.step(self.state, action)
         self.cur = Snap(self.state)
         if bool(done):                                  # the env already auto-reset: show the last frame + banner
+            self.prev = Snap(info["final_state"])       # where the episode really ended (on the flag, in the enemy)
             if bool(info["goal"]):
                 self.banner = "Goal reached!"
             elif bool(info["truncated"]):
@@ -201,8 +221,10 @@ class Viewer:
         self.text(surf, s, f"Coins {b.coins}/{L.N_COINS}", ox + 4 * s, oy + 4 * s, YELLOW)
         mode = "YOU" if self.human else "AGENT"
         self.text(surf, s, f"{mode}   return {b.ret:.1f}", ox + 4 * s, oy + 14 * s)
+        if self.watch.label:                                       # which policy: run, update, last evaluation
+            self.text(surf, s, V.fit_text(self.watch.label, V.HUD_CHARS), ox + 4 * s, oy + 24 * s)
         if self.paused:
-            self.text(surf, s, "PAUSED", ox + 4 * s, oy + 24 * s, YELLOW)
+            self.text(surf, s, "PAUSED", ox + 4 * s, oy + 34 * s, YELLOW)
         if frozen and self.banner:
             lw = f.size(self.banner)[0]
             self.text(surf, s, self.banner, ox + (V.SCREEN_W * s - lw) // 2, oy + 40 * s, YELLOW)
@@ -231,6 +253,8 @@ class Viewer:
                         self.restart()
                     elif ev.key == pygame.K_TAB and self.params is not None:
                         self.human = not self.human
+                    elif ev.key == pygame.K_l:
+                        self.reload(force=True)
                     elif ev.key in (pygame.K_SPACE, pygame.K_UP, pygame.K_w):
                         self.jump_latch = True
 
@@ -239,6 +263,7 @@ class Viewer:
                     self.banner = ""
                     self.prev = self.cur
                     self.cam.snap(*V.to_px(self.cur.x, self.cur.y))
+                    self.reload()                                  # a newer policy plays the new episode
                 if not self.paused or single:
                     acc += DT_SIM if single else dt
                     while acc >= DT_SIM and now >= self.hold_until:
@@ -268,11 +293,13 @@ def main() -> None:
     ap.add_argument("--theme", default="grass", choices=sorted(terrain.THEMES), help="ground material")
     ap.add_argument("--no-decor", action="store_true", help="no bushes / mushrooms on the ground")
     ap.add_argument("--hidden", type=int, default=128)
+    ap.add_argument("--no-follow", action="store_true",
+                    help="keep the policy it started with (default: load a newer one between episodes, so you can "
+                         "watch a run learn; L loads it at once)")
     cli.add_level_argument(ap)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
-    args.params = str(runs.resolve_params(args.params))
-    print(f"policy: {args.params}")
+    print(f"policy: {runs.resolve_params(args.params)}")
     v = Viewer(args)
     print("compiling the env on the CPU (a few seconds) ...")
     v.step(v.state, 0)                                    # warm-up so the window does not stutter at the start

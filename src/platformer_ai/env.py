@@ -2,7 +2,7 @@
 use jax.vmap for thousands of them.  Nothing here touches the CPU.
 
     state = reset(key)                                        # the real spawn
-    state, obs, reward, done, info = step(state, action)     # auto-resets when done
+    state, obs, reward, done, info = step(state, action)     # auto-resets when done (info["final_state"]: before it)
 
 The level is an INPUT (data, not code): every function takes `levels=` (from make_levels; default: the level of
 level.py / PLATFORMER_LEVEL).  Several levels of different sizes are padded to one shape, every environment carries the
@@ -211,12 +211,20 @@ def initial_state(rng=None, levels=None, level=0) -> EnvState:
         ep_return=f32(0), ep_coins=f32(0), level=jnp.asarray(level, jnp.int32))
 
 
+def _unsafe_start(x, y, enemy_x, lv: Level):
+    """Would a player standing at (x, y) start inside an enemy (the same box test as a hit in step)?  Starts that are
+    close but not touching stay: the agent can still get away, and they are the enemy practice of many levels."""
+    return ((x + HW > enemy_x - L.ENEMY_HALF_W) & (x - HW < enemy_x + L.ENEMY_HALF_W) &
+            (y > lv.enemy_y - L.ENEMY_H) & (y - HEIGHT < lv.enemy_y) & lv.enemy_on).any()
+
+
 def _sample_start(key, lv: Level, level, use_s_points: bool, random_phases: bool, spawn_prob: float) -> EnvState:
     """Random episode start (lv = the arrays of `level`).
     * random_phases: platforms and enemies begin at random phases and the spawn position is jittered, so
       the agent has to react to what it sees instead of replaying one timed route.
     * use_s_points: with probability 1 - spawn_prob start at a random 'S' point or on a moving platform
-      instead of the spawn (always with random phases) to practise the hard parts directly."""
+      instead of the spawn (always with random phases) to practise the hard parts directly.  A start inside an
+      enemy (one that cannot be pushed far enough away) becomes a spawn start instead."""
     f32, i32 = jnp.float32, jnp.int32
     km, nm = lv.plat_top.shape[0], lv.enemy_x0.shape[0]
     k = jax.random.split(key, 10)
@@ -248,10 +256,23 @@ def _sample_start(key, lv: Level, level, use_s_points: bool, random_phases: bool
         sx, sy = jnp.asarray(spawn_x, f32), jnp.asarray(spawn_y, f32)
         phases = jnp.bool_(random_phases)
 
-    # never start on top of an enemy: push it 3 tiles away (to whichever side still fits its patrol range)
-    away = jnp.where(sx + 3.0 <= base + lv.enemy_max, sx + 3.0, sx - 3.0)
-    away = jnp.clip(away, base + lv.enemy_min + 0.1, base + lv.enemy_max - 0.1)
-    ex = jnp.where(jnp.abs(ex - sx) < 1.5, away, ex)
+    def push(ex, sx):
+        # never start on top of an enemy: push it 3 tiles away (to whichever side still fits its patrol range)
+        away = jnp.where(sx + 3.0 <= base + lv.enemy_max, sx + 3.0, sx - 3.0)
+        away = jnp.clip(away, base + lv.enemy_min + 0.1, base + lv.enemy_max - 0.1)
+        return jnp.where(jnp.abs(ex - sx) < 1.5, away, ex)
+
+    ex_spawn = push(ex, spawn_x)
+    ex = push(ex, sx)
+    if use_s_points:
+        # an enemy with a short patrol (a rider on a narrow platform) cannot be pushed far enough: such a start would
+        # die before the agent can act, so it falls back to the (jittered) spawn, which the level check keeps safe
+        bad = _unsafe_start(sx, sy, ex, lv) & ~use_spawn
+        sx = jnp.where(bad, spawn_x, sx)
+        sy = jnp.where(bad, spawn_y, sy)
+        ex = jnp.where(bad, ex_spawn, ex)
+        use_spawn = use_spawn | bad
+        phases = jnp.logical_or(~use_spawn, random_phases)
     init = EnvState(
         x=jnp.asarray(lv.spawn_x, f32), y=jnp.asarray(lv.spawn_y, f32), vx=f32(0), vy=f32(0),
         coins_alive=lv.coin_on, plat_x=lv.plat_start_x, plat_dir=lv.plat_dir0, enemy_x=lv.enemy_x0,
@@ -510,7 +531,9 @@ def step(state: EnvState, action, random_starts: bool = False, random_phases: bo
                    rng=next_key, ep_return=state.ep_return + task_reward,
                    ep_coins=state.ep_coins + n_got, level=state.level)
     final_obs = observe(nxt, levels)
-    info = dict(terminated=terminated, truncated=truncated, final_obs=final_obs,
+    # final_state: the state the step ended in, before the auto-reset (what play / viewer show at an episode's end);
+    # code that does not use it (training, evaluation) gets it removed by the compiler
+    info = dict(terminated=terminated, truncated=truncated, final_obs=final_obs, final_state=nxt,
                 ep_return=nxt.ep_return, ep_length=t, ep_coins=nxt.ep_coins, goal=goal,
                 max_x=nxt.furthest, from_spawn=state.from_spawn, level=state.level)
 

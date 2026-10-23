@@ -134,3 +134,21 @@ def test_lerp_pos_smooths_but_not_across_teleports():
     assert V.lerp_pos(1.0, 2.0, 0.25) == 1.25
     assert V.lerp_pos(1.0, 2.0, 5.0) == 2.0 and V.lerp_pos(1.0, 2.0, -1.0) == 1.0
     assert V.lerp_pos(60.0, 17.5, 0.3) == 17.5           # reset: jump straight to the new position
+
+
+def test_signs_only_on_the_built_in_map():
+    """Bug (0.1.0): the built-in level's signs ('Falling hurts...', 'Great Job!') were drawn on every level."""
+    from pathlib import Path
+    docs = Path(__file__).resolve().parents[1] / "docs"
+    assert L.IS_BUILTIN                                                 # the tests run on the built-in level
+    assert V.world_labels(builtin=False) == []
+    assert L.same_map((docs / "builtin.txt").read_text(), L.BUILTIN_LEVEL)       # a copy of it keeps its signs
+    for f in ("levels/01_walk.txt", "levels/03_many.txt", "example_many.txt"):
+        assert not L.same_map((docs / f).read_text(), L.BUILTIN_LEVEL), f
+    moved = L.BUILTIN_LEVEL.replace("platform 8 28 to 34", "platform 8 28 to 33")
+    assert L.same_map(moved, L.BUILTIN_LEVEL)                           # path lines do not move the signs
+
+
+def test_fit_text():
+    assert V.fit_text("short", 10) == "short"
+    assert V.fit_text("x" * 12, 10) == "xxxxxxx..." and len(V.fit_text("y" * 99, V.HUD_CHARS)) == V.HUD_CHARS

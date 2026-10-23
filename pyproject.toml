@@ -1,6 +1,6 @@
 [project]
 name = "platformer-ai"
-version = "0.1.0"
+version = "0.2.0"
 description = "A tiny platformer and PPO written in pure JAX: training runs entirely on the GPU, with a pygame viewer."
 readme = "README.md"
 license = "MIT"
@@ -31,6 +31,7 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+addopts = "-ra"           # skipped / failed tests and the run's notes in the short test summary
 
 [tool.ruff]
 line-length = 120

@@ -53,6 +53,8 @@ platform 8 28 to 34
 enemy 7 49 from 44.5625 to 52.4375
 """
 
+BUILTIN_LEVEL = LEVEL      # the level above, also when PLATFORMER_LEVEL picks another one
+
 # Try another level without editing this file: PLATFORMER_LEVEL=my_level.txt uv run python -m platformer_ai.viewer
 # (a text file with the map rows and optional path lines; works for every command, including train and levelcheck).
 LEVEL_FILE = os.environ.get("PLATFORMER_LEVEL")
@@ -67,7 +69,8 @@ if LEVEL_FILE:
         levelcheck.short_errors_on_exit("PLATFORMER_LEVEL must be the path of a text file with the level.")
         raise levelcheck.LevelError(f"cannot read the level file PLATFORMER_LEVEL={LEVEL_FILE}: {_e.strerror}") from None
 
-# Signs drawn in the world by the viewer (no effect on the game): (text, x, y) = top-left corner in tiles.
+# Signs drawn in the world by the viewer (no effect on the game): (text, x, y) = top-left corner in tiles.  They belong to
+# the map of the built-in level, so the viewer only draws them when the level has that map (IS_BUILTIN, below).
 LABELS = [("Falling hurts...", 28.9, 7.9), ("Great Job!", 62.3, 0.3)]
 
 # --- moving platform / enemy / riding coin parameters (tiles, tiles per second) ---
@@ -177,7 +180,8 @@ def load(path: str) -> Arrays:
         with open(path) as f:
             text = f.read()
     except OSError as e:
-        raise levelcheck.LevelError(f"cannot read the level file {path}: {e.strerror}") from None
+        what = "no such level file or folder" if not os.path.exists(path) else e.strerror
+        raise levelcheck.LevelError(f"cannot read the level file {path}: {what}") from None
     return build(text, name=path)
 
 
@@ -200,6 +204,14 @@ try:
 except levelcheck.LevelError:
     levelcheck.short_errors_on_exit(CHECK_HINT)       # a short message instead of a traceback when it is not caught
     raise
+
+
+def same_map(text_a: str, text_b: str) -> bool:
+    """Do two level texts have the same map rows (path lines and comments aside)?"""
+    return levelcheck.split_text(text_a)[0] == levelcheck.split_text(text_b)[0]
+
+
+IS_BUILTIN = same_map(LEVEL, BUILTIN_LEVEL)        # the built-in map (level.py, or a copy such as docs/builtin.txt)
 SOLID: np.ndarray = CURRENT.SOLID        # (H, W) bool
 ONEWAY: np.ndarray = CURRENT.ONEWAY      # (H, W) bool, static one-way tiles
 GOAL: np.ndarray = CURRENT.GOAL          # (H, W) bool

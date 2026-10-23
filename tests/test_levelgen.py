@@ -148,3 +148,19 @@ def test_show_marks_every_level_beatable_or_not(capsys):
     assert capsys.readouterr().out.count("beatable (levelplan search)") == 2
     assert levelgen.main(["--show", "1", "--no-verify"]) == 0
     assert "not checked for beatability (--no-verify)" in capsys.readouterr().out
+
+
+def test_levelplan_on_an_empty_folder_is_a_message_not_a_traceback(tmp_path, capsys):
+    """Bug (0.1.0): level_files() raised LevelError out of levelplan.main."""
+    assert levelplan.main([str(tmp_path)]) == 2
+    assert "no level files (*.txt) in the folder" in capsys.readouterr().err
+
+
+def test_a_missing_level_folder_is_named_as_missing(tmp_path):
+    import pytest
+
+    from platformer_ai import level as L
+    from platformer_ai.levelcheck import LevelError
+    with pytest.raises(LevelError) as e:
+        L.load_all([str(tmp_path / "gone") + "/"])
+    assert "no such level file or folder" in str(e.value)

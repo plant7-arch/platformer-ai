@@ -152,9 +152,20 @@ def coin_positions(plat_x) -> list[tuple[float, float]]:
     return out
 
 
-def world_labels() -> list[tuple[str, float, float]]:
-    """Signs of the level (level.LABELS) as (text, left, top) in world pixels."""
+def world_labels(builtin: bool | None = None) -> list[tuple[str, float, float]]:
+    """Signs of the level (level.LABELS) as (text, left, top) in world pixels.  They are placed for the built-in map,
+    so any other level gets none (builtin: default = whether the current level has that map)."""
+    if not (L.IS_BUILTIN if builtin is None else builtin):
+        return []
     return [(t, *to_px(x, y)) for t, x, y in L.LABELS]
+
+
+HUD_CHARS = 56                         # characters of the 8 px font that fit on the 480 px HUD line
+
+
+def fit_text(text: str, n: int) -> str:
+    """text cut to n characters ('...' at the end when it was longer)."""
+    return text if len(text) <= n else text[:max(0, n - 3)] + "..."
 
 
 SCORE_LABEL_WIDTH = 102                # the "You collected N coins." sign is centred above the goal flag, wrapped to this

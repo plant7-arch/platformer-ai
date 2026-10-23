@@ -5,6 +5,7 @@
 Without --levels it trains on the level of level.py (or PLATFORMER_LEVEL).
 Every run gets its own folder runs/<date>_<time>[_NAME] (--name NAME, or --out DIR); see runs.py.
 List them:  uv run python -m platformer_ai.runs
+Watch it learn: the viewer / play load each new save (--save-every N updates, default 25) between episodes.
 Continue a run that stopped (Ctrl-C, crash, or to train longer):
     uv run python -m platformer_ai.train --resume [RUN] [--total-steps N]
 Start a NEW run from the weights of another policy (any run, also runs/pretrained/; any levels and settings):
@@ -140,7 +141,9 @@ def eval_envs(n_levels: int, per_level: int) -> int:
 
 # with --resume the settings come from the run's run.json; only these options may be given as well
 RESUME_OPTIONS = {"resume", "total_steps", "eval_every", "eval_per_level", "test_eval_per_level", "verbosity",
-                  "log_every"}
+                  "log_every", "save_every"}
+RESUME_HELP = ("--total-steps, --eval-every, --eval-per-level, --test-eval-per-level, -v, --log-every and --save-every")
+SAVE_EVERY = 25           # updates between saves (policy + checkpoint), --save-every
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -175,11 +178,15 @@ def build_parser() -> argparse.ArgumentParser:
                     help="evaluation episodes per --test-levels level (default: as --eval-per-level). The held-out "
                          "set is usually small, so e.g. 50 gives firm per-level numbers at little cost")
     ap.add_argument("-v", "--verbosity", type=int, default=1, choices=range(4), metavar="0-3",
-                    help="how much to print: 0 = only the final evaluation; 1 = a progress line every ~1/40 of the run "
+                    help="how much to print: 0 = only the final evaluation (none with --eval-every 0); 1 = a progress line every ~1/40 of the run "
                          "and one line per evaluation (default); 2 = every update and every evaluation in full; "
                          "3 = like 2, with every level named in the evaluations")
     ap.add_argument("--log-every", type=int, metavar="N",
                     help="print a progress line every N updates (default: see --verbosity)")
+    ap.add_argument("--save-every", type=int, default=SAVE_EVERY, metavar="N",
+                    help="save the policy and the checkpoint every N updates (default %(default)s; and always at the "
+                         "end).  The viewer and play reload a newer policy between episodes, so a small N (e.g. 5) "
+                         "lets you watch the agent learn")
     ap.add_argument("--levels", nargs="+", metavar="PATH",
                     help="level files or folders (all *.txt inside) to train on together "
                          "(default: the level of level.py / PLATFORMER_LEVEL)")
@@ -190,8 +197,7 @@ def build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--out", help="run folder (default: a new runs/<date>_<time>[_NAME])")
     ap.add_argument("--resume", metavar="RUN", nargs="?", const="latest",
                     help="continue a run where it stopped: 'latest' (also: just --resume), a run name or folder. "
-                         "Settings and levels come from its run.json; only --total-steps, --eval-every, "
-                         "--eval-per-level, --test-eval-per-level, -v and --log-every can be given with it")
+                         f"Settings and levels come from its run.json; only {RESUME_HELP} can be given with it")
     ap.add_argument("--init-from", metavar="RUN",
                     help="start the network from this policy ('pretrained', a run name or folder, or a .msgpack "
                          "file) instead of random weights; a new run with fresh optimiser and learning-rate schedule")
@@ -216,6 +222,8 @@ def main(argv=None) -> None:
     args = ap.parse_args(argv)
     if args.resume and args.init_from:
         raise SystemExit("--resume continues a run, --init-from starts a new one: use one of them")
+    if args.save_every < 1:
+        raise SystemExit(f"--save-every must be at least 1 (got {args.save_every})")
     start_params = None
     if args.init_from:
         start_params = runs.resolve_params(args.init_from)
@@ -225,10 +233,10 @@ def main(argv=None) -> None:
     resumed = None
     if args.resume:
         out, info, cfg, resumed = resume_point(args, given_options(ap, argv))
-        level_args, test_args = info["level_args"], info["test_level_args"]
-        if info.get("platformer_level") != os.environ.get("PLATFORMER_LEVEL") and not level_args:
+        level_args, test_args = runs.stored_paths(info, "level_args"), runs.stored_paths(info, "test_level_args")
+        if not level_args and not same_platformer_level(info):
             raise SystemExit(f"this run trained on PLATFORMER_LEVEL={info.get('platformer_level')}; "
-                             f"set it the same way to resume")
+                             f"set it to the same file to resume")
     else:
         cfg = replace(Config(), total_timesteps=args.total_steps or Config.total_timesteps, num_envs=args.num_envs,
                       num_steps=args.num_steps, lr=args.lr, seed=args.seed, gamma=args.gamma,
@@ -250,9 +258,12 @@ def main(argv=None) -> None:
     if not resumed:
         out = Path(args.out) if args.out else runs.new_run_dir(args.name)
         out.mkdir(parents=True, exist_ok=True)
+        project = (lambda ps: [runs.to_project(x) for x in ps] if ps else ps)       # noqa: E731
+        env_level = os.environ.get("PLATFORMER_LEVEL")
         info = dict(created=datetime.datetime.now().isoformat(timespec="seconds"), command=command,
-                    levels=names, test_levels=tests[0] if tests else [], level_args=level_args,
-                    test_level_args=test_args, platformer_level=os.environ.get("PLATFORMER_LEVEL"),
+                    levels=names, test_levels=tests[0] if tests else [], paths="project",
+                    level_args=project(level_args), test_level_args=project(test_args),
+                    platformer_level=runs.to_project(env_level) if env_level else None,
                     config=dataclasses.asdict(cfg), updates=0, steps=0, last_eval={}, finished=False,
                     init_from=str(start_params) if start_params else None)
         (out / "levels.txt").write_text("".join(f"train {n}\n" for n in names) +
@@ -308,17 +319,17 @@ def main(argv=None) -> None:
     eval_key = jax.random.PRNGKey(12345)       # same start conditions at every evaluation
 
     def save(i: int, finished: bool = False):
-        (out / runs.PARAMS).write_bytes(serialization.to_bytes(runner[0].params))
+        # every file is written beside and renamed over the old one: an interrupted save never leaves a broken file,
+        # and the viewer following this run never reads half a policy.  The policy goes last, so when the viewer sees
+        # a new one, run.json already says which update it is.
         parts = dict(train_state=runner[0], rng=runner[3])
         if use_curriculum:
             parts["curriculum"] = runner[4]
             write_curriculum_csv(out / "curriculum.csv", names, jax.device_get(runner[4]))
-        state = serialization.to_bytes(parts)
-        tmp = out / (runs.STATE + ".tmp")
-        tmp.write_bytes(state)
-        tmp.replace(out / runs.STATE)            # (an interrupted save never leaves a broken checkpoint)
+        runs.write_atomic(out / runs.STATE, serialization.to_bytes(parts))
         info.update(updates=i, steps=i * cfg.batch_size, finished=finished)
         runs.write_info(out, info)
+        runs.write_atomic(out / runs.PARAMS, serialization.to_bytes(runner[0].params))
 
     keys = ("n_all", "all_return", "all_goal", "n_spawn", "sp_return", "sp_coins", "sp_goal",
             "sp_maxx", "sp_len")
@@ -358,7 +369,7 @@ def main(argv=None) -> None:
                     print(eval_compact(i, results))
                 if use_curriculum and args.verbosity >= 1:
                     print("\n".join(curriculum_lines(m, names, detail=args.verbosity >= 2 or last)))
-            if i % 25 == 0:
+            if i % args.save_every == 0 and not last:
                 save(i)
     except KeyboardInterrupt:                          # Ctrl-C: keep everything up to the last finished update
         if done >= first:
@@ -370,6 +381,21 @@ def main(argv=None) -> None:
     print(f"done in {time.time() - t_start:.0f}s, saved {out / runs.PARAMS}")
 
 
+def same_platformer_level(info: dict) -> bool:
+    """Is PLATFORMER_LEVEL (now) the level file the run trained on?  Compared as files, so a resume from a subfolder
+    with a path relative to it counts.  Runs before 0.2.0 kept the value as typed."""
+    now = os.environ.get("PLATFORMER_LEVEL")
+    then = info.get("platformer_level")
+    if not now or not then:
+        return not now and not then
+    if info.get("paths") == "project":
+        then = runs.from_project(then)
+    try:
+        return os.path.samefile(now, then)
+    except OSError:
+        return now == then
+
+
 def resume_point(args, given: dict[str, str] | None = None):
     """--resume: -> (run folder, its run.json, Config, dict(update=last saved update, bytes=checkpoint)).
     given: the options typed on the command line ({dest: flag}); settings among them are refused, not ignored."""
@@ -379,8 +405,7 @@ def resume_point(args, given: dict[str, str] | None = None):
     settings = [flag for dest, flag in (given or {}).items() if dest not in RESUME_OPTIONS | {"init_from"}]
     if settings:
         raise SystemExit(f"--resume continues a run with the settings in its run.json: leave out {', '.join(settings)}.  "
-                         "Only --total-steps, --eval-every, --eval-per-level, --test-eval-per-level, -v and "
-                         "--log-every can be given with --resume (to change the settings, start a new run with "
+                         f"Only {RESUME_HELP} can be given with --resume (to change the settings, start a new run with "
                          "--init-from RUN)")
     run = runs.resolve_run(args.resume)
     if run is None:
@@ -392,7 +417,7 @@ def resume_point(args, given: dict[str, str] | None = None):
                          f"    uv run python -m platformer_ai.train --init-from {run.name} [--levels ...]")
     state = run / runs.STATE
     if not state.is_file():
-        raise SystemExit(f"{run} has no {runs.STATE} (saved every 25 updates): nothing to resume from.  To train on "
+        raise SystemExit(f"{run} has no {runs.STATE} (saved every --save-every updates): nothing to resume from.  To train on "
                          f"from its policy in a new run:  uv run python -m platformer_ai.train --init-from {run.name}")
     cfg = Config(**info["config"])
     if args.total_steps:

@@ -182,7 +182,7 @@ def test_train_refuses_unusable_settings_without_making_a_run_folder(tmp_path, m
         assert msg in str(e.value), (argv, str(e.value))
     with pytest.raises(SystemExit) as e:                  # the allowed options get as far as looking for the run
         train.main(["--resume", "x", "--total-steps", "5000", "-v", "2", "--log-every", "3", "--eval-every", "0",
-                    "--eval-per-level", "2", "--test-eval-per-level", "9"])
+                    "--eval-per-level", "2", "--test-eval-per-level", "9", "--save-every", "5"])
     assert "no run 'x'" in str(e.value)
     assert not (tmp_path / "runs").exists()
 
@@ -203,3 +203,96 @@ def test_runs_and_assets_are_the_ones_of_the_project_folder(tmp_path, monkeypatc
     assert runs.project_path("assets") == Path("assets")
     monkeypatch.chdir(other / "sub")
     assert runs.project_path("runs") == Path("runs")
+
+
+def fake_project(tmp_path):
+    repo = tmp_path / "repo"
+    (repo / "levels").mkdir(parents=True)
+    (repo / "pyproject.toml").write_text('[project]\nname = "platformer-ai"\n')
+    return repo
+
+
+def test_level_paths_are_kept_relative_to_the_project(tmp_path, monkeypatch):
+    """Bug (0.1.0): run.json kept --levels as typed, so --resume from another folder could not find them."""
+    repo = fake_project(tmp_path)
+    monkeypatch.chdir(repo / "levels")
+    assert runs.to_project("a.txt") == "levels/a.txt"                  # typed in a subfolder
+    assert runs.to_project("../levels/") == "levels"
+    outside = tmp_path / "elsewhere.txt"
+    assert runs.to_project(str(outside)) == str(outside.resolve())      # outside the project: absolute
+    assert runs.from_project("levels/a.txt") == "a.txt"                  # opened from levels/
+    monkeypatch.chdir(repo)
+    assert runs.from_project("levels/a.txt") == "levels/a.txt"
+    assert runs.from_project(str(outside)) == str(outside)
+    info = dict(paths="project", level_args=["levels"], test_level_args=None)
+    monkeypatch.chdir(repo / "levels")
+    assert runs.stored_paths(info, "level_args") == ["."]
+    assert runs.stored_paths(info, "test_level_args") is None
+
+
+def test_old_runs_without_project_paths_still_resume_from_a_subfolder(tmp_path, monkeypatch):
+    """Runs from before 0.2.0 kept the paths as typed in the project folder: tried as they are, then inside it."""
+    repo = fake_project(tmp_path)
+    (repo / "levels" / "a.txt").write_text("x")
+    old = dict(level_args=["levels/", "levels/a.txt", "/abs/x.txt", "missing.txt"])
+    monkeypatch.chdir(repo)
+    assert runs.stored_paths(old, "level_args") == ["levels/", "levels/a.txt", "/abs/x.txt", "missing.txt"]
+    monkeypatch.chdir(repo / "levels")
+    assert runs.stored_paths(old, "level_args") == [".", "a.txt", "/abs/x.txt", "missing.txt"]
+
+
+def test_same_platformer_level_compares_files(tmp_path, monkeypatch):
+    from platformer_ai import train
+    repo = fake_project(tmp_path)
+    (repo / "levels" / "a.txt").write_text("x")
+    monkeypatch.chdir(repo)
+    info = dict(paths="project", platformer_level="levels/a.txt")
+    monkeypatch.setenv("PLATFORMER_LEVEL", "levels/a.txt")
+    assert train.same_platformer_level(info)
+    monkeypatch.chdir(repo / "levels")
+    monkeypatch.setenv("PLATFORMER_LEVEL", "a.txt")                     # the same file, typed from the subfolder
+    assert train.same_platformer_level(info)
+    monkeypatch.delenv("PLATFORMER_LEVEL")
+    assert not train.same_platformer_level(info)
+    assert train.same_platformer_level(dict(platformer_level=None))
+
+
+def test_resume_from_a_subfolder_with_relative_level_paths(tmp_path):
+    """Real (tiny) training in a project folder with --levels typed relative to it, then --resume from a subfolder,
+    with --save-every.  Needs jax (~1 min)."""
+    import json
+    import shutil
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    repo = fake_project(tmp_path)
+    shutil.copy(Path(__file__).resolve().parents[1] / "docs" / "levels" / "01_walk.txt", repo / "levels")
+    env = {k: v for k, v in os.environ.items() if k != "PLATFORMER_LEVEL"}
+
+    def train(cwd, *extra):
+        return subprocess.run([sys.executable, "-m", "platformer_ai.train", *extra], cwd=cwd, env=env,
+                              capture_output=True, text=True, timeout=600)
+
+    small = ["--num-envs", "16", "--num-steps", "8", "--eval-every", "0", "--save-every", "2"]
+    r = train(repo, "--total-steps", "512", "--levels", "levels/", "--name", "sub", *small)
+    assert r.returncode == 0, r.stdout + r.stderr
+    run = next((repo / "runs").iterdir())
+    info = json.loads((run / runs.INFO).read_text())
+    assert info["paths"] == "project" and info["level_args"] == ["levels"] and info["updates"] == 4
+    assert not list(run.glob("*.tmp"))
+    r = train(repo / "levels", "--resume", "--total-steps", "1024", "--save-every", "3")
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "resuming after update 4" in r.stdout
+    assert json.loads((run / runs.INFO).read_text())["updates"] == 8
+
+
+def test_save_every_must_be_positive(tmp_path, monkeypatch):
+    import pytest
+
+    from platformer_ai import train
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(SystemExit) as e:
+        train.main(["--save-every", "0"])
+    assert "--save-every must be at least 1" in str(e.value)
+    assert not (tmp_path / "runs").exists()

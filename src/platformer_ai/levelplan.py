@@ -158,7 +158,11 @@ def main(argv=None) -> int:
     if not argv:
         print("usage: python -m platformer_ai.levelplan LEVEL_FILES_OR_FOLDERS...")
         return 2
-    files = levelcheck.level_files(argv)
+    try:
+        files = levelcheck.level_files(argv)
+    except levelcheck.LevelError as e:              # a folder without level files
+        print(f"levelplan: {e}", file=sys.stderr)
+        return 2
     texts, problems = [], []                        # every broken or unreadable file at once, without a traceback
     for f in files:
         try:

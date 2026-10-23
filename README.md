@@ -26,9 +26,10 @@ cd platformer-ai
 uv sync
 
 uv run python -m platformer_ai.viewer                 # watch the agent (the included one until you train your own; Tab: play yourself)
+                                                      # (it follows a run that is training: see "Watching a run learn")
 uv run python -m platformer_ai.train                  # train your own on the built-in level: 25M steps, into a new runs/<date>_<time>/
 uv run python -m platformer_ai.runs                   # list the runs; the latest one is what viewer / play / evaluate use
-uv run pytest                                         # tests (about 5 minutes on the GPU, longer on the CPU)
+uv run pytest                                         # tests (about 5 minutes on the GPU, longer on the CPU, e.g. 8 on 2 cores)
 uv run python check_gpu.py                            # optional: does JAX see the GPU? (prints the devices, runs a matmul)
 ```
 
@@ -63,6 +64,7 @@ src/platformer_ai/
   evaluate.py   fixed GPU evaluation (also during training); `python -m platformer_ai.evaluate` scores a policy on levels
   train.py      training loop, prints metrics + periodic evaluation, saves params
   play.py       watch a trained policy in the terminal (ASCII)
+  policywatch.py  viewer / play follow a run: load a newer params.msgpack between episodes
   render.py     ASCII rendering
   terminal.py   alternate-screen drawing used by play.py
   viewer.py     pygame window: watch the agent or play yourself (reads the env, never trains)
@@ -89,7 +91,9 @@ default):
   timed route by heart and never look at the platform or the enemy; with random phases it has to react.
 * **Random starts** (`--no-random-starts` turns them off). With probability `1 - spawn-prob` (default
   0.5) an episode begins at one of the level's `S` points or riding a moving platform, so the hard parts are
-  practised directly. `play`, `viewer`, `evaluate` and the `EVAL` lines always start at the spawn.
+  practised directly. A start that would begin inside an enemy (a rider on a narrow platform cannot be pushed far
+  enough away) becomes a spawn start instead. `play`, `viewer`, `evaluate` and the `EVAL` lines always start at the
+  spawn.
 * **Progress bonus** (`--progress-coef 0.1`, `0` = off): +0.1 per tile of *new* furthest-right progress.
   Walking back and forth pays nothing, waiting costs nothing (the ferry needs waiting).
 * Longer horizon: `gamma` 0.995 and 128-step rollouts.
@@ -133,7 +137,10 @@ if the agent only works from the spawn but not from the other starts, lower it.
 
 `play` draws on the terminal's alternate screen (like `vim` or `htop`): your scrollback, including the
 end of the training log, stays intact, and the per-episode results are printed after the game view closes.
-Ctrl-C leaves cleanly. When stdout is not a terminal (piped), it only prints the results.
+The last frame of an episode shows how it ended (`goal reached!`, `game over`, `time is up`) for a second.
+Ctrl-C leaves cleanly. When stdout is not a terminal (piped), it only prints the results. `--episodes 0` plays until
+Ctrl-C. Like the viewer, `play` runs on the CPU (`JAX_PLATFORMS=cpu` unless you set it yourself), so it never takes GPU
+memory from a training run, and it follows the policy (below).
 
 ## Runs: keeping several trainings
 
@@ -142,15 +149,15 @@ Every training run gets its own folder, so nothing is overwritten:
 ```
 runs/2026-10-14_205407/                  uv run python -m platformer_ai.train
 runs/2026-10-14_211502_three_levels/     uv run python -m platformer_ai.train --levels docs/levels/ --name three_levels
-    params.msgpack    the policy (saved every 25 updates and at the end)
+    params.msgpack    the policy (saved every --save-every updates, default 25, and at the end)
     checkpoint.msgpack  network + optimiser state + random key, saved with it (what --resume needs)
     run.json          command, levels, settings, steps done, last evaluation, finished or not
     levels.txt        the level files it trained / was tested on
 ```
 
 `--out DIR` picks the folder yourself. **The latest run** is your run whose `params.msgpack` was saved most recently
-(a run that is still training counts, so you can watch it learn); `viewer`, `play` and `evaluate` use it unless you pass
-`--params` (a run name, a run folder or a `.msgpack` file). `runs/pretrained/` (the policy that comes with the
+(a run that is still training counts, so you can watch it learn, see below); `viewer`, `play` and `evaluate` use it
+unless you pass `--params` (a run name, a run folder or a `.msgpack` file). `runs/pretrained/` (the policy that comes with the
 repository) is only used when you have no runs of your own, or with `--params pretrained`. See them all:
 
 ```bash
@@ -160,8 +167,22 @@ uv run python -m platformer_ai.runs
 * 2026-10-14_211502_three_levels   2026-10-14 21:16   24,903,680       3   0.96    7.22  done
 ```
 
+**Watching a run learn.** `viewer` and `play` follow the policy: at the start of every episode they look whether
+there is a newer `params.msgpack` (the run that is training saved again, or a newer run became the latest) and load it.
+The viewer's HUD names it (`2026-10-23_131500  update 75/190  eval goal 0.62`, from the run's `run.json`), `L` loads
+the newest one at once, and `--no-follow` keeps the policy it started with. Opened before a run has saved anything,
+the viewer starts in keyboard mode and the agent takes over when the first policy appears. Saves are written whole
+(beside the old file, then renamed over it), so the viewer never reads half a policy. A 25M-step run is only about 190
+updates; save more often to see more steps of the learning:
+
+```bash
+uv run python -m platformer_ai.train --save-every 5          # terminal 1
+uv run python -m platformer_ai.viewer                         # terminal 2: watch the knight get better, episode by episode
+uv run python -m platformer_ai.play --episodes 0              # or in the terminal
+```
+
 **Resuming.** A run that stopped (Ctrl-C saves the last finished update and prints the command; a crash loses at
-most the updates since the last save, every 25) goes on where it was:
+most the updates since the last save, every `--save-every`, default 25) goes on where it was:
 
 ```bash
 uv run python -m platformer_ai.train --resume                         # the latest run
@@ -169,9 +190,11 @@ uv run python -m platformer_ai.train --resume 2026-10-14_205407       # a given 
 uv run python -m platformer_ai.train --resume --total-steps 50000000  # a finished run: train it longer
 ```
 
-The settings and levels come from the run's `run.json`; only what changes the length, the evaluation or the printing
-can be given (`--total-steps`, `--eval-every`, `--eval-per-level`, `--test-eval-per-level`, `-v`, `--log-every`); any
-other option is refused with a message, not ignored (to change settings, start a new run with `--init-from`). The
+The settings and levels come from the run's `run.json`; only what changes the length, the evaluation, the printing or
+the saving can be given (`--total-steps`, `--eval-every`, `--eval-per-level`, `--test-eval-per-level`, `-v`,
+`--log-every`, `--save-every`); any other option is refused with a message, not ignored (to change settings, start a new
+run with `--init-from`). `run.json` keeps the level paths relative to the project folder, so `--resume` works from any
+folder inside it (`PLATFORMER_LEVEL` must name the same file, from wherever you are). The
 network, the Adam state, the learning-rate schedule and the random stream continue exactly; the environments start
 fresh episodes. With a bigger `--total-steps` the learning-rate schedule is stretched to the new end, so the rate
 picks up again from `lr x (1 - done / new total)` and decays to 0.
@@ -220,12 +243,14 @@ knight / slime / coin / platform animations, coin counter. It uses the repositor
 | arrows / `A` `D`, `Space` / `Up` / `W` | move, jump |
 | `P`, `.` | pause, advance one step while paused |
 | `R` | restart the episode |
+| `L` | load the newest policy now (otherwise it happens at the next episode) |
 | `Esc` / `Q` | quit |
 
 Options: `--level FILE`, `--human` (start with the keyboard), `--sample`, `--random-phases` (random platform / enemy
 start and a jittered spawn at every restart, like the evaluation; without it every greedy episode is the same),
-`--scale N` (initial window size), `--theme grass|sand|ice`, `--no-decor`, `--assets DIR`, `--seed`. Without a params
-file it starts in keyboard mode.
+`--scale N` (initial window size), `--theme grass|sand|ice`, `--no-decor`, `--assets DIR`, `--seed`, `--no-follow`.
+Without a params file it starts in keyboard mode. The HUD shows the coins, who plays, the return and which policy
+(run, update, last evaluation).
 
 The viewer runs one env on the **CPU** (`JAX_PLATFORMS=cpu` is set unless you set it yourself), so it never
 touches the GPU, even while a training run is going. The art is only pictures: the physics are `env.py`, and
@@ -234,7 +259,9 @@ the sprites are placed from the env state (feet position, one tile = 16 px).
 **The picture follows the level.** The terrain is generated from the level's ASCII (`terrain.py`): a solid
 cell with air above it gets a grass top tile, any other solid cell a dirt tile (a position hash varies them, the same
 every run), small bushes and mushrooms are sprinkled on free ground, the sky/water backdrop is generated for any
-width, and every `G` gets a flag. So editing `LEVEL` is enough; the signs (`LABELS` in `level.py`) are optional.
+width, and every `G` gets a flag. So editing `LEVEL` is enough. The signs (`LABELS` in `level.py`: "Falling hurts...",
+"Great Job!") are placed for the built-in map, so they are only drawn on it (also on a copy such as `docs/builtin.txt`);
+every level gets the coin count above its flag.
 
 ## The game (ported from the original Godot level)
 
@@ -596,6 +623,10 @@ with the `evaluate` output for the levels in the table and the commands you trai
   function.
 * **More segment kinds**: a new `seg_*` method in `levelgen.Builder`, its name in `levelsettings.KINDS` and a weight
   per tier in `levelsettings.TIER_DEFAULTS`; `levelplan` checks that the levels stay beatable.
+
+## Changes
+
+See [CHANGELOG.md](CHANGELOG.md). The version is in `pyproject.toml` (and in the header of `uv run pytest`).
 
 ## Credits and license
 
